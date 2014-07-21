@@ -23,6 +23,10 @@ class RPG(object):
         def guess_group(self):
             pass
 
+        def guess_chagelog_data(self):
+            # returns list of tuples (author, email)
+            pass
+
         def guess_build_dependency(self):
             pass
 
