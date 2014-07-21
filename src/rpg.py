@@ -1,19 +1,31 @@
 class Rpg(object):
     """Main class that is controlled by RPM GUI"""
 
-    # TODO paths will also contain hash of tarball or filename
-    self.base_path = "/tmp/rpg-<hash>/%s" 
-    self.source_extraction_path = self.base_path % "source"
-    self.project_build_path = self.base_path % "projectbuild"
-    self.rpm_stuff_path = self.base_path % "rpmstuff"
-
-    def __init__(self, arg):
-        self.project_builder = ProjectBuilder()
-        self.package_builder = PackageBuilder()
-        self.plugin_engine = PluginEngine()
-        self.source_loader = SourceLoader(source_extraction_path)
-        self.copr_uploader = CoprUploader()
+    def __init__(self):
+        self._project_builder = ProjectBuilder()
+        self._package_builder = PackageBuilder()
+        self._plugin_engine = PluginEngine()
+        self._source_loader = SourceLoader(source_extraction_path)
+        self._copr_uploader = CoprUploader()
         self.spec = Spec()
+        # TODO run "dnf makecache" in the background
+
+    @property
+    def source_extraction_path():
+        return self.base_path % "source"
+
+    @property
+    def rpm_stuff_path():
+        # directory with tarball and spec file
+        return self.base_path % "rpmstuff"
+
+    @property
+    def project_build_path():
+        return self.base_path % "projectbuild"
+
+    @property
+    def base_path():
+        return "/tmp/rpg-" + self._hash + "/%s"
 
     @property
     def project_name():
@@ -28,26 +40,35 @@ class Rpg(object):
         return rpm_stuff_path + '/' + self.project_name + ".tar.gz"
 
     def process_archive_or_dir(path):
-        """executed after dir/tarball/SRPM selection"""
-        self.source_loader.load_sources(path)
+        """executed in background after dir/tarball/SRPM selection"""
+        self._hash = "<hash>"  # TODO hash of tarball or filename
+        self._source_loader.load_sources(path, source_extraction_path)
 
-    def run_sources_analysis():
-        """executed in background before second screen (build commands)"""
-        self.plugin_engine.execute_phase(BEFORE_PROJECT_BUILD)
+    def run_raw_sources_analysis():
+        """executed in background after dir/tarball/SRPM selection"""
+        self._plugin_engine.execute_phase(BEFORE_PATCHES_APLIED,
+                                          self.source_extraction_path)
+
+    def run_pathed_sources_analysis():
+        """executed in background after patch selection and reordering"""
+        self._plugin_engine.execute_phase(AFTER_PATCHES_APLIED,
+                                          self.source_extraction_path)
 
     def build_project():
-        """executed in background after patch selection and reordering"""
-        self.plugin_engine.execute_phase(AFTER_PROJECT_BUILD)
+        """executed in background after filled requires screen"""
+        self._project_builder.build(self.source_extraction_path,
+                                    self.project_build_path)
 
     def run_installed_files_analysis():
         """executed in background after successful project build"""
-        self.plugin_engine.execute_phase(AFTER_PROJECT_BUILD)
+        self._plugin_engine.execute_phase(AFTER_PROJECT_BUILD,
+                                          self.project_build_path)
 
     def build_packages(*distros):
         """builds packages for desired distributions"""
         for distro in distros:
-            self.package_builder.build(self.spec_path, self.tarball_path,
-                                       self.distro)
+            self._package_builder.build(self.spec_path, self.tarball_path,
+                                        self.distro)
 
 
     class Predictor:
