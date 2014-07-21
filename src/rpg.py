@@ -14,17 +14,17 @@ class RPG(object):
            every guess_* method takes prefix of result string
            and returns list of strings matched ordered by their rank"""
 
-        def guess_name(self, prefix):
+        def guess_name(self):
             pass
             
-        def guess_provide(self, prefix):
+        def guess_provide(self):
             pass
             
-        def guess_group(self, prefix):
+        def guess_group(self):
             pass
 
-        def guess_dependency(self, prefix):
+        def guess_dependency(self):
             pass
 
-        def guess_license(self, prefix):
+        def guess_license(self):
             pass
