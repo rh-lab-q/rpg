@@ -6,6 +6,7 @@ class Spec(Subpackage):
         self.vendor = None
         self.packager = None
         self.subpackages = None  # list
+        self.changelogs = None
 
     def write(target_file):
         pass
@@ -13,19 +14,18 @@ class Spec(Subpackage):
     def load(source_file):
         pass
 
+    class Changelog:
+        def __init__(self, date, author, email, message):
+            self.date = date
+            self.author = author
+            self.email = email
+            self.message = message
+
 class Subpackage:
     def __init__(self):
-        self.files = None  #set (source_file, target_file, is_)
+        self.files = None  #set of tuple (source_file, target_file, tag, attr)
+                           # tag could be config, doc, ghost, dir
         self.tags = None # dict "key" -> list[vals]
                          # hold name, version, release, summary, description,
                          # group
         self.scripts = None # dict of ["prein, ..."] -> string
-
-    def add_tag(self, key, *vals):
-        pass
-
-    def mark_doc(self, *file):
-        pass
-
-    def mark_docdir(self, dir):
-        pass

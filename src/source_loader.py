@@ -5,6 +5,6 @@ class SourceLoader:
         self.source_dir = tmp_dir
 
     def load_sources(self, file_or_dir):
-        """extracts archive to source_dir if argument is file,
-           changes source_dir to file_or_dir otherwise"""
+        """extracts archive to source_dir and adds eventually root directory
+           if argument is file, changes source_dir to file_or_dir otherwise"""
         pass

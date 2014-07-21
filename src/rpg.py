@@ -23,6 +23,9 @@ class RPG(object):
         def guess_group(self):
             pass
 
+        def guess_build_dependency(self):
+            pass
+
         def guess_dependency(self):
             pass
 
