@@ -7,7 +7,7 @@ class PluginEngine:
        as params.
        There are two main phases (BEFORE_PROJECT_BUILD
        and AFTER_PROJECT_BUILD). These phases will decorate plugin methods,
-       e.g. @before_project_build. Other decorator could be
+       e.g. @before_project_build. Other filter decorators could be
        @each_file('regex'), @root_dir, @each_dir and
        @file('relative/path/from/project/root/dir') that will proceed only
        relevant files"""
