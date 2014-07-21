@@ -7,19 +7,19 @@ class Spec(Subpackage):
         self.packager = None
         self.subpackages = None  # list
 
+    def write(target_file):
+        pass
+
+    def load(source_file):
+        pass
 
 class Subpackage:
     def __init__(self):
-        self.name = None
-        self.version = None
-        self.release = None
-        self.summary = None
-        self.description = None
-        self.group = None
-        self.files = None  #list
-
-    def add_files(self, *files):
-        pass
+        self.files = None  #set (source_file, target_file, is_)
+        self.tags = None # dict "key" -> list[vals]
+                         # hold name, version, release, summary, description,
+                         # group
+        self.scripts = None # dict of ["prein, ..."] -> string
 
     def add_tag(self, key, *vals):
         pass
