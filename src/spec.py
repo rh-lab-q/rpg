@@ -5,8 +5,9 @@ class Spec(Subpackage):
         self.url = None
         self.vendor = None
         self.packager = None
-        self.subpackages = None  # list
-        self.changelogs = None
+        self.subpackages = None  # list[Subpackage]
+        self.changelogs = None  # list[Changelog]
+        self.patches = None  # list[str:paths]
 
     def write(target_file):
         pass

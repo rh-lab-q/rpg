@@ -4,3 +4,6 @@ class ProjectBuilder:
            directory, build_params is list of command strings.
            returns list of files that should be installed or error string"""
         pass
+
+    def apply_patches(ordered_patches):
+        pass

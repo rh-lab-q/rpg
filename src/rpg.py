@@ -49,8 +49,12 @@ class Rpg(object):
         self._plugin_engine.execute_phase(BEFORE_PATCHES_APLIED,
                                           self.source_extraction_path)
 
-    def run_pathed_sources_analysis():
+    def apply_patches(ordered_patches):
         """executed in background after patch selection and reordering"""
+        self._project_builder.apply_patches(ordered_patches)
+
+    def run_pathed_sources_analysis():
+        """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(AFTER_PATCHES_APLIED,
                                           self.source_extraction_path)
 
