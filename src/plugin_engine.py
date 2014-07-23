@@ -15,3 +15,7 @@ class PluginEngine:
     def execute_phase(self, phase, project_root_dir):
         """trigger all plugin methods that are subscribed to the phase"""
         pass
+
+    def load_plugins(dir):
+        """finds all plugins in dir and it's subdirectories"""
+        pass
