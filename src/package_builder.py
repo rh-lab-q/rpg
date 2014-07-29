@@ -1,5 +1,6 @@
 from getpass import getuser
 from subprocess import call, check_output, PIPE, Popen, STDOUT
+from utils import  move_file
 
 class PackageBuilder:
 
@@ -7,9 +8,6 @@ class PackageBuilder:
         words = args.split()
         word_count = len(words)
         return words[word_count - 1]
-
-    def _move_file(self, location, target):
-        call(["mv", location, target])
 
     def _parse_error(self, log_path):
         _ret = []
@@ -21,14 +19,14 @@ class PackageBuilder:
             if write:
                 _ret.append(str(line).replace('\n', ''))
         return _ret
-        
+
     def build(self, spec_file, tarball, distro):
         """builds RPM package in mock from given spec_file and tarball,
            returns None or string in case of error occurrence"""
         call(["rpmdev-setuptree", ""])
         user = getuser()
-        self.__moveFile(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
-        self.__moveFile(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
+        self.move_file(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
+        self.move_file(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
         spec_name = self.__getLastWord(spec_file)
         result = check_output(["rpmbuild", "-bs", "/home/"+user+"/rpmbuild/SPECS/" + spec_name])
         srpm_path = self.__getLastWord(result) 
