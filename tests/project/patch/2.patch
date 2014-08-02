@@ -1,0 +1,23 @@
+From e4ccf8ed310be1c21210b1b68b90884203089d7b Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Sat, 2 Aug 2014 22:19:54 +0200
+Subject: [PATCH] erase
+
+---
+ tests/project/sourcecode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/project/sourcecode.c b/tests/project/sourcecode.c
+index 5ff1393..5c9a13a 100644
+--- a/tests/project/sourcecode.c
++++ b/tests/project/sourcecode.c
+@@ -1,5 +1,5 @@
+ #include <sqlite3.h>
+ 
+ int main(int argc, char* argv[]) {
+-    return 0;
++    return 1;
+ }
+-- 
+1.8.3.1
+
