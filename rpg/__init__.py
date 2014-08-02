@@ -1,5 +1,5 @@
-class Rpg(object):
-    """Main class that is controlled by RPM GUI"""
+class Base(object):
+    """Base class that is controlled by RPM GUI"""
 
     def __init__(self):
         self._project_builder = ProjectBuilder()
@@ -101,3 +101,8 @@ class Rpg(object):
 
         def guess_license(self):
             pass
+
+
+class Plugin:
+    """class from which are plugins derived"""
+    pass

@@ -12,6 +12,9 @@ class PluginEngine:
        @file('relative/path/from/project/root/dir') that will proceed only
        relevant files"""
 
+    def __init__(self, spec):
+        self.spec = spec
+
     def execute_phase(self, phase, project_root_dir):
         """trigger all plugin methods that are subscribed to the phase"""
         pass

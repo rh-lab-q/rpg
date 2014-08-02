@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
-from src.gui.wizard import Wizard
+from rpg.gui.wizard import Wizard
 
 def main():
     import sys

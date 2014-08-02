@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox, QGroupBox,
     QComboBox, QPushButton, QGridLayout, QPlainTextEdit, QListWidget, QHBoxLayout)
-from src.gui.changelog_dialog import Ui_ChangeLog  
-from src.rpg import Rpg
+from rpg.gui.changelog_dialog import Ui_ChangeLog  
+from rpg import Base
 
 class Wizard(QtWidgets.QWizard):
     ''' Main class that holds other pages, number of pages are in NUM_PAGES 
@@ -164,10 +164,10 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        Rpg.license = self.licenseEdit.text()
-        Rpg.url = self.URLEdit.text()
-        Rpg.vendor = self.vendorEdit.text()
-        Rpg.packager = self.packagerEdit.text()
+        Base.license = self.licenseEdit.text()
+        Base.url = self.URLEdit.text()
+        Base.vendor = self.vendorEdit.text()
+        Base.packager = self.packagerEdit.text()
 
         return True
 
