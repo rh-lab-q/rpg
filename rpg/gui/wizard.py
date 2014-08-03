@@ -1,7 +1,8 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox, QGroupBox,
-    QComboBox, QPushButton, QGridLayout, QPlainTextEdit, QListWidget, QHBoxLayout)
-from rpg.gui.changelog_dialog import Ui_ChangeLog  
+    QComboBox, QPushButton, QGridLayout, QPlainTextEdit, QListWidget, QHBoxLayout,
+    QDialog, QFileDialog)
+from rpg.gui.dialogs import DialogChangelog, DialogSRPM, DialogError
 from rpg import Base
 
 class Wizard(QtWidgets.QWizard):
@@ -21,27 +22,26 @@ class Wizard(QtWidgets.QWizard):
         self.setWizardStyle(self.ClassicStyle)
         
         # Setting pages to wizard
-        self.setPage(self.PageGreetings, GreetingsPage(self))
+        self.setPage(self.PageGreetings, GreetingsPage())
         self.setPage(self.PageImport, ImportPage())
         self.setPage(self.PageScripts, ScriptsPage())
         self.setPage(self.PagePatches, PatchesPage())
         self.setPage(self.PageRequires, RequiresPage())
         self.setPage(self.PageScriplets, ScripletsPage())
         self.setPage(self.PageSubpackages, SubpackagesPage())
-        self.setPage(self.PageDocsChangelog, DocsChangelogPage())
+        self.setPage(self.PageDocsChangelog, DocsChangelogPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
         self.setPage(self.PageCopr, CoprPage())
         self.setPage(self.PageFinal, FinalPage())
         self.setStartId(self.PageGreetings)
 
 class GreetingsPage(QtWidgets.QWizardPage):
-    def __init__(self, Wizard, parent=None):
+    def __init__(self, parent=None):
         super(GreetingsPage, self).__init__(parent)
-        self.Wizard = Wizard
         self.setTitle(self.tr("RPG"))
         self.setSubTitle(self.tr("RPM package generator"))
 
-        self.greetingsLabel = QLabel("<html><head/><body><p align=\"center\">" + 
+        greetingsLabel = QLabel("<html><head/><body><p align=\"center\">" + 
                                      "<span style=\" font-size:36pt;\">PRG - RPM Package Generator</span></p></body></html>"+
                                      "<p align=\"center\">RPG is tool, that guides people through the creation of a RPM package.</p>"+ 
                                      "<p align=\"center\">RPG makes packaging much easier due to the automatic analysis of packaged files.</p>"+ 
@@ -49,7 +49,7 @@ class GreetingsPage(QtWidgets.QWizardPage):
                                      "<p align=\"center\">or the advanced users can use our tool for a quick creation of a package.</p>")
         grid = QVBoxLayout()
         grid.addSpacing(150)
-        grid.addWidget(self.greetingsLabel)
+        grid.addWidget(greetingsLabel)
         self.setLayout(grid)
 
     def nextId(self):
@@ -63,90 +63,90 @@ class ImportPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Fill in fields and import your SRPM or source folder"))
 
         ''' Creating widgets and setting them to layout'''
-        self.nameLabel = QLabel("Name: ")
+        nameLabel = QLabel("Name: ")
         self.nameEdit = QLineEdit()
         self.nameEdit.setMinimumHeight(30)
-        self.nameLabel.setBuddy(self.nameEdit)
+        nameLabel.setBuddy(self.nameEdit)
 
-        self.versionLabel = QLabel("Version: ")
+        versionLabel = QLabel("Version: ")
         self.versionEdit = QLineEdit()
         self.versionEdit.setMinimumHeight(30)
-        self.versionLabel.setBuddy(self.versionEdit)
+        versionLabel.setBuddy(self.versionEdit)
 
-        self.releaseLabel = QLabel("Release: ")
+        releaseLabel = QLabel("Release: ")
         self.releaseEdit = QLineEdit()
         self.releaseEdit.setMinimumHeight(30)
-        self.releaseLabel.setBuddy(self.releaseEdit)
+        releaseLabel.setBuddy(self.releaseEdit)
 
-        self.licenseLabel = QLabel("License: ")
+        licenseLabel = QLabel("License: ")
         self.licenseEdit = QLineEdit()
         self.licenseEdit.setMinimumHeight(30)
-        self.licenseLabel.setBuddy(self.licenseEdit)
+        licenseLabel.setBuddy(self.licenseEdit)
 
-        self.URLLabel = QLabel("URL: ")
+        URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
         self.URLEdit.setMinimumHeight(30)
-        self.URLLabel.setBuddy(self.URLEdit)
+        URLLabel.setBuddy(self.URLEdit)
 
-        self.groupLabel = QLabel("Group: ")
+        groupLabel = QLabel("Group: ")
         self.groupEdit = QComboBox()
         self.groupEdit.addItem("First")
         self.groupEdit.addItem("Second")
         self.groupEdit.addItem("Third")
         self.groupEdit.setMinimumHeight(30)
-        self.groupLabel.setBuddy(self.groupEdit)
+        groupLabel.setBuddy(self.groupEdit)
 
-        self.summaryLabel = QLabel("Summary: ")
+        summaryLabel = QLabel("Summary: ")
         self.summaryEdit = QLineEdit()
         self.summaryEdit.setMinimumHeight(30)
-        self.summaryLabel.setBuddy(self.summaryEdit)
+        summaryLabel.setBuddy(self.summaryEdit)
 
-        self.descriptionLabel = QLabel("Description: ")
+        descriptionLabel = QLabel("Description: ")
         self.descriptionEdit = QLineEdit()
         self.descriptionEdit.setMinimumHeight(30)
-        self.descriptionLabel.setBuddy(self.descriptionEdit)
+        descriptionLabel.setBuddy(self.descriptionEdit)
 
-        self.vendorLabel = QLabel("Vendor: ")
+        vendorLabel = QLabel("Vendor: ")
         self.vendorEdit = QLineEdit()
         self.vendorEdit.setMinimumHeight(30)
-        self.vendorLabel.setBuddy(self.vendorEdit)
+        vendorLabel.setBuddy(self.vendorEdit)
 
-        self.packagerLabel = QLabel("Packager: ")
+        packagerLabel = QLabel("Packager: ")
         self.packagerEdit = QLineEdit()
         self.packagerEdit.setMinimumHeight(30)
-        self.packagerLabel.setBuddy(self.packagerEdit)
+        packagerLabel.setBuddy(self.packagerEdit)
 
-        self.importLabel = QLabel("Path: ")
+        importLabel = QLabel("Path: ")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
-        self.importLabel.setBuddy(self.importEdit)
+        importLabel.setBuddy(self.importEdit)
         self.importButton = QPushButton("Import")
         self.importButton.setMinimumHeight(30)
         self.importButton.clicked.connect(self.openImportPageFileDialog)
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
-        grid.addWidget(self.nameLabel, 0, 0, 1, 1)
+        grid.addWidget(nameLabel, 0, 0, 1, 1)
         grid.addWidget(self.nameEdit, 0, 1, 1, 2)
-        grid.addWidget(self.versionLabel, 1, 0, 1, 1)
+        grid.addWidget(versionLabel, 1, 0, 1, 1)
         grid.addWidget(self.versionEdit, 1, 1, 1, 2)
-        grid.addWidget(self.releaseLabel, 2, 0, 1, 1)
+        grid.addWidget(releaseLabel, 2, 0, 1, 1)
         grid.addWidget(self.releaseEdit, 2, 1, 1, 2)
-        grid.addWidget(self.licenseLabel, 3, 0, 1, 1)
+        grid.addWidget(licenseLabel, 3, 0, 1, 1)
         grid.addWidget(self.licenseEdit, 3, 1, 1, 2)
-        grid.addWidget(self.URLLabel, 4, 0, 1, 1)
+        grid.addWidget(URLLabel, 4, 0, 1, 1)
         grid.addWidget(self.URLEdit, 4, 1, 1, 2)
-        grid.addWidget(self.groupLabel, 5, 0, 1, 1)
+        grid.addWidget(groupLabel, 5, 0, 1, 1)
         grid.addWidget(self.groupEdit, 5, 1, 1, 2)
-        grid.addWidget(self.summaryLabel, 6, 0, 1, 1)
+        grid.addWidget(summaryLabel, 6, 0, 1, 1)
         grid.addWidget(self.summaryEdit, 6, 1, 1, 2)
-        grid.addWidget(self.descriptionLabel, 7, 0, 1, 1)
+        grid.addWidget(descriptionLabel, 7, 0, 1, 1)
         grid.addWidget(self.descriptionEdit, 7, 1, 1, 2)
-        grid.addWidget(self.vendorLabel, 8, 0, 1, 1)
+        grid.addWidget(vendorLabel, 8, 0, 1, 1)
         grid.addWidget(self.vendorEdit, 8, 1, 1, 2)
-        grid.addWidget(self.packagerLabel, 9, 0, 1, 1)
+        grid.addWidget(packagerLabel, 9, 0, 1, 1)
         grid.addWidget(self.packagerEdit, 9, 1, 1, 2)
-        grid.addWidget(self.importLabel, 10, 0, 1, 1)
+        grid.addWidget(importLabel, 10, 0, 1, 1)
         grid.addWidget(self.importEdit, 10, 1, 1, 1)
         grid.addWidget(self.importButton, 10, 2, 1, 1)
         mainLayout.addSpacing(40)
@@ -164,10 +164,10 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        Base.license = self.licenseEdit.text()
-        Base.url = self.URLEdit.text()
-        Base.vendor = self.vendorEdit.text()
-        Base.packager = self.packagerEdit.text()
+        Rpg.license = self.licenseEdit.text()
+        Rpg.url = self.URLEdit.text()
+        Rpg.vendor = self.vendorEdit.text()
+        Rpg.packager = self.packagerEdit.text()
 
         return True
 
@@ -182,33 +182,33 @@ class ScriptsPage(QtWidgets.QWizardPage):
         super(ScriptsPage, self).__init__(parent)
  
         self.setTitle(self.tr("Scripts page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Write scripts"))
 
-        self.prepareLabel = QLabel("%prepare: ")
+        prepareLabel = QLabel("%prepare: ")
         self.prepareEdit = QPlainTextEdit()
 
-        self.configLabel = QLabel("%config: ")
+        configLabel = QLabel("%config: ")
         self.configEdit = QPlainTextEdit()
 
-        self.buildLabel = QLabel("%build: ")
+        buildLabel = QLabel("%build: ")
         self.buildEdit = QPlainTextEdit()
 
-        self.installLabel = QLabel("%install: ")
+        installLabel = QLabel("%install: ")
         self.installEdit = QPlainTextEdit()
 
-        self.checkLabel = QLabel("%check: ")
+        checkLabel = QLabel("%check: ")
         self.checkEdit = QPlainTextEdit()
 
         grid = QGridLayout()
-        grid.addWidget(self.prepareLabel, 0, 0)
+        grid.addWidget(prepareLabel, 0, 0)
         grid.addWidget(self.prepareEdit, 0, 1)
-        grid.addWidget(self.configLabel, 1, 0)
+        grid.addWidget(configLabel, 1, 0)
         grid.addWidget(self.configEdit, 1, 1)
-        grid.addWidget(self.buildLabel, 2, 0)
+        grid.addWidget(buildLabel, 2, 0)
         grid.addWidget(self.buildEdit, 2, 1)
-        grid.addWidget(self.installLabel, 3, 0)
+        grid.addWidget(installLabel, 3, 0)
         grid.addWidget(self.installEdit, 3, 1)
-        grid.addWidget(self.checkLabel, 4, 0)
+        grid.addWidget(checkLabel, 4, 0)
         grid.addWidget(self.checkEdit, 4, 1)
         self.setLayout(grid)
 
@@ -224,11 +224,11 @@ class PatchesPage(QtWidgets.QWizardPage):
         super(PatchesPage, self).__init__(parent)
  
         self.setTitle(self.tr("Patches page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Select patches"))
         
         self.addButton = QPushButton("+")
         self.removeButton = QPushButton("-")
-        self.patchesLabel = QLabel("Patches")
+        patchesLabel = QLabel("Patches")
         self.listPatches = QListWidget()
         self.addButton.setMaximumWidth(68)
         self.addButton.setMaximumHeight(60)
@@ -237,7 +237,7 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.removeButton.setMaximumHeight(60)
 
         grid = QGridLayout()
-        grid.addWidget(self.patchesLabel, 0, 0)
+        grid.addWidget(patchesLabel, 0, 0)
         grid.addWidget(self.addButton, 0, 1,)
         grid.addWidget(self.removeButton, 0, 2)
         grid.addWidget(self.listPatches, 1, 0, 1, 0)
@@ -256,25 +256,25 @@ class RequiresPage(QtWidgets.QWizardPage):
         super(RequiresPage, self).__init__(parent)
  
         self.setTitle(self.tr("Requires page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Write requires and provides"))
 
-        self.buildRequiresLabel = QLabel("BuildRequires: ")
+        buildRequiresLabel = QLabel("BuildRequires: ")
         self.buildRequiresEdit = QPlainTextEdit()
         self.buildRequiresEdit.setMaximumHeight(40)
 
-        self.requiresLabel = QLabel("Requires: ")
+        requiresLabel = QLabel("Requires: ")
         self.requiresEdit = QPlainTextEdit()
         self.requiresEdit.setMaximumHeight(40)
 
-        self.preovidesLabel = QLabel("Provides: ")
+        preovidesLabel = QLabel("Provides: ")
         self.previdesEdit = QPlainTextEdit()
 
         grid = QGridLayout()
-        grid.addWidget(self.buildRequiresLabel, 0, 0)
+        grid.addWidget(buildRequiresLabel, 0, 0)
         grid.addWidget(self.buildRequiresEdit, 1, 0)
-        grid.addWidget(self.requiresLabel, 2, 0)
+        grid.addWidget(requiresLabel, 2, 0)
         grid.addWidget(self.requiresEdit, 3, 0,)
-        grid.addWidget(self.preovidesLabel, 4, 0)
+        grid.addWidget(preovidesLabel, 4, 0)
         grid.addWidget(self.previdesEdit, 5, 0)
         self.setLayout(grid)
     
@@ -286,38 +286,38 @@ class ScripletsPage(QtWidgets.QWizardPage):
         super(ScripletsPage, self).__init__(parent)
  
         self.setTitle(self.tr("Scriplets page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Write scriplets"))
         
-        self.pretransLabel = QLabel("%pretrans: ")
+        pretransLabel = QLabel("%pretrans: ")
         self.pretransEdit = QPlainTextEdit()
         
-        self.preLabel = QLabel("%pre: ")
+        preLabel = QLabel("%pre: ")
         self.preEdit = QPlainTextEdit()
         
-        self.postLabel = QLabel("%post: ")
+        postLabel = QLabel("%post: ")
         self.postEdit = QPlainTextEdit()
         
-        self.postunLabel = QLabel("%postun: ")
+        postunLabel = QLabel("%postun: ")
         self.postunEdit = QPlainTextEdit()
         
-        self.preunLabel = QLabel("%preun: ")
+        preunLabel = QLabel("%preun: ")
         self.preunEdit = QPlainTextEdit()
         
-        self.posttransLabel = QLabel("%posttrans: ")
+        posttransLabel = QLabel("%posttrans: ")
         self.posttransEdit = QPlainTextEdit()
 
         grid = QGridLayout()
-        grid.addWidget(self.pretransLabel, 0, 0)
+        grid.addWidget(pretransLabel, 0, 0)
         grid.addWidget(self.pretransEdit, 0, 1)
-        grid.addWidget(self.preLabel, 1, 0)
+        grid.addWidget(preLabel, 1, 0)
         grid.addWidget(self.preEdit, 1, 1,)
-        grid.addWidget(self.postLabel, 2, 0)
+        grid.addWidget(postLabel, 2, 0)
         grid.addWidget(self.postEdit, 2, 1)
-        grid.addWidget(self.postunLabel, 3, 0)
+        grid.addWidget(postunLabel, 3, 0)
         grid.addWidget(self.postunEdit, 3, 1)
-        grid.addWidget(self.preunLabel, 4, 0)
+        grid.addWidget(preunLabel, 4, 0)
         grid.addWidget(self.preunEdit, 4, 1,)
-        grid.addWidget(self.posttransLabel, 5, 0)
+        grid.addWidget(posttransLabel, 5, 0)
         grid.addWidget(self.posttransEdit, 5, 1)
         self.setLayout(grid)
 
@@ -329,18 +329,23 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         super(SubpackagesPage, self).__init__(parent)
  
         self.setTitle(self.tr("Subpackages page"))
-        self.setSubTitle(self.tr("Please write something here"))
-        self.filesLabel = QLabel("Files")
-        self.subpackagesLabel = QLabel("Subpackages ")
+        self.setSubTitle(self.tr("Choose subpackages"))
+        
+        filesLabel = QLabel("Files")
+        subpackagesLabel = QLabel("Subpackages ")
+        
         self.addPackButton = QPushButton("+")
+        self.addPackButton.setMaximumWidth(68)
+        self.addPackButton.setMaximumHeight(60)
+        
         self.removePackButton = QPushButton("-")
         self.removePackButton.setMaximumWidth(68)
         self.removePackButton.setMaximumHeight(60)
-        self.addPackButton.setMaximumWidth(68)
-        self.addPackButton.setMaximumHeight(60)
+
         self.transferButton = QPushButton("->")
         self.transferButton.setMaximumWidth(120)
         self.transferButton.setMaximumHeight(20)
+        
         self.filesListWidget = QListWidget()
         self.subpackagesListWidget = QListWidget()
         
@@ -348,9 +353,9 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         upperLayout = QHBoxLayout()
         lowerLayout = QHBoxLayout()
         upperLayout.addSpacing(150)
-        upperLayout.addWidget(self.filesLabel)
+        upperLayout.addWidget(filesLabel)
         upperLayout.addSpacing(190)
-        upperLayout.addWidget(self.subpackagesLabel)
+        upperLayout.addWidget(subpackagesLabel)
         upperLayout.addWidget(self.addPackButton)
         upperLayout.addWidget(self.removePackButton)
         lowerLayout.addWidget(self.filesListWidget)
@@ -364,13 +369,14 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         return Wizard.PageDocsChangelog
 
 class DocsChangelogPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(DocsChangelogPage, self).__init__(parent)
- 
+        
+        self.Wizard = Wizard
         self.setTitle(self.tr("Document files page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Add documentation files"))
 
-        self.documentationFilesLabel = QLabel("Documentation files ")
+        documentationFilesLabel = QLabel("Documentation files ")
         self.addDocumentationButton = QPushButton("+")
         self.addDocumentationButton.clicked.connect(self.openAddDocumentationFileDialog)
         self.removeDocumentationButton = QPushButton("-")
@@ -384,7 +390,7 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
         lowerLayout = QHBoxLayout()
         upperLayout.addWidget(self.addDocumentationButton)
         upperLayout.addWidget(self.removeDocumentationButton)
-        upperLayout.addWidget(self.documentationFilesLabel)
+        upperLayout.addWidget(documentationFilesLabel)
         upperLayout.addSpacing(500)
         midleLayout.addWidget(self.documentationFilesList)
         lowerLayout.addWidget(self.openChangelogDialogButton)
@@ -395,10 +401,9 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def openChangeLogDialog(self):
-        changelog_window = QDialog()
-        changelog_ui = Ui_ChangeLog()
-        changelog_ui.setupUi(changelog_window)
-        changelog_window.exec_()
+        changelogWindow = QDialog()
+        changelog = DialogChangelog(changelogWindow, self)
+        changelog.exec_()
 
     def openAddDocumentationFileDialog(self):
         brows = QFileDialog()
@@ -414,7 +419,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.Wizard = Wizard # Main wizard of program
         self.nextPageIsFinal = True # BOOL to determine which page is next one
         self.setTitle(self.tr("Build page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("Options to build"))
 
         self.x86_CheckBox = QCheckBox("x86")
         self.x64_CheckBox = QCheckBox("x64")
@@ -435,7 +440,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.editSpecButton = QPushButton("Edit SPEC file")
         self.uploadToCOPR_Button.clicked.connect(self.switchToCOPR)
         self.uploadToCOPR_Button.clicked.connect(self.Wizard.next)
-        self.specWarningLabel = QLabel("* Edit SPEC file on your own risk")
+        specWarningLabel = QLabel("* Edit SPEC file on your own risk")
         self.buildLocationEdit = QLineEdit()
 
         mainLayout = QVBoxLayout()
@@ -479,7 +484,7 @@ class BuildPage(QtWidgets.QWizardPage):
         upperLayout.addWidget(releaseBox)
         upper2Layout.addWidget(archBox)
         midleLayout.addWidget(self.editSpecButton)
-        midleLayout.addWidget(self.specWarningLabel)
+        midleLayout.addWidget(specWarningLabel)
         midleLayout.addSpacing(330)
         midleLayout.addWidget(self.uploadToCOPR_Button)
         lowerLayout.addWidget(self.buildToButton)
@@ -495,7 +500,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def switchToCOPR(self):
-        # If user clicked uplodad to copr button, so next page is not final
+        ''' If user clicked uplodad to copr button, so next page is not final '''
 
         self.nextPageIsFinal = False
 
@@ -515,9 +520,9 @@ class CoprPage(QtWidgets.QWizardPage):
         super(CoprPage, self).__init__(parent)
  
         self.setTitle(self.tr("Copr page"))
-        self.setSubTitle(self.tr("Please write something here"))
+        self.setSubTitle(self.tr("COPR repository setting and uploading"))
 
-        self.COPRLabel = QLabel("<html><head/><body><p align=\"center\">You are going to upload your package to COPR."+
+        COPRLabel = QLabel("<html><head/><body><p align=\"center\">You are going to upload your package to COPR."+
                                 "</p><p align=\"center\">Copr is designed to be a lightweight buildsystem that allows "+
                                 "</p><p align=\"center\">contributors to create packages, put them in repositories, </p>"+
                                 "<p align=\"center\">and make it easy for users toinstall the packages </p><p align=\"center\">"+
@@ -529,44 +534,44 @@ class CoprPage(QtWidgets.QWizardPage):
         self.createCOPRButton = QPushButton("Create COPR repository")
         self.chooseCONFButton = QPushButton("Choose .conf file")
         self.chooseCONFButton.clicked.connect(self.openChooseCONFFileDialog)
-        self.releaserLabel = QLabel("Releaser: ")
+        releaserLabel = QLabel("Releaser: ")
         self.releaserEdit = QLineEdit()
-        self.projectNameLabel = QLabel("Project name: ")
+        projectNameLabel = QLabel("Project name: ")
         self.projectNameEdit = QLineEdit()
-        self.uploadCommandLabel = QLabel("Upload command: ")
+        uploadCommandLabel = QLabel("Upload command: ")
         self.uploadCommandEdit = QLineEdit()
-        self.remoteLocationLabel = QLabel("Remote location: ")
+        remoteLocationLabel = QLabel("Remote location: ")
         self.remoteLocationEdit = QLineEdit()
 
         self.releaserEdit.setMinimumHeight(30)
-        self.releaserLabel.setBuddy(self.releaserEdit)
+        releaserLabel.setBuddy(self.releaserEdit)
 
         self.projectNameEdit.setMinimumHeight(30)
-        self.projectNameLabel.setBuddy(self.projectNameEdit)
+        projectNameLabel.setBuddy(self.projectNameEdit)
 
         self.uploadCommandEdit.setMinimumHeight(30)
-        self.uploadCommandLabel.setBuddy(self.uploadCommandEdit)
+        uploadCommandLabel.setBuddy(self.uploadCommandEdit)
 
         self.remoteLocationEdit.setMinimumHeight(30)
-        self.remoteLocationLabel.setBuddy(self.remoteLocationEdit)
+        remoteLocationLabel.setBuddy(self.remoteLocationEdit)
 
         mainLayout = QVBoxLayout()
         upperLayout = QHBoxLayout()
         midleLayout = QHBoxLayout()
         lowerLayout = QGridLayout()
-        upperLayout.addWidget(self.COPRLabel)
+        upperLayout.addWidget(COPRLabel)
         midleLayout.addSpacing(170)
         midleLayout.addWidget(self.createCOPRButton)
         midleLayout.addSpacing(50)
         midleLayout.addWidget(self.chooseCONFButton)
         midleLayout.addSpacing(170)
-        lowerLayout.addWidget(self.releaserLabel, 0, 0)
+        lowerLayout.addWidget(releaserLabel, 0, 0)
         lowerLayout.addWidget(self.releaserEdit, 0, 1)
-        lowerLayout.addWidget(self.projectNameLabel)
+        lowerLayout.addWidget(projectNameLabel)
         lowerLayout.addWidget(self.projectNameEdit)
-        lowerLayout.addWidget(self.uploadCommandLabel)
+        lowerLayout.addWidget(uploadCommandLabel)
         lowerLayout.addWidget(self.uploadCommandEdit)
-        lowerLayout.addWidget(self.remoteLocationLabel)
+        lowerLayout.addWidget(remoteLocationLabel)
         lowerLayout.addWidget(self.remoteLocationEdit)
         mainLayout.addLayout(upperLayout)
         mainLayout.addSpacing(30)
@@ -585,20 +590,23 @@ class CoprPage(QtWidgets.QWizardPage):
 class FinalPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(FinalPage, self).__init__(parent)
- 
+        
+        ''' On this page will be "Finish button" instead of "Next" '''
+        FinalPage.setFinalPage(self, True)
+
         self.setTitle(self.tr("Final page"))
-        self.setSubTitle(self.tr("Please write something here"))
-        self.finalLabel = QLabel("<html><head/><body><p align=\"center\"><span style=\" font-size:24pt;\">" +
+        self.setSubTitle(self.tr("Your package was successfully created"))
+        finalLabel = QLabel("<html><head/><body><p align=\"center\"><span style=\" font-size:24pt;\">" +
                                  "Thank you for using RPG!</span></p><p align=\"center\">" +
                                  "<span style=\" font-size:24pt;\">Your package was built in:</span></p></body></html>")
         self.finalEdit = QLineEdit()
         grid = QGridLayout()
-        grid.addWidget(self.finalLabel, 0, 0)
+        grid.addWidget(finalLabel, 0, 0)
         grid.addWidget(self.finalEdit, 1, 0)
 
         mainLayout = QVBoxLayout()
         mainLayout.addSpacing(190)
-        mainLayout.addWidget(self.finalLabel)
+        mainLayout.addWidget(finalLabel)
         mainLayout.addSpacing(190)
         mainLayout.addWidget(self.finalEdit)
         mainLayout.addSpacing(190)
