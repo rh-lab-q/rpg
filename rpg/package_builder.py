@@ -1,6 +1,7 @@
 from getpass import getuser
 from subprocess import call, check_output, PIPE, Popen, STDOUT
-from utils import  move_file
+from utils import move_file
+
 
 class PackageBuilder:
 
@@ -25,18 +26,18 @@ class PackageBuilder:
            returns None or string in case of error occurrence"""
         call(["rpmdev-setuptree", ""])
         user = getuser()
-        self.move_file(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
-        self.move_file(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
-        spec_name = self._getLastWord(spec_file)
+        move_file(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
+        move_file(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
+        spec_name = self._get_last_word(spec_file)
         result = check_output(["rpmbuild", "-bs", "/home/"+user+"/rpmbuild/SPECS/" + spec_name])
-        srpm_path = self._getLastWord(result) 
-        p = Popen(["mock", "-r", distro, srpm_path], stdout = PIPE, stderr = STDOUT)
-        line=""
-        logs=""
+        srpm_path = self._get_last_word(result) 
+        p = Popen(["mock", "-r", distro, srpm_path], stdout=PIPE, stderr=STDOUT)
+        line = ""
+        logs = ""
         while p.poll() is None:
             line = str(p.stdout.readline())
             if "INFO: Results and/or logs in:" in line:
                 logs = line
-        result = str(getLastWord(logs).replace("\\n'", ""))
+        result = str(self._get_last_word(logs).replace("\\n'", ""))
         if not "Finish: run" in line:
             return self._parseError(result)
