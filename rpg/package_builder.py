@@ -27,9 +27,9 @@ class PackageBuilder:
         user = getuser()
         self.move_file(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
         self.move_file(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
-        spec_name = self.__getLastWord(spec_file)
+        spec_name = self._getLastWord(spec_file)
         result = check_output(["rpmbuild", "-bs", "/home/"+user+"/rpmbuild/SPECS/" + spec_name])
-        srpm_path = self.__getLastWord(result) 
+        srpm_path = self._getLastWord(result) 
         p = Popen(["mock", "-r", distro, srpm_path], stdout = PIPE, stderr = STDOUT)
         line=""
         logs=""
@@ -39,4 +39,4 @@ class PackageBuilder:
                 logs = line
         result = str(getLastWord(logs).replace("\\n'", ""))
         if not "Finish: run" in line:
-            return self.__parseError(result)
+            return self._parseError(result)
