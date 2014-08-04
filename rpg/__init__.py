@@ -1,14 +1,18 @@
+from rpg.plugin_engine import PluginEngine, phases
+
+
 class Base(object):
+
     """Base class that is controlled by RPM GUI"""
 
     def __init__(self):
         self._project_builder = ProjectBuilder()
-        self._package_builder = PackageBuilder()
-        self._plugin_engine = PluginEngine()
-        self._source_loader = SourceLoader(source_extraction_path)
-        self._copr_uploader = CoprUploader()
         self.spec = Spec()
-        # TODO run "dnf makecache" in the background
+        self.sack = None  # TODO dnf sack
+        self._package_builder = PackageBuilder()
+        self._plugin_engine = PluginEngine(self.spec, self.sack)
+        self._source_loader = SourceLoader(self.source_extraction_path)
+        self._copr_uploader = CoprUploader()
 
     @property
     def source_extraction_path(self):
@@ -46,7 +50,7 @@ class Base(object):
 
     def run_raw_sources_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
-        self._plugin_engine.execute_phase(BEFORE_PATCHES_APLIED,
+        self._plugin_engine.execute_phase(phases[0],
                                           self.source_extraction_path)
 
     def apply_patches(self, ordered_patches):
@@ -55,7 +59,7 @@ class Base(object):
 
     def run_pathed_sources_analysis(self):
         """executed in background after patches are applied"""
-        self._plugin_engine.execute_phase(AFTER_PATCHES_APLIED,
+        self._plugin_engine.execute_phase(phases[1],
                                           self.source_extraction_path)
 
     def build_project(self):
@@ -65,7 +69,7 @@ class Base(object):
 
     def run_installed_files_analysis(self):
         """executed in background after successful project build"""
-        self._plugin_engine.execute_phase(AFTER_PROJECT_BUILD,
+        self._plugin_engine.execute_phase(phases[2],
                                           self.project_build_path)
 
     def build_packages(self, *distros):
@@ -75,6 +79,7 @@ class Base(object):
                                         self.distro)
 
     class Predictor:
+
         """Predictor class is used for autocompletion of field,
            every guess_* method takes prefix of result string
            and returns list of strings matched ordered by their rank"""
@@ -100,8 +105,3 @@ class Base(object):
 
         def guess_license(self):
             pass
-
-
-class Plugin:
-    """class from which are plugins derived"""
-    pass
