@@ -1,4 +1,5 @@
 from rpg.plugin_engine import PluginEngine, phases
+from pathlib import Path
 
 
 class Base(object):
@@ -13,6 +14,7 @@ class Base(object):
         self._plugin_engine = PluginEngine(self.spec, self.sack)
         self._source_loader = SourceLoader(self.source_extraction_path)
         self._copr_uploader = CoprUploader()
+        self._plugin_engine.load_plugins(Path('rpg/plugins'))
 
     @property
     def source_extraction_path(self):
@@ -80,7 +82,7 @@ class Base(object):
 
     # predictor methods are used for autocompletion of the field,
     # every guess_* method return list of strings matched ordered
-    # by their rank"""
+    # by their rank
 
     def guess_name(self):
         pass
