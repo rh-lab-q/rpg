@@ -78,30 +78,28 @@ class Base(object):
             self._package_builder.build(self.spec_path, self.tarball_path,
                                         self.distro)
 
-    class Predictor:
+    # predictor methods are used for autocompletion of the field,
+    # every guess_* method return list of strings matched ordered
+    # by their rank"""
 
-        """Predictor class is used for autocompletion of field,
-           every guess_* method takes prefix of result string
-           and returns list of strings matched ordered by their rank"""
+    def guess_name(self):
+        pass
 
-        def guess_name(self):
-            pass
+    def guess_provide(self):
+        pass
 
-        def guess_provide(self):
-            pass
+    def guess_group(self):
+        pass
 
-        def guess_group(self):
-            pass
+    def guess_chagelog_data(self):
+        # returns list of tuples (author, email)
+        pass
 
-        def guess_chagelog_data(self):
-            # returns list of tuples (author, email)
-            pass
+    def guess_build_dependency(self):
+        pass
 
-        def guess_build_dependency(self):
-            pass
+    def guess_dependency(self):
+        pass
 
-        def guess_dependency(self):
-            pass
-
-        def guess_license(self):
-            pass
+    def guess_license(self):
+        pass
