@@ -1,6 +1,7 @@
-class CAnalyzer(rpg.plugin):
+from rpg.plugin import Plugin
 
-    @before_project_build
-    @files("*.c")
-    def add_c_dependencies(file, SPEC):
+
+class CPlugin(Plugin):
+
+    def after_patches_applied(self, project_dir, spec, sack):
         pass

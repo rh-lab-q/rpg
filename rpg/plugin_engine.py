@@ -9,14 +9,9 @@ phases = ("before_patches_aplied", "after_patches_applied",
 class PluginEngine:
 
     """PluginEngine class is responsible for executing properly plugins.
-       Plugin is class that implements methods which take file/dir and SPEC
-       as params.
-       There are threee main phases (BEFORE_PATCHES_APLIED,
-       AFTER_PATCHES_APPLIED and AFTER_PROJECT_BUILD). These phases will
-       decorate plugin methods, e.g. @before_project_build. Other filter
-       decorators could be @each_file('regex'), @root_dir, @each_dir and
-       @file('relative/path/from/project/root/dir') that will proceed only
-       relevant files"""
+       Plugin class should implement one of methods named as phase
+       it subscribes to. That method takes pathlib.Path instance of project
+       root dir, spec object and dnf sack."""
 
     def __init__(self, spec, sack):
         self.spec = spec
