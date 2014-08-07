@@ -1,17 +1,20 @@
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit, QDialogButtonBox,
-    QLineEdit, QVBoxLayout, QCalendarWidget, QHBoxLayout, QFileDialog)
-from rpg import Base
-import sys
+from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit,
+                             QDialogButtonBox, QLineEdit, QVBoxLayout,
+                             QCalendarWidget, QHBoxLayout, QFileDialog)
+
 
 class DialogChangelog(QtWidgets.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogChangelog, self).__init__(parent)
 
+        # Reference to wizard
+        self.wizard = Wizard
+
         # Setting dialog's size
         self.setMinimumSize(QtCore.QSize(350, 500))
         self.setMaximumSize(QtCore.QSize(850, 650))
-        
+
         # Labels and QLineEdits for input
         nameLabel = QLabel("Name")
         emailLabel = QLabel("Email")
@@ -22,11 +25,11 @@ class DialogChangelog(QtWidgets.QDialog):
         self.emailEdit = QLineEdit()
         self.messageEdit = QPlainTextEdit()
         self.datePicker = QCalendarWidget()
-        
+
         # Button box with "OK" and "Cancel buttons"
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
-        self.boxButtons = QDialogButtonBox(parent = Wizard)
+        self.boxButtons = QDialogButtonBox(parent=Wizard)
         self.boxButtons.addButton(self.okButton, 0)
         self.boxButtons.addButton(self.cancelButton, 1)
         self.boxButtons.accepted.connect(self.acceptIt)
@@ -54,13 +57,12 @@ class DialogChangelog(QtWidgets.QDialog):
 
     def acceptIt(self):
         ''' If user clicked "OK" button '''
-
-        print ("Accepted")
         self.accept()
 
     def importFromCVS(self):
         ''' If user clicked "Import from CVS" button '''
         pass
+
 
 class DialogError(QtWidgets.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
@@ -73,10 +75,10 @@ class DialogError(QtWidgets.QDialog):
         # Setting labels and tet
         errorLabel = QLabel("Error!")
         self.errorText = QLabel("Here will be text of error message")
-        
+
         # Setting button
         self.okButton = QPushButton("OK")
-        boxButtons = QDialogButtonBox(parent = Wizard)
+        boxButtons = QDialogButtonBox(parent=Wizard)
         boxButtons.addButton(self.okButton, 0)
         boxButtons.accepted.connect(self.acceptIt)
 
@@ -99,24 +101,25 @@ class DialogError(QtWidgets.QDialog):
         ''' If user clicked "OK" button '''
         self.aceept()
 
+
 class DialogSRPM(QtWidgets.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSRPM, self).__init__(parent)
 
-        # Setting 
+        # Setting
         self.setMinimumSize(QtCore.QSize(350, 150))
         self.setMaximumSize(QtCore.QSize(500, 300))
 
         # Setting label
         SrpmLabel = QLabel("Do you wish to edit source code?")
-        
+
         # Setting buttons
         self.editButton = QPushButton("Edit")
         self.editButton.clicked.connect(self.openFileBrowser)
 
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
-        self.boxButtons = QDialogButtonBox(parent = Wizard)
+        self.boxButtons = QDialogButtonBox(parent=Wizard)
         self.boxButtons.addButton(self.okButton, 0)
         self.boxButtons.addButton(self.cancelButton, 1)
         self.boxButtons.accepted.connect(self.acceptIt)
@@ -127,11 +130,10 @@ class DialogSRPM(QtWidgets.QDialog):
         mainLayout.addWidget(SrpmLabel)
         mainLayout.addWidget(self.editButton)
         mainLayout.addWidget(self.boxButtons)
-        self.setLayout(mainLayout) 
+        self.setLayout(mainLayout)
 
     def openFileBrowser(self):
         ''' If user clicked "Edit" button'''
-        
         brows = QFileDialog()
         brows.getOpenFileName(self, "/home")
 
