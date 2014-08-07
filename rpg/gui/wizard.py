@@ -1,29 +1,34 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox, QGroupBox,
-    QComboBox, QPushButton, QGridLayout, QPlainTextEdit, QListWidget, QHBoxLayout,
-    QDialog, QFileDialog)
+from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
+                             QGroupBox, QComboBox, QPushButton, QGridLayout,
+                             QPlainTextEdit, QListWidget, QHBoxLayout,
+                             QDialog, QFileDialog)
 from rpg.gui.dialogs import DialogChangelog, DialogSRPM, DialogError
 from rpg import Base
 
+
 class Wizard(QtWidgets.QWizard):
-    ''' Main class that holds other pages, number of pages are in NUM_PAGES 
+    ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
         - counted from 0 (PageGreetings) to 10 (PageFinal)'''
 
     NUM_PAGES = 11
-    (PageGreetings, PageImport, PageScripts, PagePatches, PageRequires, PageScriplets, PageSubpackages,
-        PageDocsChangelog, PageBuild, PageCopr, PageFinal) = range(NUM_PAGES)
- 
+    (PageGreetings, PageImport, PageScripts, PagePatches, PageRequires,
+        PageScriplets, PageSubpackages, PageDocsChangelog, PageBuild, PageCopr,
+        PageFinal) = range(NUM_PAGES)
+
     def __init__(self, parent=None):
         super(Wizard, self).__init__(parent)
-        ''' Initialization of class - setting up pages and the look of wizard itself'''
 
+        self.base = Base()
+        self.dialogSRPM = DialogSRPM()
+        self.dialogError = DialogError()
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
-        
+
         # Setting pages to wizard
         self.setPage(self.PageGreetings, GreetingsPage())
-        self.setPage(self.PageImport, ImportPage())
+        self.setPage(self.PageImport, ImportPage(self))
         self.setPage(self.PageScripts, ScriptsPage())
         self.setPage(self.PagePatches, PatchesPage())
         self.setPage(self.PageRequires, RequiresPage())
@@ -35,18 +40,26 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageFinal, FinalPage())
         self.setStartId(self.PageGreetings)
 
+
 class GreetingsPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(GreetingsPage, self).__init__(parent)
         self.setTitle(self.tr("RPG"))
         self.setSubTitle(self.tr("RPM package generator"))
 
-        greetingsLabel = QLabel("<html><head/><body><p align=\"center\">" + 
-                                     "<span style=\" font-size:36pt;\">PRG - RPM Package Generator</span></p></body></html>"+
-                                     "<p align=\"center\">RPG is tool, that guides people through the creation of a RPM package.</p>"+ 
-                                     "<p align=\"center\">RPG makes packaging much easier due to the automatic analysis of packaged files.</p>"+ 
-                                     "<p align=\"center\">Beginners can get familiar with packaging process </p>"+ 
-                                     "<p align=\"center\">or the advanced users can use our tool for a quick creation of a package.</p>")
+        greetingsLabel = QLabel("<html><head/><body><p align=\"center\">" +
+                                "<span style=\" font-size:36pt;\">PRG - " +
+                                "RPM Package Generator</span></p></body>" +
+                                "</html><p align=\"center\">RPG is tool," +
+                                " that guides people through the creation" +
+                                "of a RPM package.</p><p align=\"center\">" +
+                                "RPG makes packaging much easier due to" +
+                                " the automatic analysis of packaged" +
+                                "files.</p><p align=\"center\">" +
+                                "Beginners can get familiar with" +
+                                "packaging process </p><p align=\"center\">" +
+                                "or the advanced users can use our tool for" +
+                                "a quick creation of a package.</p>")
         grid = QVBoxLayout()
         grid.addSpacing(150)
         grid.addWidget(greetingsLabel)
@@ -54,13 +67,16 @@ class GreetingsPage(QtWidgets.QWizardPage):
 
     def nextId(self):
             return Wizard.PageImport
- 
+
+
 class ImportPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Base, parent=None):
         super(ImportPage, self).__init__(parent)
 
+        self.base = Base
         self.setTitle(self.tr("Beginning"))
-        self.setSubTitle(self.tr("Fill in fields and import your SRPM or source folder"))
+        self.setSubTitle(self.tr("Fill in fields and import" +
+                                 "your SRPM or source folder"))
 
         ''' Creating widgets and setting them to layout'''
         nameLabel = QLabel("Name: ")
@@ -164,23 +180,25 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        Rpg.license = self.licenseEdit.text()
-        Rpg.url = self.URLEdit.text()
-        Rpg.vendor = self.vendorEdit.text()
-        Rpg.packager = self.packagerEdit.text()
+        Base.spec.license = self.licenseEdit.text()
+        Base.spec.url = self.URLEdit.text()
+        Base.spec.vendor = self.vendorEdit.text()
+        Base.spec.packager = self.packagerEdit.text()
 
         return True
 
     def nextId(self):
         ''' [int] Function that determines the next page after the current one
-            - returns integer value and then checks, which value is page in NUM_PAGES'''
+            - returns integer value and then checks, which value is page"
+            in NUM_PAGES'''
 
         return Wizard.PageScripts
+
 
 class ScriptsPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(ScriptsPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Scripts page"))
         self.setSubTitle(self.tr("Write scripts"))
 
@@ -215,17 +233,18 @@ class ScriptsPage(QtWidgets.QWizardPage):
     def validatePage(self):
         ''' ###### Setting up RPG class references ###### '''
         return True
- 
+
     def nextId(self):
         return Wizard.PagePatches
- 
+
+
 class PatchesPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(PatchesPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Patches page"))
         self.setSubTitle(self.tr("Select patches"))
-        
+
         self.addButton = QPushButton("+")
         self.removeButton = QPushButton("-")
         patchesLabel = QLabel("Patches")
@@ -250,11 +269,12 @@ class PatchesPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         return Wizard.PageRequires
- 
+
+
 class RequiresPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(RequiresPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Requires page"))
         self.setSubTitle(self.tr("Write requires and provides"))
 
@@ -277,32 +297,33 @@ class RequiresPage(QtWidgets.QWizardPage):
         grid.addWidget(preovidesLabel, 4, 0)
         grid.addWidget(self.previdesEdit, 5, 0)
         self.setLayout(grid)
-    
+
     def nextId(self):
         return Wizard.PageScriplets
+
 
 class ScripletsPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(ScripletsPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Scriplets page"))
         self.setSubTitle(self.tr("Write scriplets"))
-        
+
         pretransLabel = QLabel("%pretrans: ")
         self.pretransEdit = QPlainTextEdit()
-        
+
         preLabel = QLabel("%pre: ")
         self.preEdit = QPlainTextEdit()
-        
+
         postLabel = QLabel("%post: ")
         self.postEdit = QPlainTextEdit()
-        
+
         postunLabel = QLabel("%postun: ")
         self.postunEdit = QPlainTextEdit()
-        
+
         preunLabel = QLabel("%preun: ")
         self.preunEdit = QPlainTextEdit()
-        
+
         posttransLabel = QLabel("%posttrans: ")
         self.posttransEdit = QPlainTextEdit()
 
@@ -324,20 +345,21 @@ class ScripletsPage(QtWidgets.QWizardPage):
     def nextId(self):
         return Wizard.PageSubpackages
 
+
 class SubpackagesPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(SubpackagesPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Subpackages page"))
         self.setSubTitle(self.tr("Choose subpackages"))
-        
+
         filesLabel = QLabel("Files")
         subpackagesLabel = QLabel("Subpackages ")
-        
+
         self.addPackButton = QPushButton("+")
         self.addPackButton.setMaximumWidth(68)
         self.addPackButton.setMaximumHeight(60)
-        
+
         self.removePackButton = QPushButton("-")
         self.removePackButton.setMaximumWidth(68)
         self.removePackButton.setMaximumHeight(60)
@@ -345,10 +367,10 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         self.transferButton = QPushButton("->")
         self.transferButton.setMaximumWidth(120)
         self.transferButton.setMaximumHeight(20)
-        
+
         self.filesListWidget = QListWidget()
         self.subpackagesListWidget = QListWidget()
-        
+
         mainLayout = QVBoxLayout()
         upperLayout = QHBoxLayout()
         lowerLayout = QHBoxLayout()
@@ -364,24 +386,26 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(upperLayout)
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
-        
+
     def nextId(self):
         return Wizard.PageDocsChangelog
+
 
 class DocsChangelogPage(QtWidgets.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(DocsChangelogPage, self).__init__(parent)
-        
+
         self.Wizard = Wizard
         self.setTitle(self.tr("Document files page"))
         self.setSubTitle(self.tr("Add documentation files"))
 
         documentationFilesLabel = QLabel("Documentation files ")
         self.addDocumentationButton = QPushButton("+")
-        self.addDocumentationButton.clicked.connect(self.openAddDocumentationFileDialog)
+        self.addDocumentationButton.clicked.connect(self.openDocsFileDialog)
         self.removeDocumentationButton = QPushButton("-")
         self.openChangelogDialogButton = QPushButton("Changelog")
-        self.openChangelogDialogButton.clicked.connect(self.openChangeLogDialog)
+        self.openChangelogDialogButton.clicked.connect(
+            self.openChangeLogDialog)
         self.documentationFilesList = QListWidget()
 
         mainLayout = QVBoxLayout()
@@ -405,19 +429,20 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
         changelog = DialogChangelog(changelogWindow, self)
         changelog.exec_()
 
-    def openAddDocumentationFileDialog(self):
+    def openDocsFileDialog(self):
         brows = QFileDialog()
         brows.getOpenFileName(self, "/home")
 
     def nextId(self):
         return Wizard.PageBuild
 
+
 class BuildPage(QtWidgets.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
-        
-        self.Wizard = Wizard # Main wizard of program
-        self.nextPageIsFinal = True # BOOL to determine which page is next one
+
+        self.Wizard = Wizard  # Main wizard of program
+        self.nextPageIsFinal = True  # BOOL to determine which page is next one
         self.setTitle(self.tr("Build page"))
         self.setSubTitle(self.tr("Options to build"))
 
@@ -452,7 +477,7 @@ class BuildPage(QtWidgets.QWizardPage):
         archBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
         layoutArchBox = QGridLayout()
-       
+
         releaseBox.setTitle('Choose distribution')
         layoutReleaseBox.setColumnStretch(0, 1)
         layoutReleaseBox.setColumnStretch(1, 1)
@@ -500,8 +525,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def switchToCOPR(self):
-        ''' If user clicked uplodad to copr button, so next page is not final '''
-
+        '''If user clicked uplodad to copr button, so next page is not final'''
         self.nextPageIsFinal = False
 
     def openBuildPathFileDialog(self):
@@ -515,21 +539,32 @@ class BuildPage(QtWidgets.QWizardPage):
             self.nextPageIsFinal = True
             return Wizard.PageCopr
 
+
 class CoprPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(CoprPage, self).__init__(parent)
- 
+
         self.setTitle(self.tr("Copr page"))
         self.setSubTitle(self.tr("COPR repository setting and uploading"))
 
-        COPRLabel = QLabel("<html><head/><body><p align=\"center\">You are going to upload your package to COPR."+
-                                "</p><p align=\"center\">Copr is designed to be a lightweight buildsystem that allows "+
-                                "</p><p align=\"center\">contributors to create packages, put them in repositories, </p>"+
-                                "<p align=\"center\">and make it easy for users toinstall the packages </p><p align=\"center\">"+
-                                "onto their system. Within the Fedora Project it </p><p align=\"center\">is used toallow"+
-                                "packagers to create third party repositories.</p><p align=\"center\"><br/>For more information,"+
-                                "please visit <a href=\"https://copr.fedoraproject.org/\"><span style=\" text-decoration: underline;"+
-                                "color:#0000ff;\">https://copr.fedoraproject.org/</span></a></p></body></html>")
+        COPRLabel = QLabel("<html><head/><body><p align=\"center\">You are" +
+                           " going to upload your package to COPR." +
+                           "</p><p align=\"center\">Copr is designed to be" +
+                           " a lightweight buildsystem that allows " +
+                           "</p><p align=\"center\">contributors to create" +
+                           " packages, put them in repositories, </p>" +
+                           "<p align=\"center\">and make it easy for" +
+                           " users toinstall the packages </p>" +
+                           "<p align=\"center\">onto their system." +
+                           " Within the Fedora Project it </p>" +
+                           "<p align=\"center\">is used toallow" +
+                           "packagers to create third party repositories." +
+                           "</p><p align=\"center\"><br/>For more " +
+                           "information,please visit <a href=\"" +
+                           "https://copr.fedoraproject.org/\"><span style=\"" +
+                           " text-decoration: underline;color:#0000ff;\">" +
+                           "https://copr.fedoraproject.org/</span></a></p>" +
+                           "</body></html>")
 
         self.createCOPRButton = QPushButton("Create COPR repository")
         self.chooseCONFButton = QPushButton("Choose .conf file")
@@ -587,18 +622,21 @@ class CoprPage(QtWidgets.QWizardPage):
     def nextId(self):
         return Wizard.PageFinal
 
+
 class FinalPage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(FinalPage, self).__init__(parent)
-        
+
         ''' On this page will be "Finish button" instead of "Next" '''
         FinalPage.setFinalPage(self, True)
 
         self.setTitle(self.tr("Final page"))
         self.setSubTitle(self.tr("Your package was successfully created"))
-        finalLabel = QLabel("<html><head/><body><p align=\"center\"><span style=\" font-size:24pt;\">" +
-                                 "Thank you for using RPG!</span></p><p align=\"center\">" +
-                                 "<span style=\" font-size:24pt;\">Your package was built in:</span></p></body></html>")
+        finalLabel = QLabel("<html><head/><body><p align=\"center\"><span" +
+                            "style=\" font-size:24pt;\">Thank you for" +
+                            "using RPG!</span></p><p align=\"center\">" +
+                            "<span style=\" font-size:24pt;\">Your" +
+                            " package was built in:</span></p></body></html>")
         self.finalEdit = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(finalLabel, 0, 0)
