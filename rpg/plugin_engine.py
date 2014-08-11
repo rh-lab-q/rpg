@@ -2,7 +2,7 @@ from rpg.plugin import Plugin
 import inspect
 import os.path
 
-phases = ("before_patches_aplied", "after_patches_applied",
+phases = ("before_patches_applied", "after_patches_applied",
           "after_project_build")
 
 
@@ -24,13 +24,14 @@ class PluginEngine:
         if phase not in phases:
             # TODO log warning
             return
+        print("rpg: plugin phase %s executed" % phase)
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, phase)
             except AttributeError:
                 continue
             if callable(method):
-                # TODO log info execution of plugin
+                print("rpg: plugin %s executed" % plugin.__class__.__name__)
                 try:
                     method(project_dir, self.spec, self.sack)
                 except Exception:

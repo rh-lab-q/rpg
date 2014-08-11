@@ -1,4 +1,4 @@
-from rpg import Plugin
+from rpg.plugin import Plugin
 
 
 class FindFilePlugin(Plugin):

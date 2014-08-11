@@ -1,4 +1,9 @@
 from rpg.plugin_engine import PluginEngine, phases
+from rpg.project_builder import ProjectBuilder
+from rpg.copr_uploader import CoprUploader
+from rpg.package_builder import PackageBuilder
+from rpg.source_loader import SourceLoader
+from rpg.spec import Spec
 from pathlib import Path
 
 
@@ -12,7 +17,7 @@ class Base(object):
         self.sack = None  # TODO dnf sack
         self._package_builder = PackageBuilder()
         self._plugin_engine = PluginEngine(self.spec, self.sack)
-        self._source_loader = SourceLoader(self.source_extraction_path)
+        self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
         self._plugin_engine.load_plugins(Path('rpg/plugins'))
 

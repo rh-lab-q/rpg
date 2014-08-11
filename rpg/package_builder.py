@@ -1,6 +1,6 @@
 from getpass import getuser
 from subprocess import call, check_output, PIPE, Popen, STDOUT
-from utils import move_file
+from rpg.utils import move_file
 
 
 class PackageBuilder:

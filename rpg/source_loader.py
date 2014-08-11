@@ -6,7 +6,6 @@ import shutil
 import sys
 import tarfile as tar
 import zipfile as zip
-from spec import Spec
 
 
 class SourceLoader:
@@ -89,11 +88,7 @@ class SourceLoader:
                         # archive does not have a rootdir
                         # add flag to SPEC, that in %prep a rootdir must be
                         # created
-                        Spec.create_root_directory = True
                         break
-
-            else:  # first element isn't a directory -> rootdir does not exist
-                Spec.create_root_directory = True
 
             archive = tarfile if tar_archive else zipfile
             try:
