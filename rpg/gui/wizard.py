@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QComboBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog)
-from rpg.gui.dialogs import DialogChangelog, DialogSRPM, DialogError
+from rpg.gui.dialogs import DialogChangelog
 from rpg import Base
 
 
@@ -21,23 +21,21 @@ class Wizard(QtWidgets.QWizard):
         super(Wizard, self).__init__(parent)
 
         self.base = Base()
-        self.dialogSRPM = DialogSRPM()
-        self.dialogError = DialogError()
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
 
         # Setting pages to wizard
         self.setPage(self.PageGreetings, GreetingsPage())
         self.setPage(self.PageImport, ImportPage(self))
-        self.setPage(self.PageScripts, ScriptsPage())
-        self.setPage(self.PagePatches, PatchesPage())
-        self.setPage(self.PageRequires, RequiresPage())
-        self.setPage(self.PageScriplets, ScripletsPage())
-        self.setPage(self.PageSubpackages, SubpackagesPage())
+        self.setPage(self.PageScripts, ScriptsPage(self))
+        self.setPage(self.PagePatches, PatchesPage(self))
+        self.setPage(self.PageRequires, RequiresPage(self))
+        self.setPage(self.PageScriplets, ScripletsPage(self))
+        self.setPage(self.PageSubpackages, SubpackagesPage(self))
         self.setPage(self.PageDocsChangelog, DocsChangelogPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
-        self.setPage(self.PageCopr, CoprPage())
-        self.setPage(self.PageFinal, FinalPage())
+        self.setPage(self.PageCopr, CoprPage(self))
+        self.setPage(self.PageFinal, FinalPage(self))
         self.setStartId(self.PageGreetings)
 
 
@@ -70,10 +68,10 @@ class GreetingsPage(QtWidgets.QWizardPage):
 
 
 class ImportPage(QtWidgets.QWizardPage):
-    def __init__(self, Base, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(ImportPage, self).__init__(parent)
 
-        self.base = Base
+        self.base = Wizard.base
         self.setTitle(self.tr("Beginning"))
         self.setSubTitle(self.tr("Fill in fields and import" +
                                  "your SRPM or source folder"))
@@ -180,10 +178,17 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        Base.spec.license = self.licenseEdit.text()
-        Base.spec.url = self.URLEdit.text()
-        Base.spec.vendor = self.vendorEdit.text()
-        Base.spec.packager = self.packagerEdit.text()
+        self.base.spec.tags['Name'] = self.nameEdit.text()
+        self.base.spec.tags['Version'] = self.versionEdit.text()
+        self.base.spec.tags['Release'] = self.releaseEdit.text()
+        self.base.spec.tags['License'] = self.licenseEdit.text()
+        self.base.spec.tags['URL'] = self.URLEdit.text()
+        self.base.spec.tags['Group'] = self.groupEdit.currentText()
+        self.base.spec.tags['Summary'] = self.summaryEdit.text()
+        self.base.spec.tags['%description'] = self.descriptionEdit.text()
+        self.base.spec.tags['Vendor'] = self.vendorEdit.text()
+        self.base.spec.tags['Packager'] = self.packagerEdit.text()
+        self.base.spec.tags['Path'] = self.importEdit.text()
 
         return True
 
@@ -196,17 +201,16 @@ class ImportPage(QtWidgets.QWizardPage):
 
 
 class ScriptsPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(ScriptsPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Scripts page"))
         self.setSubTitle(self.tr("Write scripts"))
 
         prepareLabel = QLabel("%prepare: ")
         self.prepareEdit = QPlainTextEdit()
-
-        configLabel = QLabel("%config: ")
-        self.configEdit = QPlainTextEdit()
 
         buildLabel = QLabel("%build: ")
         self.buildEdit = QPlainTextEdit()
@@ -220,18 +224,19 @@ class ScriptsPage(QtWidgets.QWizardPage):
         grid = QGridLayout()
         grid.addWidget(prepareLabel, 0, 0)
         grid.addWidget(self.prepareEdit, 0, 1)
-        grid.addWidget(configLabel, 1, 0)
-        grid.addWidget(self.configEdit, 1, 1)
-        grid.addWidget(buildLabel, 2, 0)
-        grid.addWidget(self.buildEdit, 2, 1)
-        grid.addWidget(installLabel, 3, 0)
-        grid.addWidget(self.installEdit, 3, 1)
-        grid.addWidget(checkLabel, 4, 0)
-        grid.addWidget(self.checkEdit, 4, 1)
+        grid.addWidget(buildLabel, 1, 0)
+        grid.addWidget(self.buildEdit, 1, 1)
+        grid.addWidget(installLabel, 2, 0)
+        grid.addWidget(self.installEdit, 2, 1)
+        grid.addWidget(checkLabel, 3, 0)
+        grid.addWidget(self.checkEdit, 3, 1)
         self.setLayout(grid)
 
     def validatePage(self):
-        ''' ###### Setting up RPG class references ###### '''
+        self.base.spec.tags['%prep'] = self.prepareEdit.toPlainText()
+        self.base.spec.tags['%build'] = self.buildEdit.toPlainText()
+        self.base.spec.tags['%install'] = self.installEdit.toPlainText()
+        self.base.spec.tags['%check'] = self.checkEdit.toPlainText()
         return True
 
     def nextId(self):
@@ -239,8 +244,10 @@ class ScriptsPage(QtWidgets.QWizardPage):
 
 
 class PatchesPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(PatchesPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Patches page"))
         self.setSubTitle(self.tr("Select patches"))
@@ -272,15 +279,17 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 
 class RequiresPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Requires page"))
         self.setSubTitle(self.tr("Write requires and provides"))
 
         buildRequiresLabel = QLabel("BuildRequires: ")
-        self.buildRequiresEdit = QPlainTextEdit()
-        self.buildRequiresEdit.setMaximumHeight(40)
+        self.bRequiresEdit = QPlainTextEdit()
+        self.bRequiresEdit.setMaximumHeight(40)
 
         requiresLabel = QLabel("Requires: ")
         self.requiresEdit = QPlainTextEdit()
@@ -291,20 +300,28 @@ class RequiresPage(QtWidgets.QWizardPage):
 
         grid = QGridLayout()
         grid.addWidget(buildRequiresLabel, 0, 0)
-        grid.addWidget(self.buildRequiresEdit, 1, 0)
+        grid.addWidget(self.bRequiresEdit, 1, 0)
         grid.addWidget(requiresLabel, 2, 0)
         grid.addWidget(self.requiresEdit, 3, 0,)
         grid.addWidget(preovidesLabel, 4, 0)
         grid.addWidget(self.previdesEdit, 5, 0)
         self.setLayout(grid)
 
+    def validatePage(self):
+        self.base.spec.tags["BuildRequires"] = self.bRequiresEdit.toPlainText()
+        self.base.spec.tags["Requires"] = self.requiresEdit.toPlainText()
+        self.base.spec.tags["Provides"] = self.previdesEdit.toPlainText()
+        return True
+
     def nextId(self):
         return Wizard.PageScriplets
 
 
 class ScripletsPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(ScripletsPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Scriplets page"))
         self.setSubTitle(self.tr("Write scriplets"))
@@ -342,13 +359,24 @@ class ScripletsPage(QtWidgets.QWizardPage):
         grid.addWidget(self.posttransEdit, 5, 1)
         self.setLayout(grid)
 
+    def validatePage(self):
+        self.base.spec.tags["%pretrans"] = self.pretransEdit.toPlainText()
+        self.base.spec.tags["%pre"] = self.preEdit.toPlainText()
+        self.base.spec.tags["%post"] = self.postEdit.toPlainText()
+        self.base.spec.tags["%postun"] = self.postunEdit.toPlainText()
+        self.base.spec.tags["%preun"] = self.preunEdit.toPlainText()
+        self.base.spec.tags["%posttrans"] = self.posttransEdit.toPlainText()
+        return True
+
     def nextId(self):
         return Wizard.PageSubpackages
 
 
 class SubpackagesPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(SubpackagesPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Subpackages page"))
         self.setSubTitle(self.tr("Choose subpackages"))
@@ -395,7 +423,7 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(DocsChangelogPage, self).__init__(parent)
 
-        self.Wizard = Wizard
+        self.base = Wizard.base
         self.setTitle(self.tr("Document files page"))
         self.setSubTitle(self.tr("Add documentation files"))
 
@@ -440,6 +468,8 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
 class BuildPage(QtWidgets.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.Wizard = Wizard  # Main wizard of program
         self.nextPageIsFinal = True  # BOOL to determine which page is next one
@@ -524,6 +554,10 @@ class BuildPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
 
+    def validatePage(self):
+        print(self.base.spec.tags)
+        return True
+
     def switchToCOPR(self):
         '''If user clicked uplodad to copr button, so next page is not final'''
         self.nextPageIsFinal = False
@@ -541,8 +575,10 @@ class BuildPage(QtWidgets.QWizardPage):
 
 
 class CoprPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(CoprPage, self).__init__(parent)
+
+        self.base = Wizard.base
 
         self.setTitle(self.tr("Copr page"))
         self.setSubTitle(self.tr("COPR repository setting and uploading"))
@@ -624,9 +660,10 @@ class CoprPage(QtWidgets.QWizardPage):
 
 
 class FinalPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
+    def __init__(self, Wizard, parent=None):
         super(FinalPage, self).__init__(parent)
 
+        self.base = Wizard.base
         ''' On this page will be "Finish button" instead of "Next" '''
         FinalPage.setFinalPage(self, True)
 
