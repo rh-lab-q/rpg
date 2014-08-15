@@ -1,7 +1,4 @@
 class Subpackage:
-    # auto-completion flags -> GUI
-    create_root_directory = False
-    files_use_defattrs = False
 
     # Holds the most common keywords used with SPEC file tags, along with the
     # conventional order preserved

@@ -6,15 +6,12 @@ import pathlib
 
 class ProjectBuilder:
 
-    def __init__(self, project_source_dir):
-        self.project_source_dir = project_source_dir
-
-    def build(self, project_target_dir, build_params=None):
+    def build(self, project_source_dir, project_target_dir, build_params):
         """Builds project in given project_target_dir then cleans this
            directory, build_params is list of command strings.
            returns list of files that should be installed or error string"""
         current_dir = os.getcwd()
-        call("cp", self.project_source_dir, project_target_dir)
+        call(["cp", project_source_dir, project_target_dir])
         root_files = self._list_files_root(project_target_dir)
         if "configure.ac" in root_files:
             call(["autoconf", "-I", project_target_dir])
