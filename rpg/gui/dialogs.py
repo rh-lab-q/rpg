@@ -1,7 +1,8 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit,
                              QDialogButtonBox, QLineEdit, QVBoxLayout,
-                             QCalendarWidget, QHBoxLayout, QFileDialog)
+                             QCalendarWidget, QHBoxLayout, QFileDialog,
+                             QComboBox)
 
 
 class DialogChangelog(QtWidgets.QDialog):
@@ -136,6 +137,53 @@ class DialogSRPM(QtWidgets.QDialog):
         ''' If user clicked "Edit" button'''
         brows = QFileDialog()
         brows.getOpenFileName(self, "/home")
+
+    def acceptIt(self):
+        ''' If user clicked "OK" button '''
+        self.accept()
+
+
+class DialogSubpackage(QtWidgets.QDialog):
+    def __init__(self, Dialog, Wizard, parent=None):
+        super(DialogSubpackage, self).__init__(parent)
+
+                # Settings
+        self.setMinimumSize(QtCore.QSize(350, 150))
+        self.setMaximumSize(QtCore.QSize(500, 600))
+
+        # Setting labels
+        nameLabel = QLabel("Name")
+        groupLabel = QLabel("Group")
+        summaryLabel = QLabel("Summary")
+        descriptionLabel = QLabel("Description")
+
+        # Setting text editors
+        self.nameEdit = QLineEdit()
+        self.groupEdit = QComboBox()
+        self.summaryEdit = QLineEdit()
+        self.descriptionEdit = QPlainTextEdit()
+
+        # Setting buttons
+        self.okButton = QPushButton("OK")
+        self.cancelButton = QPushButton("Cancel")
+        self.boxButtons = QDialogButtonBox(parent=Wizard)
+        self.boxButtons.addButton(self.okButton, 0)
+        self.boxButtons.addButton(self.cancelButton, 1)
+        self.boxButtons.accepted.connect(self.acceptIt)
+        self.boxButtons.rejected.connect(self.reject)
+
+        # Setting layout
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(nameLabel)
+        mainLayout.addWidget(self.nameEdit)
+        mainLayout.addWidget(groupLabel)
+        mainLayout.addWidget(self.groupEdit)
+        mainLayout.addWidget(summaryLabel)
+        mainLayout.addWidget(self.summaryEdit)
+        mainLayout.addWidget(descriptionLabel)
+        mainLayout.addWidget(self.descriptionEdit)
+        mainLayout.addWidget(self.boxButtons)
+        self.setLayout(mainLayout)
 
     def acceptIt(self):
         ''' If user clicked "OK" button '''

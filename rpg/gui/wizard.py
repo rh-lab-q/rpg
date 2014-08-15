@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QComboBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog)
-from rpg.gui.dialogs import DialogChangelog
+from rpg.gui.dialogs import DialogChangelog, DialogSubpackage
 from rpg import Base
 
 
@@ -170,7 +170,9 @@ class ImportPage(QtWidgets.QWizardPage):
     def openImportPageFileDialog(self):
         ''' Open file browser in new dialog window'''
         brows = QFileDialog()
-        brows.getOpenFileName(self, "/home")
+        #brows.setFileMode(QFileDialog.Directory)
+        brows.getExistingDirectory(self, "Choose source folder or archive",
+                                   "~/")
 
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button
@@ -185,7 +187,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.base.spec.tags['URL'] = self.URLEdit.text()
         self.base.spec.tags['Group'] = self.groupEdit.currentText()
         self.base.spec.tags['Summary'] = self.summaryEdit.text()
-        self.base.spec.tags['%description'] = self.descriptionEdit.text()
+        self.base.spec.scripts['%description'] = self.descriptionEdit.text()
         self.base.spec.tags['Vendor'] = self.vendorEdit.text()
         self.base.spec.tags['Packager'] = self.packagerEdit.text()
         self.base.spec.tags['Path'] = self.importEdit.text()
@@ -233,10 +235,10 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.tags['%prep'] = self.prepareEdit.toPlainText()
-        self.base.spec.tags['%build'] = self.buildEdit.toPlainText()
-        self.base.spec.tags['%install'] = self.installEdit.toPlainText()
-        self.base.spec.tags['%check'] = self.checkEdit.toPlainText()
+        self.base.spec.scripts['%prep'] = self.prepareEdit.toPlainText()
+        self.base.spec.scripts['%build'] = self.buildEdit.toPlainText()
+        self.base.spec.scripts['%install'] = self.installEdit.toPlainText()
+        self.base.spec.scripts['%check'] = self.checkEdit.toPlainText()
         return True
 
     def nextId(self):
@@ -360,12 +362,12 @@ class ScripletsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.tags["%pretrans"] = self.pretransEdit.toPlainText()
-        self.base.spec.tags["%pre"] = self.preEdit.toPlainText()
-        self.base.spec.tags["%post"] = self.postEdit.toPlainText()
-        self.base.spec.tags["%postun"] = self.postunEdit.toPlainText()
-        self.base.spec.tags["%preun"] = self.preunEdit.toPlainText()
-        self.base.spec.tags["%posttrans"] = self.posttransEdit.toPlainText()
+        self.base.spec.scripts["%pretrans"] = self.pretransEdit.toPlainText()
+        self.base.spec.scripts["%pre"] = self.preEdit.toPlainText()
+        self.base.spec.scripts["%post"] = self.postEdit.toPlainText()
+        self.base.spec.scripts["%postun"] = self.postunEdit.toPlainText()
+        self.base.spec.scripts["%preun"] = self.preunEdit.toPlainText()
+        self.base.spec.scripts["%posttrans"] = self.posttransEdit.toPlainText()
         return True
 
     def nextId(self):
@@ -387,6 +389,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         self.addPackButton = QPushButton("+")
         self.addPackButton.setMaximumWidth(68)
         self.addPackButton.setMaximumHeight(60)
+        self.addPackButton.clicked.connect(self.openSubpackageDialog)
 
         self.removePackButton = QPushButton("-")
         self.removePackButton.setMaximumWidth(68)
@@ -414,6 +417,11 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(upperLayout)
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
+
+    def openSubpackageDialog(self):
+        subpackageWindow = QDialog()
+        subpackage = DialogSubpackage(subpackageWindow, self)
+        subpackage.exec_()
 
     def nextId(self):
         return Wizard.PageDocsChangelog
@@ -555,7 +563,10 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
+        print(" ---- Tags: ---- ")
         print(self.base.spec.tags)
+        print("\n ----- Scripts: ----- ")
+        print(self.base.spec.scripts)
         return True
 
     def switchToCOPR(self):
@@ -670,7 +681,7 @@ class FinalPage(QtWidgets.QWizardPage):
         self.setTitle(self.tr("Final page"))
         self.setSubTitle(self.tr("Your package was successfully created"))
         finalLabel = QLabel("<html><head/><body><p align=\"center\"><span" +
-                            "style=\" font-size:24pt;\">Thank you for" +
+                            "style=\" font-size:24pt;\">Thank you for " +
                             "using RPG!</span></p><p align=\"center\">" +
                             "<span style=\" font-size:24pt;\">Your" +
                             " package was built in:</span></p></body></html>")
