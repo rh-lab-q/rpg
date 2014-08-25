@@ -17,17 +17,21 @@ Packages needed for the build, or the build requires:
 * dnf
 * rpmdevtools
 
+Start RPG
+=========
+execute `python3 RPG.py` from project root directory
+
 
 Running tests
 =============
 
-execute `nosetests-3.4 tests`from project root directory
+execute `nosetests-3.4 tests` from project root directory
 
 
-Documentation, tutorials and examples
-=====================================
+Documentation
+=============
 
-check [github wiki pages](https://github.com/rh-lab-q/rpg/wiki/)
+For documentation, tutorials and examples check [github wiki pages](https://github.com/rh-lab-q/rpg/wiki/)
 
 
 License
