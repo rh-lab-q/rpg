@@ -71,7 +71,6 @@ class Base(object):
 
     def build_project(self):
         """executed in background after filled requires screen"""
-        self.spec.scripts["%build"] = "bla"  # TODO erase, let GUI set that
         self._project_builder.build(self.source_extraction_path,
                                     self.project_build_path,
                                     self.spec.scripts["%build"])

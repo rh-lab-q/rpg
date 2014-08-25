@@ -191,6 +191,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.base.spec.tags['Vendor'] = self.vendorEdit.text()
         self.base.spec.tags['Packager'] = self.packagerEdit.text()
         self.base.spec.tags['Path'] = self.importEdit.text()
+        self.base.process_archive_or_dir()  # TODO add dir
 
         return True
 
@@ -242,6 +243,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
+        self.base.spec.scripts["%build"] = self.buildEdit.text
         return Wizard.PagePatches
 
 
@@ -277,6 +279,10 @@ class PatchesPage(QtWidgets.QWizardPage):
         brows.getOpenFileName(self, "/home")
 
     def nextId(self):
+        self.base.apply_patches()  # TODO pass list of paths (strings)
+        self.base.run_pathed_sources_analysis()
+        self.base.build_project()
+        self.base.run_installed_files_analysis()
         return Wizard.PageRequires
 
 
@@ -579,6 +585,7 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         if (self.nextPageIsFinal):
+            self.base.build_packages()
             return Wizard.PageFinal
         else:
             self.nextPageIsFinal = True
