@@ -52,7 +52,7 @@ class GreetingsPage(QtWidgets.QWizardPage):
                                 " that guides people through the creation" +
                                 "of a RPM package.</p><p align=\"center\">" +
                                 "RPG makes packaging much easier due to" +
-                                " the automatic analysis of packaged" +
+                                " the automatic analysis of packaged " +
                                 "files.</p><p align=\"center\">" +
                                 "Beginners can get familiar with" +
                                 "packaging process </p><p align=\"center\">" +
@@ -73,7 +73,7 @@ class ImportPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
         self.setTitle(self.tr("Beginning"))
-        self.setSubTitle(self.tr("Fill in fields and import" +
+        self.setSubTitle(self.tr("Fill in fields and import " +
                                  "your SRPM or source folder"))
 
         ''' Creating widgets and setting them to layout'''
@@ -102,14 +102,6 @@ class ImportPage(QtWidgets.QWizardPage):
         self.URLEdit.setMinimumHeight(30)
         URLLabel.setBuddy(self.URLEdit)
 
-        groupLabel = QLabel("Group: ")
-        self.groupEdit = QComboBox()
-        self.groupEdit.addItem("First")
-        self.groupEdit.addItem("Second")
-        self.groupEdit.addItem("Third")
-        self.groupEdit.setMinimumHeight(30)
-        groupLabel.setBuddy(self.groupEdit)
-
         summaryLabel = QLabel("Summary: ")
         self.summaryEdit = QLineEdit()
         self.summaryEdit.setMinimumHeight(30)
@@ -130,7 +122,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.packagerEdit.setMinimumHeight(30)
         packagerLabel.setBuddy(self.packagerEdit)
 
-        importLabel = QLabel("Path: ")
+        importLabel = QLabel("Source: ")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
         importLabel.setBuddy(self.importEdit)
@@ -140,18 +132,19 @@ class ImportPage(QtWidgets.QWizardPage):
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
-        grid.addWidget(nameLabel, 0, 0, 1, 1)
-        grid.addWidget(self.nameEdit, 0, 1, 1, 2)
-        grid.addWidget(versionLabel, 1, 0, 1, 1)
-        grid.addWidget(self.versionEdit, 1, 1, 1, 2)
-        grid.addWidget(releaseLabel, 2, 0, 1, 1)
-        grid.addWidget(self.releaseEdit, 2, 1, 1, 2)
-        grid.addWidget(licenseLabel, 3, 0, 1, 1)
-        grid.addWidget(self.licenseEdit, 3, 1, 1, 2)
-        grid.addWidget(URLLabel, 4, 0, 1, 1)
-        grid.addWidget(self.URLEdit, 4, 1, 1, 2)
-        grid.addWidget(groupLabel, 5, 0, 1, 1)
-        grid.addWidget(self.groupEdit, 5, 1, 1, 2)
+        grid.addWidget(importLabel, 0, 0, 1, 1)
+        grid.addWidget(self.importEdit, 0, 1, 1, 1)
+        grid.addWidget(self.importButton, 0, 2, 1, 1)
+        grid.addWidget(nameLabel, 1, 0, 1, 1)
+        grid.addWidget(self.nameEdit, 1, 1, 1, 2)
+        grid.addWidget(versionLabel, 2, 0, 1, 1)
+        grid.addWidget(self.versionEdit, 2, 1, 1, 2)
+        grid.addWidget(releaseLabel, 3, 0, 1, 1)
+        grid.addWidget(self.releaseEdit, 3, 1, 1, 2)
+        grid.addWidget(licenseLabel, 4, 0, 1, 1)
+        grid.addWidget(self.licenseEdit, 4, 1, 1, 2)
+        grid.addWidget(URLLabel, 5, 0, 1, 1)
+        grid.addWidget(self.URLEdit, 5, 1, 1, 2)
         grid.addWidget(summaryLabel, 6, 0, 1, 1)
         grid.addWidget(self.summaryEdit, 6, 1, 1, 2)
         grid.addWidget(descriptionLabel, 7, 0, 1, 1)
@@ -160,9 +153,6 @@ class ImportPage(QtWidgets.QWizardPage):
         grid.addWidget(self.vendorEdit, 8, 1, 1, 2)
         grid.addWidget(packagerLabel, 9, 0, 1, 1)
         grid.addWidget(self.packagerEdit, 9, 1, 1, 2)
-        grid.addWidget(importLabel, 10, 0, 1, 1)
-        grid.addWidget(self.importEdit, 10, 1, 1, 1)
-        grid.addWidget(self.importButton, 10, 2, 1, 1)
         mainLayout.addSpacing(40)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
@@ -188,7 +178,6 @@ class ImportPage(QtWidgets.QWizardPage):
         self.base.spec.tags['Release'] = self.releaseEdit.text()
         self.base.spec.tags['License'] = self.licenseEdit.text()
         self.base.spec.tags['URL'] = self.URLEdit.text()
-        self.base.spec.tags['Group'] = self.groupEdit.currentText()
         self.base.spec.tags['Summary'] = self.summaryEdit.text()
         self.base.spec.scripts['%description'] = self.descriptionEdit.text()
         self.base.spec.tags['Vendor'] = self.vendorEdit.text()
