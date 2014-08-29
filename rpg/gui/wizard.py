@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
-                             QGroupBox, QComboBox, QPushButton, QGridLayout,
+                             QGroupBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage
@@ -130,6 +130,22 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importButton.setMinimumHeight(30)
         self.importButton.clicked.connect(self.openImportPageFileDialog)
 
+        # Making mandatory fields:
+        self.registerField("Name*", self.nameEdit)
+        self.registerField("Summary*", self.summaryEdit)
+        self.registerField("Version*", self.versionEdit)
+        self.registerField("Release*", self.releaseEdit)
+        self.registerField("License*", self.licenseEdit)
+        self.registerField("Source*", self.importEdit)
+
+        # Highlighting mandatory fields:
+        self.nameEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+        self.summaryEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+        self.versionEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+        self.releaseEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+        self.licenseEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+        self.importEdit.setStyleSheet("QLineEdit{border: 1px solid red;}")
+
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
         grid.addWidget(importLabel, 0, 0, 1, 1)
@@ -143,10 +159,10 @@ class ImportPage(QtWidgets.QWizardPage):
         grid.addWidget(self.releaseEdit, 3, 1, 1, 2)
         grid.addWidget(licenseLabel, 4, 0, 1, 1)
         grid.addWidget(self.licenseEdit, 4, 1, 1, 2)
-        grid.addWidget(URLLabel, 5, 0, 1, 1)
-        grid.addWidget(self.URLEdit, 5, 1, 1, 2)
-        grid.addWidget(summaryLabel, 6, 0, 1, 1)
-        grid.addWidget(self.summaryEdit, 6, 1, 1, 2)
+        grid.addWidget(summaryLabel, 5, 0, 1, 1)
+        grid.addWidget(self.summaryEdit, 5, 1, 1, 2)
+        grid.addWidget(URLLabel, 6, 0, 1, 1)
+        grid.addWidget(self.URLEdit, 6, 1, 1, 2)
         grid.addWidget(descriptionLabel, 7, 0, 1, 1)
         grid.addWidget(self.descriptionEdit, 7, 1, 1, 2)
         grid.addWidget(vendorLabel, 8, 0, 1, 1)
@@ -215,6 +231,9 @@ class ScriptsPage(QtWidgets.QWizardPage):
         checkLabel = QLabel("%check: ")
         self.checkEdit = QPlainTextEdit()
 
+        buildArchLabel = QLabel("BuildArch: ")
+        self.buildArchCheckbox = QCheckBox("noarch")
+
         grid = QGridLayout()
         grid.addWidget(prepareLabel, 0, 0)
         grid.addWidget(self.prepareEdit, 0, 1)
@@ -224,6 +243,8 @@ class ScriptsPage(QtWidgets.QWizardPage):
         grid.addWidget(self.installEdit, 2, 1)
         grid.addWidget(checkLabel, 3, 0)
         grid.addWidget(self.checkEdit, 3, 1)
+        grid.addWidget(buildArchLabel, 4, 0)
+        grid.addWidget(self.buildArchCheckbox, 4, 1)
         self.setLayout(grid)
 
     def validatePage(self):
@@ -231,6 +252,10 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.base.spec.scripts['%build'] = self.buildEdit.toPlainText()
         self.base.spec.scripts['%install'] = self.installEdit.toPlainText()
         self.base.spec.scripts['%check'] = self.checkEdit.toPlainText()
+        if self.buildArchCheckbox.isChecked():
+            self.base.spec.tags['BuildArch'] = "noarch"
+        else:
+            self.base.spec.tags.pop('BuildArch', None)
         return True
 
     def nextId(self):
@@ -284,7 +309,6 @@ class PatchesPage(QtWidgets.QWizardPage):
         for i in range(0, self.itemsCount):
             self.pathes.append(self.listPatches.item(i).text())
 
-        print(self.pathes)
         self.base.apply_patches(self.pathes)
         self.base.run_pathed_sources_analysis()
         self.base.build_project()
@@ -578,10 +602,6 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
-        print(" ---- Tags: ---- ")
-        print(self.base.spec.tags)
-        print("\n ----- Scripts: ----- ")
-        print(self.base.spec.scripts)
         return True
 
     def switchToCOPR(self):
