@@ -1,5 +1,7 @@
+from pathlib import Path
 from support import RpgTestCase
 from rpg.command import Command
+import subprocess
 
 
 class PluginEngineTest(RpgTestCase):
@@ -18,3 +20,11 @@ class PluginEngineTest(RpgTestCase):
         path = self.test_project_dir.resolve()
         expected = "%s\n%s/c\n" % (path, path)
         self.assertEqual(expected, output)
+
+        # doesn't add 'cd work_dir' during execute to command lines
+        cur_dir = Path('.')
+        with self.assertRaises(subprocess.CalledProcessError) as ctx:
+            cmd.execute(cur_dir)
+        expected = "Command '['/bin/sh', '-c', 'cd %s && pwd && cd c && pwd" \
+            "']' returned non-zero exit status 1" % cur_dir.resolve()
+        self.assertEqual(expected, str(ctx.exception))

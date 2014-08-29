@@ -35,6 +35,6 @@ class Command:
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
 
-        self._command_lines.insert(0, "cd %s" % work_dir.resolve())
-        o = check_output(["/bin/sh", "-c", " && ".join(self._command_lines)])
+        command_lines = ["cd %s" % work_dir.resolve()] + self._command_lines
+        o = check_output(["/bin/sh", "-c", " && ".join(command_lines)])
         return o.decode('utf-8')
