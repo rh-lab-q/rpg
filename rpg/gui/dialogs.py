@@ -147,7 +147,9 @@ class DialogSubpackage(QtWidgets.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSubpackage, self).__init__(parent)
 
-                # Settings
+        self.wizard = Wizard
+
+        # Settings
         self.setMinimumSize(QtCore.QSize(350, 150))
         self.setMaximumSize(QtCore.QSize(500, 600))
 
@@ -186,5 +188,5 @@ class DialogSubpackage(QtWidgets.QDialog):
         self.setLayout(mainLayout)
 
     def acceptIt(self):
-        ''' If user clicked "OK" button '''
+        self.wizard.tree.addSubpackage(self.nameEdit.text())
         self.accept()

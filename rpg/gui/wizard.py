@@ -2,7 +2,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
-                             QDialog, QFileDialog)
+                             QDialog, QFileDialog, QTreeWidget,
+                             QTreeWidgetItem)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage
 from rpg import Base
 
@@ -323,10 +324,10 @@ class PatchesPage(QtWidgets.QWizardPage):
         for i in range(0, self.itemsCount):
             self.pathes.append(self.listPatches.item(i).text())
 
-        self.base.apply_patches(self.pathes)
-        self.base.run_pathed_sources_analysis()
-        self.base.build_project()
-        self.base.run_installed_files_analysis()
+        #self.base.apply_patches(self.pathes)
+        #self.base.run_pathed_sources_analysis()
+        #self.base.build_project()
+        #self.base.run_installed_files_analysis()
         return True
 
     def nextId(self):
@@ -432,6 +433,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         super(SubpackagesPage, self).__init__(parent)
 
         self.base = Wizard.base
+        self.tree = self.SubpackTreeWidget(self)
 
         self.setTitle(self.tr("Subpackages page"))
         self.setSubTitle(self.tr("Choose subpackages"))
@@ -447,14 +449,14 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         self.removePackButton = QPushButton("-")
         self.removePackButton.setMaximumWidth(68)
         self.removePackButton.setMaximumHeight(60)
+        self.removePackButton.clicked.connect(self.removeItem)
 
         self.transferButton = QPushButton("->")
         self.transferButton.setMaximumWidth(120)
         self.transferButton.setMaximumHeight(20)
+        self.transferButton.clicked.connect(self.moveFileToTree)
 
         self.filesListWidget = QListWidget()
-        self.subpackagesListWidget = QListWidget()
-
         mainLayout = QVBoxLayout()
         upperLayout = QHBoxLayout()
         lowerLayout = QHBoxLayout()
@@ -466,10 +468,36 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         upperLayout.addWidget(self.removePackButton)
         lowerLayout.addWidget(self.filesListWidget)
         lowerLayout.addWidget(self.transferButton)
-        lowerLayout.addWidget(self.subpackagesListWidget)
+        lowerLayout.addWidget(self.tree)
         mainLayout.addLayout(upperLayout)
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
+
+    def moveFileToTree(self):
+        ''' Function to move items from left to right
+            (depending on which and where selected)
+            - trigered when user clicked [ -> ] button '''
+        self.subpackageItems = self.tree.selectedItems()
+        self.subpackageItem = self.subpackageItems[0]
+        self.itemLeft = self.filesListWidget.takeItem(self.filesListWidget.
+                                                      currentRow())
+        for itemRight in self.tree.selectedItems():
+            if (itemRight.parent() is None):
+                self.tree.addFileToSubpackage(itemRight,
+                                              self.itemLeft.text(), "file")
+            else:
+                self.tree.addFileToSubpackage(itemRight.parent(),
+                                              self.itemLeft.text(), "file")
+        self.itemLeft = None
+
+    def removeItem(self):
+        ''' Function to remove items (depending on which and where selected)
+            - trigered when user clicked [ - ] button '''
+        root = self.tree.invisibleRootItem()
+        for item in self.tree.selectedItems():
+            if (item.parent() is not None):
+                self.filesListWidget.addItem(item.text(0))
+            (item.parent() or root).removeChild(item)
 
     def openSubpackageDialog(self):
         subpackageWindow = QDialog()
@@ -478,6 +506,35 @@ class SubpackagesPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         return Wizard.PageDocsChangelog
+
+    # Class for tree view (Subpackages generation)
+    class SubpackTreeWidget(QTreeWidget):
+        def __init__(self, Page):
+            self.page = Page
+            QtWidgets.QWidget.__init__(self)
+            self.column = 0  # only one column in each row
+            self.setHeaderHidden(True)  # make invisible -1 row (with name)
+
+        def addSubpackage(self, Name):
+            self.name = Name
+            ''' Add new subpackage and make root it's parent '''
+            self.addParent(self.invisibleRootItem(),
+                           self.name,
+                           self.name + " Subpackage")
+
+        def addParent(self, parent, title, data):
+            item = QTreeWidgetItem(parent, [title])
+            item.setData(self.column, QtCore.Qt.UserRole, data)
+
+            ''' Dropdown arrows near subpackages '''
+            item.setChildIndicatorPolicy(QTreeWidgetItem.ShowIndicator)
+            item.setExpanded(True)  # To look like a tree (expanding items)
+            return item
+
+        def addFileToSubpackage(self, parent, title, data):
+            item = QTreeWidgetItem(parent, [title])
+            item.setData(self.column, QtCore.Qt.UserRole, data)
+            return item
 
 
 class DocsChangelogPage(QtWidgets.QWizardPage):
