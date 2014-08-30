@@ -33,6 +33,12 @@ class Subpackage:
         # e.g. "%prep" -> "%autosetup"
         self.scripts = {}
 
+    def __getattr__(self, key):
+        pass
+
+    def __setattr__(self, key, value):
+        pass
+
     def _files_remove_duplicity(self):
         """Function checks for duplicity in files list, leaving only the last
         occurence of that specific file. Function is not order preserving."""
@@ -125,6 +131,9 @@ class Spec(Subpackage):
         super(Spec, self).__init__()
         self.subpackages = []
         self.changelogs = []
+
+    def __str__(self):
+        pass
 
     def _files_remove_duplicity(self):
         return super(Spec, self)._files_remove_duplicity()
