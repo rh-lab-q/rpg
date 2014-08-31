@@ -78,33 +78,40 @@ class ImportPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Fill in fields and import " +
                                  "your SRPM or source folder"))
         ''' Creating widgets and setting them to layout'''
-        self.nameLabel = QLabel("<font color=\'red\'>*</font> Name: ")
+        self.nameLabel = QLabel("Name<font color=\'red\'>*</font>")
         self.nameEdit = QLineEdit()
         self.nameEdit.setMinimumHeight(30)
         self.nameLabel.setBuddy(self.nameEdit)
         self.nameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.nameLabel.setToolTip("Text for name label")
 
-        self.versionLabel = QLabel("<font color=\'red\'>*</font> Version: ")
+        self.versionLabel = QLabel("Version<font color=\'red\'>*</font>")
         self.versionEdit = QLineEdit()
         self.versionEdit.setMinimumHeight(30)
         self.versionLabel.setBuddy(self.versionEdit)
         self.versionLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.versionLabel.setToolTip("Text for verion label")
 
-        self.releaseLabel = QLabel("<font color=\'red\'>*</font> Release: ")
+        self.releaseLabel = QLabel("Release<font color=\'red\'>*</font>")
         self.releaseEdit = QLineEdit()
         self.releaseEdit.setMinimumHeight(30)
         self.releaseLabel.setBuddy(self.releaseEdit)
         self.releaseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.releaseLabel.setToolTip("Text for release label")
 
-        self.licenseLabel = QLabel("<font color=\'red\'>*</font> License: ")
+        self.licenseLabel = QLabel("License<font color=\'red\'>*</font>")
         self.licenseEdit = QLineEdit()
         self.licenseEdit.setMinimumHeight(30)
         self.licenseLabel.setBuddy(self.licenseEdit)
         self.licenseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.licenseLabel.setToolTip("Text for license label")
+
+        self.summaryLabel = QLabel("Summary<font color=\'red\'>*</font>")
+        self.summaryEdit = QLineEdit()
+        self.summaryEdit.setMinimumHeight(30)
+        self.summaryLabel.setBuddy(self.summaryEdit)
+        self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.summaryLabel.setToolTip("Text for summary label")
 
         self.URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
@@ -112,13 +119,6 @@ class ImportPage(QtWidgets.QWizardPage):
         self.URLLabel.setBuddy(self.URLEdit)
         self.URLLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.URLLabel.setToolTip("Text for URL label")
-
-        self.summaryLabel = QLabel("<font color=\'red\'>*</font> Summary: ")
-        self.summaryEdit = QLineEdit()
-        self.summaryEdit.setMinimumHeight(30)
-        self.summaryLabel.setBuddy(self.summaryEdit)
-        self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.summaryLabel.setToolTip("Text for summary label")
 
         self.descriptionLabel = QLabel("Description: ")
         self.descriptionEdit = QLineEdit()
@@ -142,7 +142,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.packagerLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.packagerLabel.setToolTip("Text for packager label")
 
-        self.importLabel = QLabel("<font color=\'red\'>*</font> Source: ")
+        self.importLabel = QLabel("Source<font color=\'red\'>*</font>")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
         self.importLabel.setBuddy(self.importEdit)
