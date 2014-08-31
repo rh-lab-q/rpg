@@ -149,9 +149,13 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.importLabel.setToolTip("Text for import label")
 
-        self.importButton = QPushButton("Import")
-        self.importButton.setMinimumHeight(30)
-        self.importButton.clicked.connect(self.openImportPageFileDialog)
+        self.importArButton = QPushButton("Import\narchive")
+        self.importArButton.setMinimumHeight(50)
+        self.importArButton.clicked.connect(self.getArchiveFileDialog)
+
+        self.importDirButton = QPushButton("Import\ndirectory")
+        self.importDirButton.setMinimumHeight(50)
+        self.importDirButton.clicked.connect(self.getDirFileDialog)
 
         # Making mandatory fields:
         self.registerField("Name*", self.nameEdit)
@@ -165,36 +169,50 @@ class ImportPage(QtWidgets.QWizardPage):
         grid = QGridLayout()
         grid.addWidget(self.importLabel, 0, 0, 1, 1)
         grid.addWidget(self.importEdit, 0, 1, 1, 1)
-        grid.addWidget(self.importButton, 0, 2, 1, 1)
+        grid.addWidget(self.importArButton, 0, 2, 1, 1)
+        grid.addWidget(self.importDirButton, 0, 3, 1, 1)
         grid.addWidget(self.nameLabel, 1, 0, 1, 1)
-        grid.addWidget(self.nameEdit, 1, 1, 1, 2)
+        grid.addWidget(self.nameEdit, 1, 1, 1, 3)
         grid.addWidget(self.versionLabel, 2, 0, 1, 1)
-        grid.addWidget(self.versionEdit, 2, 1, 1, 2)
+        grid.addWidget(self.versionEdit, 2, 1, 1, 3)
         grid.addWidget(self.releaseLabel, 3, 0, 1, 1)
-        grid.addWidget(self.releaseEdit, 3, 1, 1, 2)
+        grid.addWidget(self.releaseEdit, 3, 1, 1, 3)
         grid.addWidget(self.licenseLabel, 4, 0, 1, 1)
-        grid.addWidget(self.licenseEdit, 4, 1, 1, 2)
+        grid.addWidget(self.licenseEdit, 4, 1, 1, 3)
         grid.addWidget(self.summaryLabel, 5, 0, 1, 1)
-        grid.addWidget(self.summaryEdit, 5, 1, 1, 2)
+        grid.addWidget(self.summaryEdit, 5, 1, 1, 3)
         grid.addWidget(self.URLLabel, 6, 0, 1, 1)
-        grid.addWidget(self.URLEdit, 6, 1, 1, 2)
+        grid.addWidget(self.URLEdit, 6, 1, 1, 3)
         grid.addWidget(self.descriptionLabel, 7, 0, 1, 1)
-        grid.addWidget(self.descriptionEdit, 7, 1, 1, 2)
+        grid.addWidget(self.descriptionEdit, 7, 1, 1, 3)
         grid.addWidget(self.vendorLabel, 8, 0, 1, 1)
-        grid.addWidget(self.vendorEdit, 8, 1, 1, 2)
+        grid.addWidget(self.vendorEdit, 8, 1, 1, 3)
         grid.addWidget(self.packagerLabel, 9, 0, 1, 1)
-        grid.addWidget(self.packagerEdit, 9, 1, 1, 2)
+        grid.addWidget(self.packagerEdit, 9, 1, 1, 3)
         mainLayout.addSpacing(40)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
 
-    def openImportPageFileDialog(self):
-        ''' Open file browser in new dialog window'''
+    def getDirFileDialog(self):
+        ''' Returns path to archive'''
+        brows = QFileDialog()
+        path = brows.getExistingDirectory(self,
+                                          "Choose source folder or" +
+                                          "archive",
+                                          "/home",
+                                          QFileDialog.ShowDirsOnly)
+        self.importEdit.setText(path)
+
+    def getArchiveFileDialog(self):
+        ''' Returns path to dir '''
         brows = QFileDialog()
         self.getPath = brows.getOpenFileName(self,
-                                             "Choose source folder or archive",
+                                             "Choose directory",
                                              "/home",
-                                             "Archives (*.zip *.xz *.gz)")
+                                             "Archives" +
+                                             "(*.zip *.xz *.gz *.bz2);;" +
+                                             "Directory" +
+                                             "(*.dir)")
         self.path = self.getPath[0]
         self.importEdit.setText(self.path)
 
@@ -324,10 +342,10 @@ class PatchesPage(QtWidgets.QWizardPage):
         for i in range(0, self.itemsCount):
             self.pathes.append(self.listPatches.item(i).text())
 
-        #self.base.apply_patches(self.pathes)
-        #self.base.run_pathed_sources_analysis()
-        #self.base.build_project()
-        #self.base.run_installed_files_analysis()
+        self.base.apply_patches(self.pathes)
+        self.base.run_pathed_sources_analysis()
+        self.base.build_project()
+        self.base.run_installed_files_analysis()
         return True
 
     def nextId(self):
