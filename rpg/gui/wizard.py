@@ -200,9 +200,12 @@ class ImportPage(QtWidgets.QWizardPage):
         if(path.exists()):
             self.importEdit.setStyleSheet("")
         else:
-            self.importEdit.setStyleSheet("QLineEdit { border-style: outset;" +
-                                          "border-width: 2px;" +
-                                          "border-color: red;}")
+            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
+                                          "border-width: 1px;" +
+                                          "border-color: red;" +
+                                          "border-radius: 3px;" +
+                                          "background-color:" +
+                                          "rgb(233,233,233);}")
 
     def getDirFileDialog(self):
         ''' Returns path to archive'''
