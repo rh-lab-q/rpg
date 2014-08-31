@@ -364,10 +364,10 @@ class PatchesPage(QtWidgets.QWizardPage):
         for i in range(0, self.itemsCount):
             self.pathes.append(self.listPatches.item(i).text())
 
-        #self.base.apply_patches(self.pathes)
-        #self.base.run_pathed_sources_analysis()
-        #self.base.build_project()
-        #self.base.run_installed_files_analysis()
+        self.base.apply_patches(self.pathes)
+        self.base.run_pathed_sources_analysis()
+        self.base.build_project()
+        self.base.run_installed_files_analysis()
         return True
 
     def nextId(self):
