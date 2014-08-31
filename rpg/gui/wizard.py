@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QDialog, QFileDialog, QTreeWidget,
                              QTreeWidgetItem)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage
+from pathlib import Path
 from rpg import Base
 
 
@@ -148,6 +149,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importLabel.setBuddy(self.importEdit)
         self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.importLabel.setToolTip("Text for import label")
+        self.importEdit.textChanged.connect(self.checkPath)
 
         self.importArButton = QPushButton("Import\narchive")
         self.importArButton.setMinimumHeight(50)
@@ -193,6 +195,15 @@ class ImportPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
 
+    def checkPath(self):
+        path = Path(self.importEdit.text())
+        if(path.exists()):
+            self.importEdit.setStyleSheet("")
+        else:
+            self.importEdit.setStyleSheet("QLineEdit { border-style: outset;" +
+                                          "border-width: 2px;" +
+                                          "border-color: red;}")
+
     def getDirFileDialog(self):
         ''' Returns path to archive'''
         brows = QFileDialog()
@@ -210,9 +221,7 @@ class ImportPage(QtWidgets.QWizardPage):
                                              "Choose directory",
                                              "/home",
                                              "Archives" +
-                                             "(*.zip *.xz *.gz *.bz2);;" +
-                                             "Directory" +
-                                             "(*.dir)")
+                                             "(*.zip *.xz *.gz *.bz2)")
         self.path = self.getPath[0]
         self.importEdit.setText(self.path)
 
@@ -232,8 +241,18 @@ class ImportPage(QtWidgets.QWizardPage):
         self.base.spec.tags['Vendor'] = self.vendorEdit.text()
         self.base.spec.tags['Packager'] = self.packagerEdit.text()
         self.base.spec.tags['Path'] = self.importEdit.text()
-        self.base.process_archive_or_dir(self.base.spec.tags['Path'])
-        return True
+
+        # Verifying path
+        path = Path(self.base.spec.tags['Path'])
+        if(path.exists()):
+            self.base.process_archive_or_dir(self.base.spec.tags['Path'])
+            self.importEdit.setStyleSheet("")
+            return True
+        else:
+            self.importEdit.setStyleSheet("QLineEdit { border-style: outset;" +
+                                          "border-width: 2px;" +
+                                          "border-color: red;}")
+            return False
 
     def nextId(self):
         ''' [int] Function that determines the next page after the current one
