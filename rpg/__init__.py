@@ -1,10 +1,11 @@
+from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.project_builder import ProjectBuilder
 from rpg.copr_uploader import CoprUploader
 from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
-from pathlib import Path
+from subprocess import check_output
 
 
 class Base(object):
@@ -52,7 +53,7 @@ class Base(object):
 
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
-        self._hash = "<hash>"  # TODO hash of tarball or filename
+        self._hash = self.compute_checksum(path)
         self._source_loader.load_sources(path, self.source_extraction_path)
 
     def run_raw_sources_analysis(self):
@@ -85,6 +86,18 @@ class Base(object):
         for distro in distros:
             self._package_builder.build(self.spec_path, self.tarball_path,
                                         self.distro)
+
+    @staticmethod
+    def compute_checksum(sources):
+        if sources.is_dir():
+            cmd = "find %s -type f -print0 | sort -z | xargs " \
+                  "-0 sha1sum | sha1sum" % sources.resolve()
+
+            shasum = check_output(["/bin/sh", "-c", cmd])
+        else:
+            cmd = "sha1sum %s" % sources.resolve()
+            shasum = check_output(["/bin/sh", "-c", cmd])
+        return shasum.decode("utf-8")[:7]
 
     # predictor methods are used for autocompletion of the field,
     # every guess_* method return list of strings matched ordered
