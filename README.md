@@ -16,6 +16,7 @@ Packages needed for the build, or the build requires:
 * file
 * dnf
 * rpmdevtools
+* coreutils
 
 Start RPG
 =========
