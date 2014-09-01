@@ -6,6 +6,7 @@ from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from subprocess import check_output
+import shutil
 
 
 class Base(object):
@@ -54,6 +55,7 @@ class Base(object):
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
         self._hash = self.compute_checksum(path)
+        self.setup_workspace()
         self._source_loader.load_sources(path, self.source_extraction_path)
 
     def run_raw_sources_analysis(self):
@@ -98,6 +100,23 @@ class Base(object):
             cmd = "sha1sum %s" % sources.resolve()
             shasum = check_output(["/bin/sh", "-c", cmd])
         return shasum.decode("utf-8")[:7]
+
+    @property
+    def all_dirs(self):
+        return [
+            self.source_extraction_path,
+            self.project_build_path,
+            self.rpm_stuff_path
+        ]
+
+    def setup_workspace(self):
+        """make sure all directories used later will exist"""
+        try:
+            shutil.rmtree(self.base_path)
+        except FileNotFoundError:
+            pass
+        for d in self.all_dirs:
+            d.mkdir(parents=True)
 
     # predictor methods are used for autocompletion of the field,
     # every guess_* method return list of strings matched ordered
