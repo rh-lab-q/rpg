@@ -7,7 +7,12 @@ import logging
 def main():
     import sys
 
-    logging.basicConfig(filename='rpg.log', level=logging.INFO)
+    logging.basicConfig(level=logging.INFO,
+                        format='[%(asctime)s] {%(pathname)s:%(lineno)d} '
+                               '%(levelname)s - %(message)s',
+                        handlers=[logging.FileHandler("rpg.log"),
+                                  logging.StreamHandler()],
+                        datefmt='%H:%M:%S')
     logging.info('App started')
 
     app = QApplication(sys.argv)
