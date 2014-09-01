@@ -7,13 +7,12 @@ import logging
 def main():
     import sys
 
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=logging.DEBUG,
                         format='[%(asctime)s] {%(pathname)s:%(lineno)d} '
                                '%(levelname)s - %(message)s',
                         handlers=[logging.FileHandler("rpg.log"),
                                   logging.StreamHandler()],
                         datefmt='%H:%M:%S')
-    logging.info('App started')
 
     app = QApplication(sys.argv)
     wiz = Wizard()
@@ -24,7 +23,7 @@ def main():
     wiz.setBaseSize(QtCore.QSize(850, 650))
     wiz.show()
 
-    logging.info('App exiting')
+    logging.info('GUI loaded')
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

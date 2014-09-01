@@ -1,4 +1,5 @@
 import errno
+import logging
 import os
 import os.path
 import re
@@ -43,7 +44,7 @@ class SourceLoader:
         return None
 
     def _create_archive(self, path, source_dir, compression=TAR_GZIP):
-        name = os.path.basename(path)+".tar.gz"
+        name = os.path.basename(path) + ".tar.gz"
         mode = self._tar_compression_mode.get(
             self._tar_compression_type.get(compression))
         with tar.open(name, 'w:' + mode) as tarfile:
@@ -54,6 +55,9 @@ class SourceLoader:
         """Extracts archive to source_dir and adds a flag for %prep section to
         create root directory if necessary. If argument is a directory,
         copy the directory to desired location."""
+
+        logging.debug('load_sources(%s, %s) called' % (repr(path),
+                      repr(source_dir)))
 
         # first we need to test, if target is a directory or an archive
         if (os.path.isfile(path)):

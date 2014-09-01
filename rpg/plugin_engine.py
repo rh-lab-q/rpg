@@ -1,5 +1,6 @@
 from rpg.plugin import Plugin
 import inspect
+import logging
 import os.path
 
 phases = ("before_patches_applied", "after_patches_applied",
@@ -22,20 +23,22 @@ class PluginEngine:
         """trigger all plugin methods that are subscribed to the phase"""
 
         if phase not in phases:
-            # TODO log warning
+            logging.warn("tried to execute non-valid phase %s" % phase)
             return
-        print("rpg: plugin phase %s executed" % phase)
+        logging.info("plugin phase %s executed" % phase)
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, phase)
             except AttributeError:
                 continue
             if callable(method):
-                print("rpg: plugin %s executed" % plugin.__class__.__name__)
+                plugin_name = plugin.__class__.__name__
                 try:
                     method(project_dir, self.spec, self.sack)
                 except Exception:
-                    pass  # TODO log error
+                    logging.warn("can not execute plugin %s" % plugin_name)
+                else:
+                    logging.info("plugin %s executed" % plugin_name)
 
     def load_plugins(self, path):
         """finds all plugins in dir and it's subdirectories"""
@@ -51,11 +54,14 @@ class PluginEngine:
                 attr = getattr(imported_file, var_name)
                 if inspect.isclass(attr) and attr != Plugin and \
                    issubclass(attr, Plugin):
-                    # TODO info log initialization of plugin
+                    plugin_file = imported_file.__name__
                     try:
-                        self.plugins.add(attr())
+                        plugin = attr()
+                        self.plugins.add(plugin)
                     except Exception:
-                        pass  # TODO log error
+                        logging.warn("plugin %s not loaded" % plugin_file)
+                    else:
+                        logging.info("plugin %s loaded" % plugin_file)
 
 
 def _os_path_split(path):

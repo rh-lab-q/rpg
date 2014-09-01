@@ -11,7 +11,8 @@ class ProjectBuilder:
         """Builds project in given project_target_dir then cleans this
            directory, build_params is list of command strings.
            returns list of files that should be installed or error string"""
-        logging.info('Building project')
+        logging.debug('build(%s, %s, %s)' % (repr(project_source_dir),
+                             repr(project_target_dir), repr(build_params)))
         current_dir = os.getcwd()
 
         call(["cp", project_source_dir, project_target_dir, "-r", "-p"])
