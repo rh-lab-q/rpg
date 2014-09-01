@@ -24,21 +24,20 @@ class Base(object):
         self._plugin_engine.load_plugins(Path('rpg/plugins'))
 
     @property
-    def source_extraction_path(self):
-        return self.base_path % "source"
+    def base_dir(self):
+        return Path("/tmp/rpg-" + self._hash)
 
     @property
-    def rpm_stuff_path(self):
-        # directory with tarball and spec file
-        return self.base_path % "rpmstuff"
+    def extracted_dir(self):
+        return self.base_dir / "extracted"
 
     @property
-    def project_build_path(self):
-        return self.base_path % "projectbuild"
+    def compiled_dir(self):
+        return self.base_dir / "compiled"
 
     @property
-    def base_path(self):
-        return "/tmp/rpg-" + self._hash + "/%s"
+    def installed_dir(self):
+        return self.base_dir / "installed"
 
     @property
     def project_name(self):
@@ -46,22 +45,27 @@ class Base(object):
 
     @property
     def spec_path(self):
-        return self.rpm_stuff_path + '/' + self.project_name + ".spec"
+        return self.base_dir / (self.project_name + ".spec")
 
     @property
     def tarball_path(self):
-        return self.rpm_stuff_path + '/' + self.project_name + ".tar.gz"
+        return self.base_dir / (self.project_name + ".tar.gz")
+
+    @property
+    def rpm_path(self):
+        return next(self.base_dir.glob(self.project_name + "*.rpm"))
 
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
-        self._hash = self.compute_checksum(path)
+        p = Path(path)
+        self._hash = self.compute_checksum(p)
         self.setup_workspace()
-        self._source_loader.load_sources(path, self.source_extraction_path)
+        self._source_loader.load_sources(p, self.extracted_dir)
 
     def run_raw_sources_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
         self._plugin_engine.execute_phase(phases[0],
-                                          self.source_extraction_path)
+                                          self.extracted_dir)
 
     def apply_patches(self, ordered_patches):
         """executed in background after patch selection and reordering"""
@@ -70,18 +74,18 @@ class Base(object):
     def run_pathed_sources_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[1],
-                                          self.source_extraction_path)
+                                          self.extracted_dir)
 
     def build_project(self):
         """executed in background after filled requires screen"""
-        self._project_builder.build(self.source_extraction_path,
-                                    self.project_build_path,
+        self._project_builder.build(self.extracted_dir,
+                                    self.compiled_dir,
                                     self.spec.scripts["%build"])
 
     def run_installed_files_analysis(self):
         """executed in background after successful project build"""
         self._plugin_engine.execute_phase(phases[2],
-                                          self.project_build_path)
+                                          self.compiled_dir)
 
     def build_packages(self, *distros):
         """builds packages for desired distributions"""
@@ -104,15 +108,15 @@ class Base(object):
     @property
     def all_dirs(self):
         return [
-            self.source_extraction_path,
-            self.project_build_path,
-            self.rpm_stuff_path
+            self.extracted_dir,
+            self.compiled_dir,
+            self.installed_dir
         ]
 
     def setup_workspace(self):
         """make sure all directories used later will exist"""
         try:
-            shutil.rmtree(self.base_path)
+            shutil.rmtree(str(self.base_dir))
         except FileNotFoundError:
             pass
         for d in self.all_dirs:

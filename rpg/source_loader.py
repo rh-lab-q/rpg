@@ -43,7 +43,7 @@ class SourceLoader:
                 return filetype
         return None
 
-    def _create_archive(self, path, source_dir, compression=TAR_GZIP):
+    def _create_archive(self, path, extracted_dir, compression=TAR_GZIP):
         name = os.path.basename(path) + ".tar.gz"
         mode = self._tar_compression_mode.get(
             self._tar_compression_type.get(compression))
@@ -51,13 +51,15 @@ class SourceLoader:
             tarfile.add(path, arcname=os.path.basename(path))
         return name
 
-    def load_sources(self, path, source_dir, compression=TAR_GZIP):
-        """Extracts archive to source_dir and adds a flag for %prep section to
-        create root directory if necessary. If argument is a directory,
+    def load_sources(self, source_path, extracted_dir, compression=TAR_GZIP):
+        """Extracts archive to extracted_dir and adds a flag for %prep section
+        to create root directory if necessary. If argument is a directory,
         copy the directory to desired location."""
 
-        logging.debug('load_sources(%s, %s) called' % (repr(path),
-                      repr(source_dir)))
+        logging.debug('load_sources(%s, %s) called' % (repr(source_path),
+                      repr(extracted_dir)))
+        path = str(source_path)
+        extracted_dir = str(extracted_dir)
 
         # first we need to test, if target is a directory or an archive
         if (os.path.isfile(path)):
@@ -96,7 +98,7 @@ class SourceLoader:
 
             archive = tarfile if tar_archive else zipfile
             try:
-                archive.extractall(source_dir)  # same API for ZIP and TAR
+                archive.extractall(extracted_dir)  # same API for ZIP and TAR
             except OSError as e:
                 print("error: Extraction of '{}' failed: {}"
                       .format(path,
@@ -106,16 +108,16 @@ class SourceLoader:
 
         elif (os.path.isdir(path)):
             try:
-                shutil.copytree(path, source_dir)
+                shutil.copytree(path, extracted_dir)
             except OSError as e:
                 if e.errno == errno.EEXIST:
                     try:
-                        shutil.rmtree(source_dir)
-                        shutil.copytree(path, source_dir)
+                        shutil.rmtree(extracted_dir)
+                        shutil.copytree(path, extracted_dir)
                     except OSError as e:
                         if e.errno == errno.EPERM or e.errno == errno.EACCES:
                             print("error: failed creating directory tree at \
-                            {}: {}".format(source_dir,
+                            {}: {}".format(extracted_dir,
                                            os.strerror(e.errno)),
                                   file=sys.stderr)
                         return -1

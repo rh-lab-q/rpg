@@ -12,8 +12,10 @@ class ProjectBuilder:
            directory, build_params is list of command strings.
            returns list of files that should be installed or error string"""
         logging.debug('build(%s, %s, %s)' % (repr(project_source_dir),
-                             repr(project_target_dir), repr(build_params)))
+                      repr(project_target_dir), repr(build_params)))
         current_dir = os.getcwd()
+        project_source_dir = str(project_source_dir)
+        project_target_dir = str(project_target_dir)
 
         call(["cp", project_source_dir, project_target_dir, "-r", "-p"])
         root_files = self._list_files_root(project_target_dir)
