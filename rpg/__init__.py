@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.project_builder import ProjectBuilder
@@ -14,6 +15,7 @@ class Base(object):
     """Base class that is controlled by RPM GUI"""
 
     def __init__(self):
+        self._setup_logging()
         self._project_builder = ProjectBuilder()
         self.spec = Spec()
         self.sack = None  # TODO dnf sack
@@ -22,6 +24,14 @@ class Base(object):
         self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
         self._plugin_engine.load_plugins(Path('rpg/plugins'))
+
+    def _setup_logging(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='[%(asctime)s] {%(pathname)s:%(lineno)d} '
+                                   '%(levelname)s - %(message)s',
+                            handlers=[logging.FileHandler("rpg.log"),
+                                      logging.StreamHandler()],
+                            datefmt='%H:%M:%S')
 
     @property
     def base_dir(self):
