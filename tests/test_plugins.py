@@ -13,8 +13,8 @@ class FindPatchPluginTest(PluginTestCase):
 
     def test_find_patch(self):
         plugin = FindPatchPlugin()
-        plugin.before_patches_applied(self.test_project_dir / "patch",
-                                      self.spec, self.sack)
+        plugin.extracted(self.test_project_dir / "patch",
+                         self.spec, self.sack)
         patch_order = ['tests/project/patch/0.patch',
                        'tests/project/patch/1.patch',
                        'tests/project/patch/2.patch']

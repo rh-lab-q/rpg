@@ -2,14 +2,22 @@ class Plugin:
 
     """class from which are plugins derived"""
 
-    # def before_patches_applied(self, project_dir, spec, sack):
+    # def extracted(self, project_dir, spec, sack):
     #     # :api
     #     pass
 
-    # def after_patches_applied(self, project_dir, spec, sack):
+    # def patched(self, project_dir, spec, sack):
     #     # :api
     #     pass
 
-    # def after_project_build(self, project_dir, spec, sack):
+    # def compiled(self, project_dir, spec, sack):
+    #     # :api
+    #     pass
+
+    # def installed(self, project_dir, spec, sack):
+    #     # :api
+    #     pass
+
+    # def package_build(self, package_path, spec, sack):
     #     # :api
     #     pass

@@ -4,7 +4,7 @@ import os
 
 class CMakePlugin(Plugin):
 
-    def after_patches_applied(self, project_dir, spec, sack):
+    def patched(self, project_dir, spec, sack):
         if (project_dir / "CMakeLists.txt").is_file():
             compiled_dir = project_dir / "../compiled"
             os.mkdir(str(compiled_dir))

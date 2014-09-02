@@ -81,7 +81,7 @@ class Base(object):
         """executed in background after patch selection and reordering"""
         self._project_builder.apply_patches(ordered_patches)
 
-    def run_pathed_sources_analysis(self):
+    def run_patched_sources_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[1],
                                           self.extracted_dir)
@@ -92,9 +92,14 @@ class Base(object):
                                     self.compiled_dir,
                                     self.spec.scripts["%build"])
 
-    def run_installed_files_analysis(self):
-        """executed in background after successful project build"""
+    def run_compiled_analysis(self):
+        """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[2],
+                                          self.extracted_dir)
+
+    def run_installed_analysis(self):
+        """executed in background after successful project build"""
+        self._plugin_engine.execute_phase(phases[3],
                                           self.compiled_dir)
 
     def build_packages(self, *distros):

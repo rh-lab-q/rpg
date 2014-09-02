@@ -3,8 +3,7 @@ import inspect
 import logging
 import os.path
 
-phases = ("before_patches_applied", "after_patches_applied",
-          "after_project_build")
+phases = ("extracted", "patched", "compiled", "installed", "package_build")
 
 
 class PluginEngine:

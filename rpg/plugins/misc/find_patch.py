@@ -4,7 +4,7 @@ import subprocess
 
 class FindPatchPlugin(Plugin):
 
-    def before_patches_applied(self, project_dir, spec, sack):
+    def extracted(self, project_dir, spec, sack):
         patches = [(f, f.stat().st_mtime) for f in project_dir.iterdir()
                    if _is_patch(f)]
         patches_by_modification = sorted(patches, key=lambda m: m[1])
