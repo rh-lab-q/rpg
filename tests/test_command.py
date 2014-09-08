@@ -14,9 +14,9 @@ class PluginEngineTest(RpgTestCase):
         expected = "cd %s\ncmake ..\nmake\nmake test" % self.test_project_dir
         self.assertEqual(expected, str(cmd))
 
-    def test_command_execute(self):
+    def test_command_execute_from(self):
         cmd = Command("pwd\ncd c\npwd")
-        output = cmd.execute(self.test_project_dir)
+        output = cmd.execute_from(self.test_project_dir)
         path = self.test_project_dir.resolve()
         expected = "%s\n%s/c\n" % (path, path)
         self.assertEqual(expected, output)
@@ -24,7 +24,7 @@ class PluginEngineTest(RpgTestCase):
         # doesn't add 'cd work_dir' during execute to command lines
         cur_dir = Path('.')
         with self.assertRaises(subprocess.CalledProcessError) as ctx:
-            cmd.execute(cur_dir)
+            cmd.execute_from(cur_dir)
         expected = "Command '['/bin/sh', '-c', 'cd %s && pwd && cd c && pwd" \
             "']' returned non-zero exit status 1" % cur_dir.resolve()
         self.assertEqual(expected, str(ctx.exception))

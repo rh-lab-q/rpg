@@ -31,7 +31,7 @@ class Command:
             msg = "Only list of command strings or command string is accepted"
             raise TypeError(msg)
 
-    def execute(self, work_dir):
+    def execute_from(self, work_dir):
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
 
