@@ -1,15 +1,16 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog, QTreeWidget,
                              QTreeWidgetItem)
-from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
+from rpg.gui.dialogs import (DialogChangelog, DialogSubpackage,
+                                 ImportDialog)
 from pathlib import Path
 from rpg import Base
 
 
-class Wizard(QtWidgets.QWizard):
+class Wizard(QtGui.QWizard):
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
         - counted from 0 (PageGreetings) to 10 (PageFinal)'''
@@ -41,7 +42,7 @@ class Wizard(QtWidgets.QWizard):
         self.setStartId(self.PageGreetings)
 
 
-class GreetingsPage(QtWidgets.QWizardPage):
+class GreetingsPage(QtGui.QWizardPage):
     def __init__(self, parent=None):
         super(GreetingsPage, self).__init__(parent)
         self.setTitle(self.tr("RPG"))
@@ -69,7 +70,7 @@ class GreetingsPage(QtWidgets.QWizardPage):
             return Wizard.PageImport
 
 
-class ImportPage(QtWidgets.QWizardPage):
+class ImportPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(ImportPage, self).__init__(parent)
 
@@ -207,7 +208,9 @@ class ImportPage(QtWidgets.QWizardPage):
 
     def importPath(self):
         ''' Returns path selected file or archive'''
-        self.import_dialog = DialogImport(self)
+        self.import_dialog = ImportDialog(self)
+        self.import_dialog.exec_()
+        self.importEdit.setText(self.import_dialog.filesSelected())
 
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button
@@ -249,7 +252,7 @@ class ImportPage(QtWidgets.QWizardPage):
         return Wizard.PageScripts
 
 
-class ScriptsPage(QtWidgets.QWizardPage):
+class ScriptsPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(ScriptsPage, self).__init__(parent)
 
@@ -301,7 +304,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
         return Wizard.PagePatches
 
 
-class PatchesPage(QtWidgets.QWizardPage):
+class PatchesPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(PatchesPage, self).__init__(parent)
 
@@ -356,7 +359,7 @@ class PatchesPage(QtWidgets.QWizardPage):
         return Wizard.PageRequires
 
 
-class RequiresPage(QtWidgets.QWizardPage):
+class RequiresPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
 
@@ -399,7 +402,7 @@ class RequiresPage(QtWidgets.QWizardPage):
         return Wizard.PageScriplets
 
 
-class ScripletsPage(QtWidgets.QWizardPage):
+class ScripletsPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(ScripletsPage, self).__init__(parent)
 
@@ -454,7 +457,7 @@ class ScripletsPage(QtWidgets.QWizardPage):
         return Wizard.PageSubpackages
 
 
-class SubpackagesPage(QtWidgets.QWizardPage):
+class SubpackagesPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(SubpackagesPage, self).__init__(parent)
 
@@ -537,7 +540,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
     class SubpackTreeWidget(QTreeWidget):
         def __init__(self, Page):
             self.page = Page
-            QtWidgets.QWidget.__init__(self)
+            QtGui.QWidget.__init__(self)
             self.column = 0  # only one column in each row
             self.setHeaderHidden(True)  # make invisible -1 row (with name)
 
@@ -563,7 +566,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
             return item
 
 
-class DocsChangelogPage(QtWidgets.QWizardPage):
+class DocsChangelogPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(DocsChangelogPage, self).__init__(parent)
 
@@ -609,7 +612,7 @@ class DocsChangelogPage(QtWidgets.QWizardPage):
         return Wizard.PageBuild
 
 
-class BuildPage(QtWidgets.QWizardPage):
+class BuildPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
 
@@ -718,7 +721,7 @@ class BuildPage(QtWidgets.QWizardPage):
             return Wizard.PageCopr
 
 
-class CoprPage(QtWidgets.QWizardPage):
+class CoprPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(CoprPage, self).__init__(parent)
 
@@ -803,7 +806,7 @@ class CoprPage(QtWidgets.QWizardPage):
         return Wizard.PageFinal
 
 
-class FinalPage(QtWidgets.QWizardPage):
+class FinalPage(QtGui.QWizardPage):
     def __init__(self, Wizard, parent=None):
         super(FinalPage, self).__init__(parent)
 

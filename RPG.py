@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import QApplication
 from rpg.gui.wizard import Wizard
 import logging
 import sys
