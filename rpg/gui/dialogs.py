@@ -1,11 +1,11 @@
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit,
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import (QLabel, QPushButton, QPlainTextEdit,
                              QDialogButtonBox, QLineEdit, QVBoxLayout,
                              QCalendarWidget, QHBoxLayout, QFileDialog,
                              QComboBox)
 
 
-class DialogChangelog(QtWidgets.QDialog):
+class DialogChangelog(QtGui.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogChangelog, self).__init__(parent)
 
@@ -65,7 +65,7 @@ class DialogChangelog(QtWidgets.QDialog):
         pass
 
 
-class DialogError(QtWidgets.QDialog):
+class DialogError(QtGui.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogError, self).__init__(parent)
 
@@ -103,7 +103,7 @@ class DialogError(QtWidgets.QDialog):
         self.aceept()
 
 
-class DialogSRPM(QtWidgets.QDialog):
+class DialogSRPM(QtGui.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSRPM, self).__init__(parent)
 
@@ -143,7 +143,7 @@ class DialogSRPM(QtWidgets.QDialog):
         self.accept()
 
 
-class DialogSubpackage(QtWidgets.QDialog):
+class DialogSubpackage(QtGui.QDialog):
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSubpackage, self).__init__(parent)
 
@@ -191,24 +191,24 @@ class DialogSubpackage(QtWidgets.QDialog):
         self.wizard.tree.addSubpackage(self.nameEdit.text())
         self.accept()
 
-
-class DialogImport(QtWidgets.QFileSystemModel):
+"""
+class DialogImport(QtGui.QFileSystemModel):
     def __init__(self, Wizard, parent=None):
         super(DialogImport, self).__init__(parent)
 
         self.wizard = Wizard
         self.setRootPath(QtCore.QDir.currentPath())
         self.urls = []
-        self.urls.append(QtCore.QUrl.
+        '''self.urls.append(QtCore.QUrl.
                          fromLocalFile(str(QtCore.QStandardPaths.
                                            DesktopLocation)))
         self.urls.append(QtCore.QUrl.
                          fromLocalFile(str(QtCore.QStandardPaths.
-                                           DocumentsLocation)))
-        self.mfiledialog = QtWidgets.QFileDialog()
+                                           DocumentsLocation)))'''
+        self.mfiledialog = QtGui.QFileDialog()
         self.mfiledialog.setSidebarUrls(self.urls)
-        self.mfiledialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
-        self.mfiledialog.setViewMode(QtWidgets.QFileDialog.Detail)
+        self.mfiledialog.setFileMode(QtGui.QFileDialog.AnyFile)
+        self.mfiledialog.setViewMode(QtGui.QFileDialog.Detail)
         self.mfiledialog.currentChanged.connect(self.ondialogChanged)
         self.mfiledialog.exec_()
         self.pathList = self.mfiledialog.selectedFiles()
@@ -221,3 +221,28 @@ class DialogImport(QtWidgets.QFileSystemModel):
             self.mfiledialog.setFileMode(QFileDialog.Directory)
         else:
             self.mfiledialog.setFileMode(QFileDialog.AnyFile)
+"""
+
+class ImportDialog(QtGui.QFileDialog):
+    def __init__(self, Wizard, *args):
+        self.wizard = Wizard
+        QtGui.QFileDialog.__init__(self, *args)
+        self.setOption(self.DontUseNativeDialog, True)
+        self.setFileMode(self.ExistingFiles)
+        btns = self.findChildren(QtGui.QPushButton)
+        self.openBtn = [x for x in btns if 'open' in str(x.text()).lower()][0]
+        self.openBtn.clicked.disconnect()
+        self.openBtn.clicked.connect(self.openClicked)
+        self.tree = self.findChild(QtGui.QTreeView)
+
+    def openClicked(self):
+        inds = self.tree.selectionModel().selectedIndexes()
+        files = []
+        for i in inds:
+            if i.column() == 0:
+                files.append(os.path.join(str(self.directory().absolutePath()),str(i.data().toString())))
+        self.selectedFiles = files
+        self.hide()
+
+    def filesSelected(self):
+        return str(self.selectedFiles()[0])
