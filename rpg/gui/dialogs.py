@@ -2,7 +2,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit,
                              QDialogButtonBox, QLineEdit, QVBoxLayout,
                              QCalendarWidget, QHBoxLayout, QFileDialog,
-                             QComboBox)
+                             QComboBox, QTreeView)
+import os
 
 
 class DialogChangelog(QtWidgets.QDialog):
@@ -192,32 +193,26 @@ class DialogSubpackage(QtWidgets.QDialog):
         self.accept()
 
 
-class DialogImport(QtWidgets.QFileSystemModel):
-    def __init__(self, Wizard, parent=None):
-        super(DialogImport, self).__init__(parent)
+class DialogImport(QFileDialog):
+    def __init__(self):
+        QFileDialog.__init__(self)
+        self.setOption(self.DontUseNativeDialog, True)
+        self.setFileMode(self.ExistingFiles)
+        butns = self.findChildren(QPushButton)
+        self.butn = [x for x in butns if 'open' in str(x.text()).lower()][0]
+        self.butn.clicked.disconnect()
+        self.butn.clicked.connect(self.clicked)
+        self.tree = self.findChild(QTreeView)
 
-        self.wizard = Wizard
-        self.setRootPath(QtCore.QDir.currentPath())
-        self.urls = []
-        self.urls.append(QtCore.QUrl.
-                         fromLocalFile(str(QtCore.QStandardPaths.
-                                           DesktopLocation)))
-        self.urls.append(QtCore.QUrl.
-                         fromLocalFile(str(QtCore.QStandardPaths.
-                                           DocumentsLocation)))
-        self.mfiledialog = QtWidgets.QFileDialog()
-        self.mfiledialog.setSidebarUrls(self.urls)
-        self.mfiledialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
-        self.mfiledialog.setViewMode(QtWidgets.QFileDialog.Detail)
-        self.mfiledialog.currentChanged.connect(self.ondialogChanged)
-        self.mfiledialog.exec_()
-        self.pathList = self.mfiledialog.selectedFiles()
-        self.path = self.pathList[0]
-        self.wizard.importEdit.setText(self.path)
+    def clicked(self):
+        indexes = self.tree.selectionModel().selectedIndexes()
+        files = []
+        for i in indexes:
+            if i.column() == 0:
+                files.append(os.path.join(str(self.directory().absolutePath()),
+                                          str(i.data())))
+        self.selectedFiles = files
+        self.hide()
 
-    def ondialogChanged(self, filedir):
-        finfo = QtCore.QFileInfo(filedir)
-        if(finfo.isDir()):
-            self.mfiledialog.setFileMode(QFileDialog.Directory)
-        else:
-            self.mfiledialog.setFileMode(QFileDialog.AnyFile)
+    def filesSelected(self):
+        return self.selectedFiles

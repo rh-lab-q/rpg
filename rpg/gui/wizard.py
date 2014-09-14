@@ -207,7 +207,14 @@ class ImportPage(QtWidgets.QWizardPage):
 
     def importPath(self):
         ''' Returns path selected file or archive'''
-        self.import_dialog = DialogImport(self)
+
+        self.import_dialog = DialogImport()
+        self.import_dialog.exec_()
+        if (isinstance(self.import_dialog.filesSelected(), list)):
+            path = self.import_dialog.filesSelected()
+        else:
+            path = self.import_dialog.selectedFiles()
+        self.importEdit.setText(path[0])
 
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button
