@@ -1,58 +1,21 @@
-from subprocess import call
-from shutil import rmtree
+from shutil import copytree, rmtree
 import logging
-import os
-import pathlib
 
 
 class ProjectBuilder:
 
-    def build(self, project_source_dir, project_target_dir, build_params):
+    def build(self, project_source_dir, project_target_dir, build_command):
         """Builds project in given project_target_dir then cleans this
            directory, build_params is list of command strings.
            returns list of files that should be installed or error string"""
         logging.debug('build(%s, %s, %s)' % (repr(project_source_dir),
-                      repr(project_target_dir), repr(build_params)))
-        current_dir = os.getcwd()
+                      repr(project_target_dir), repr(build_command)))
         project_source_dir = str(project_source_dir)
-        project_target_dir = str(project_target_dir)
 
-        call(["cp", project_source_dir, project_target_dir, "-r", "-p"])
-        root_files = self._list_files_root(project_target_dir)
-        if "configure.ac" in root_files:
-            call(["autoconf", "-I", project_target_dir])
-            call([project_target_dir + "/configure"])
-            root_files = self._list_files_root(project_target_dir)
-        if "CMakeLists.txt" in root_files:
-            project_build_dir = project_target_dir + "/build"
-            os.mkdir(project_build_dir)
-            os.chdir(project_build_dir)
-            call(["cmake", project_target_dir])
-            root_files = self._list_files_root(project_build_dir)
-        if "Makefile" in root_files:
-            if call(["make"]) != 0:
-                return "Unable to build project."
-            install_directory = project_target_dir + "/rpg_installed"
-            if call(["make", "install", "DESTDIR=" + install_directory]) != 0:
-                return "Unable to install project."
-            installed_files = self._list_files(install_directory)
-            rmtree(project_target_dir)
-            os.chdir(current_dir)
-            return installed_files
-        else:
-            return "Makefile not available."
+        rmtree(str(project_target_dir))
+        copytree(project_source_dir, str(project_target_dir))
 
-    def _list_files_root(self, directory):
-        return [f for f in os.listdir(directory)]
-
-    def _list_files(self, directory):
-        file_list = []
-        for path, subdirs, files in os.walk(directory):
-            for name in files:
-                file_path = str(pathlib.PurePath(path, name))
-                if not "/." in file_path:
-                    file_list.append(file_path)
-        return file_list
+        build_command.execute_from(project_target_dir)
 
     def _apply_patch(self, patch):
         return False
