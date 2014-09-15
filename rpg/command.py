@@ -45,4 +45,4 @@ class Command:
         return o.decode('utf-8')
 
     def _assign_rpm_variables(self):
-        return ["%s=%s;" % (v, p) for (v, p) in self.rpm_variables]
+        return ['%s="%s"' % (v, p) for (v, p) in self.rpm_variables]
