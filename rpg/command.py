@@ -2,12 +2,14 @@ from subprocess import check_output
 
 
 class Command:
+
     """representation of scripts in spec file"""
 
     def __init__(self, cmdline=None):
         """cmdline could be list of strings or string containing multiple lines
            """
 
+        self.rpm_variables = []
         self._command_lines = []
         if cmdline:
             self.append_cmdlines(cmdline)
@@ -35,6 +37,12 @@ class Command:
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
 
-        command_lines = ["cd %s" % work_dir.resolve()] + self._command_lines
+        cd_workdir = ["cd %s" % work_dir.resolve()]
+        command_lines = self._assign_rpm_variables() + cd_workdir + \
+            self._command_lines
         o = check_output(["/bin/sh", "-c", " && ".join(command_lines)])
+        # TODO don't print stdout of commands
         return o.decode('utf-8')
+
+    def _assign_rpm_variables(self):
+        return ["%s=%s;" % (v, p) for (v, p) in self.rpm_variables]
