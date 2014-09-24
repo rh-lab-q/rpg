@@ -20,6 +20,9 @@ class Command:
 
         return "\n".join(self._command_lines)
 
+    def __repr__(self):
+        return "Command(%s)" % repr(str(self))
+
     def append_cmdlines(self, cmdline):
         """adds cmdline at the end of command sequence
            cmdline could be list of strings or string containing multiple lines
