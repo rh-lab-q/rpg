@@ -34,8 +34,10 @@ class PluginEngine:
                 plugin_name = plugin.__class__.__name__
                 try:
                     method(project_dir, self.spec, self.sack)
-                except Exception:
-                    logging.warn("can not execute plugin %s" % plugin_name)
+                except Exception as e:
+                    logging.warn(
+                        "error during executing plugin %s: %s"
+                        % (plugin_name, e))
                 else:
                     logging.info("plugin %s executed" % plugin_name)
 
