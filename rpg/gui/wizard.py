@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QTreeWidgetItem)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
+from rpg.command import Command
 from rpg import Base
 
 
@@ -237,6 +238,7 @@ class ImportPage(QtWidgets.QWizardPage):
         path = Path(self.base.spec.tags['Path'])
         if(path.exists()):
             self.base.process_archive_or_dir(self.base.spec.tags['Path'])
+            self.base.run_raw_sources_analysis()
             self.importEdit.setStyleSheet("")
             return True
         else:
@@ -253,7 +255,7 @@ class ImportPage(QtWidgets.QWizardPage):
             - returns integer value and then checks, which value is page"
             in NUM_PAGES'''
 
-        return Wizard.PageScripts
+        return Wizard.PagePatches
 
 
 class ScriptsPage(QtWidgets.QWizardPage):
@@ -294,10 +296,10 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.scripts['%prep'] = self.prepareEdit.toPlainText()
-        self.base.spec.scripts['%build'] = self.buildEdit.toPlainText()
-        self.base.spec.scripts['%install'] = self.installEdit.toPlainText()
-        self.base.spec.scripts['%check'] = self.checkEdit.toPlainText()
+        self.base.spec.scripts['%prep'] = Command(self.prepareEdit.toPlainText())
+        self.base.spec.scripts['%build'] = Command(self.buildEdit.toPlainText())
+        self.base.spec.scripts['%install'] = Command(self.installEdit.toPlainText())
+        self.base.spec.scripts['%check'] = Command(self.checkEdit.toPlainText())
         if self.buildArchCheckbox.isChecked():
             self.base.spec.tags['BuildArch'] = "noarch"
         else:
@@ -305,7 +307,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
-        return Wizard.PagePatches
+        return Wizard.PageRequires
 
 
 class PatchesPage(QtWidgets.QWizardPage):
@@ -360,7 +362,7 @@ class PatchesPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
-        return Wizard.PageRequires
+        return Wizard.PageScripts
 
 
 class RequiresPage(QtWidgets.QWizardPage):
@@ -398,12 +400,12 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.base.spec.tags["Provides"] = self.previdesEdit.toPlainText()
         self.base.build_project()
         self.base.run_compiled_analysis()
-        # self.base.install_project()
+        self.base.install_project()
         self.base.run_installed_analysis()
         return True
 
     def nextId(self):
-        return Wizard.PageScriplets
+        return Wizard.PageSubpackages
 
 
 class ScripletsPage(QtWidgets.QWizardPage):
@@ -458,7 +460,7 @@ class ScripletsPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
-        return Wizard.PageSubpackages
+        return Wizard.PageDocsChangelog
 
 
 class SubpackagesPage(QtWidgets.QWizardPage):
@@ -538,7 +540,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         subpackage.exec_()
 
     def nextId(self):
-        return Wizard.PageDocsChangelog
+        return Wizard.PageScriplets
 
     # Class for tree view (Subpackages generation)
     class SubpackTreeWidget(QTreeWidget):
@@ -706,6 +708,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
+        self.base.build_packages()
         return True
 
     def switchToCOPR(self):
@@ -718,7 +721,6 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         if (self.nextPageIsFinal):
-            self.base.build_packages()
             return Wizard.PageFinal
         else:
             self.nextPageIsFinal = True
