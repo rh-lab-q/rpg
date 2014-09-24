@@ -35,10 +35,11 @@ class Base(object):
 
     @property
     def base_dir(self):
-        if not getattr(self, "_input_name", None) or not getattr(self, "_hash", None):
+        try:
+            return Path("/tmp/rpg-%s-%s" % (self._input_name, self._hash))
+        except AttributeError:
             msg = "`process_archive_or_dir` method needs to be called first"
             raise RuntimeError(msg)
-        return Path("/tmp/rpg-%s-%s" % (self._input_name, self._hash))
 
     @property
     def extracted_dir(self):
