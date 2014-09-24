@@ -4,7 +4,7 @@ from pathlib import PurePath
 
 class FindFilePlugin(Plugin):
 
-    def compiled(self, project_dir, spec, sack):
+    def installed(self, project_dir, spec, sack):
         self.files = []
         for item in list(project_dir.glob('**/*')):
             if (item.is_file() and '__pycache__' not in str(item)):

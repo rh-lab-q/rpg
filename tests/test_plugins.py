@@ -26,8 +26,8 @@ class FindPatchPluginTest(PluginTestCase):
 
     def test_find_files(self):
         plugin = FindFilePlugin()
-        plugin.compiled(self.test_project_dir,
-                        self.spec, self.sack)
+        plugin.installed(self.test_project_dir,
+                         self.spec, self.sack)
         files = [('tests/project/patch/0.patch', None, None),
                  ('tests/project/patch/1.patch', None, None),
                  ('tests/project/patch/2.patch', None, None),
@@ -43,8 +43,8 @@ class FindPatchPluginTest(PluginTestCase):
 
     def test_find_translation_file(self):
         plugin = FindTranslationPlugin()
-        plugin.find(self.test_project_dir,
-                    self.spec, self.sack)
+        plugin.installed(self.test_project_dir,
+                         self.spec, self.sack)
         translation_file = ("-f %{CZ.mo}.lang")
         self.assertEqual(self.spec.files.insert.call_args,
                          mock.call(0, translation_file))
