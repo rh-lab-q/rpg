@@ -35,7 +35,10 @@ class Base(object):
 
     @property
     def base_dir(self):
-        return Path("/tmp/rpg-" + self._hash)
+        if not getattr(self, "_input_name", None) or not getattr(self, "_hash", None):
+            msg = "`process_archive_or_dir` method needs to be called first"
+            raise RuntimeError(msg)
+        return Path("/tmp/rpg-%s-%s" % (self._input_name, self._hash))
 
     @property
     def extracted_dir(self):
@@ -69,6 +72,7 @@ class Base(object):
         """executed in background after dir/tarball/SRPM selection"""
         p = Path(path)
         self._hash = self.compute_checksum(p)
+        self._input_name = p.name
         self.setup_workspace()
         self._source_loader.load_sources(p, self.extracted_dir)
 
