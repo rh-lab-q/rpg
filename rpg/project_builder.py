@@ -17,6 +17,13 @@ class ProjectBuilder:
 
         build_command.execute_from(project_target_dir)
 
+    def install(self, project_source_dir, project_target_dir, install_command):
+        logging.debug('install(%s, %s, %s)' % (repr(project_source_dir),
+                      repr(project_target_dir), repr(install_command)))
+        install_command.rpm_variables.append(("RPM_BUILD_ROOT",
+                                              project_target_dir))
+        install_command.execute_from(project_source_dir)
+
     def _apply_patch(self, patch):
         return False
 

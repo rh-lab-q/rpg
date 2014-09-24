@@ -97,6 +97,12 @@ class Base(object):
         self._plugin_engine.execute_phase(phases[2],
                                           self.extracted_dir)
 
+    def install_project(self):
+        """executed in background after filled requires screen"""
+        self._project_builder.install(self.compiled_dir,
+                                      self.installed_dir,
+                                      self.spec.scripts["%install"])
+
     def run_installed_analysis(self):
         """executed in background after successful project build"""
         self._plugin_engine.execute_phase(phases[3],
