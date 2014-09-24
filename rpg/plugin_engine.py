@@ -2,6 +2,7 @@ from rpg.plugin import Plugin
 import inspect
 import logging
 import os.path
+import traceback
 
 phases = ("extracted", "patched", "compiled", "installed", "package_build")
 
@@ -34,10 +35,11 @@ class PluginEngine:
                 plugin_name = plugin.__class__.__name__
                 try:
                     method(project_dir, self.spec, self.sack)
-                except Exception as e:
+                except Exception as err:
+                    msg = ''.join(traceback.format_tb(err.__traceback__)[1:])
                     logging.warn(
-                        "error during executing plugin %s: %s"
-                        % (plugin_name, e))
+                        "error during executing plugin %s:\n%s"
+                        % (plugin_name, msg))
                 else:
                     logging.info("plugin %s executed" % plugin_name)
 
