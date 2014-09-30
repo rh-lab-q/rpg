@@ -26,6 +26,9 @@ class Wizard(QtWidgets.QWizard):
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
 
+        # Enables -HELP- button
+        self.setOption(0x00000800)
+
         # Setting pages to wizard
         # self.setPage(self.PageGreetings, GreetingsPage())
         self.setPage(self.PageImport, ImportPage(self))
