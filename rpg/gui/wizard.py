@@ -301,10 +301,18 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.scripts['%prep'] = Command(self.prepareEdit.toPlainText())
-        self.base.spec.scripts['%build'] = Command(self.buildEdit.toPlainText())
-        self.base.spec.scripts['%install'] = Command(self.installEdit.toPlainText())
-        self.base.spec.scripts['%check'] = Command(self.checkEdit.toPlainText())
+        self.base.spec.scripts['%prep'] = Command(self
+                                                  .prepareEdit
+                                                  .toPlainText())
+        self.base.spec.scripts['%build'] = Command(self
+                                                   .buildEdit
+                                                   .toPlainText())
+        self.base.spec.scripts['%install'] = Command(self
+                                                     .installEdit
+                                                     .toPlainText())
+        self.base.spec.scripts['%check'] = Command(self
+                                                   .checkEdit
+                                                   .toPlainText())
         if self.buildArchCheckbox.isChecked():
             self.base.spec.tags['BuildArch'] = "noarch"
         else:
