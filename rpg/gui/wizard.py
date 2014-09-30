@@ -259,7 +259,8 @@ class ImportPage(QtWidgets.QWizardPage):
 
 class ScriptsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.prepareEdit.setPlaceholderText("prepare")
+        #self.prepareEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        self.prepareEdit.setPlaceholderText("prep")
         self.buildEdit.setPlaceholderText("build")
         self.installEdit.setPlaceholderText("install")
         self.checkEdit.setPlaceholderText("check")
@@ -301,9 +302,12 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.scripts['%prep'] = Command(self
-                                                  .prepareEdit
-                                                  .toPlainText())
+        if (len(str(self.prepareEdit.toPlainText())) is not 0):
+            self.base.spec.scripts['%prep'] = Command(self
+                                                      .prepareEdit
+                                                      .toPlainText())
+        else:
+        	self.base.spec.scripts['%prep'] = Command("Prep_test") # TODO
         self.base.spec.scripts['%build'] = Command(self
                                                    .buildEdit
                                                    .toPlainText())
@@ -379,6 +383,8 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 
 class RequiresPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+        print(self.base.spec.scripts)
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
 
@@ -422,6 +428,15 @@ class RequiresPage(QtWidgets.QWizardPage):
 
 
 class ScripletsPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+        #self.prepareEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        self.pretransEdit.setPlaceholderText("pretrans")
+        self.preEdit.setPlaceholderText("pre")
+        self.postEdit.setPlaceholderText("post")
+        self.postunEdit.setPlaceholderText("postun")
+        self.preunEdit.setPlaceholderText("preun")
+        self.posttransEdit.setPlaceholderText("posttrans")
+
     def __init__(self, Wizard, parent=None):
         super(ScripletsPage, self).__init__(parent)
 
@@ -478,7 +493,6 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
 class SubpackagesPage(QtWidgets.QWizardPage):
     def initializePage(self):
-    	print(self.base.spec.files)
     	for a, b, c in self.base.spec.files:
     		if ".lang" not in str(a):
         	    self.filesListWidget.addItem(a)
