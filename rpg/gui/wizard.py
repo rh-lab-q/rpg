@@ -27,7 +27,7 @@ class Wizard(QtWidgets.QWizard):
         self.setWizardStyle(self.ClassicStyle)
 
         # Setting pages to wizard
-        self.setPage(self.PageGreetings, GreetingsPage())
+        # self.setPage(self.PageGreetings, GreetingsPage())
         self.setPage(self.PageImport, ImportPage(self))
         self.setPage(self.PageScripts, ScriptsPage(self))
         self.setPage(self.PagePatches, PatchesPage(self))
@@ -38,7 +38,7 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageBuild, BuildPage(self))
         self.setPage(self.PageCopr, CoprPage(self))
         self.setPage(self.PageFinal, FinalPage(self))
-        self.setStartId(self.PageGreetings)
+        self.setStartId(self.PageImport)
 
 
 class GreetingsPage(QtWidgets.QWizardPage):
