@@ -39,7 +39,7 @@ class FindPatchPluginTest(PluginTestCase):
                  ('tests/project/libs/libdynamic.so.1', None, None)]
         sorted_files = sorted(files, key=lambda e: e[0])
         self.assertEqual(self.spec.files.append.call_args_list,
-                         [mock.call(sorted_files)])
+                         mock.call(sorted_files))
 
     def test_find_translation_file(self):
         plugin = FindTranslationPlugin()
@@ -47,7 +47,7 @@ class FindPatchPluginTest(PluginTestCase):
                          self.spec, self.sack)
         translation_file = ("-f %{CZ.mo}.lang")
         self.assertEqual(self.spec.files.insert.call_args,
-                         mock.call(0, translation_file))
+                         mock.call(0, (translation_file, None, None)))
 
     def test_find_library(self):
         plugin = FindLibraryPlugin()
