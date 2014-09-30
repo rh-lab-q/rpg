@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QPlainTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog, QTreeWidget,
-                             QTreeWidgetItem)
+                             QTreeWidgetItem, QTextEdit)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
 from rpg.command import Command
@@ -258,6 +258,12 @@ class ImportPage(QtWidgets.QWizardPage):
 
 
 class ScriptsPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+        self.prepareEdit.setPlaceholderText("prepare")
+        self.buildEdit.setPlaceholderText("build")
+        self.installEdit.setPlaceholderText("install")
+        self.checkEdit.setPlaceholderText("check")
+
     def __init__(self, Wizard, parent=None):
         super(ScriptsPage, self).__init__(parent)
 
@@ -267,16 +273,16 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Write scripts"))
 
         prepareLabel = QLabel("%prepare: ")
-        self.prepareEdit = QPlainTextEdit()
+        self.prepareEdit = QTextEdit()
 
         buildLabel = QLabel("%build: ")
-        self.buildEdit = QPlainTextEdit()
+        self.buildEdit = QTextEdit()
 
         installLabel = QLabel("%install: ")
-        self.installEdit = QPlainTextEdit()
+        self.installEdit = QTextEdit()
 
         checkLabel = QLabel("%check: ")
-        self.checkEdit = QPlainTextEdit()
+        self.checkEdit = QTextEdit()
 
         buildArchLabel = QLabel("BuildArch: ")
         self.buildArchCheckbox = QCheckBox("noarch")
@@ -463,6 +469,12 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
 
 class SubpackagesPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+    	print(self.base.spec.files)
+    	for a, b, c in self.base.spec.files:
+    		if ".lang" not in str(a):
+        	    self.filesListWidget.addItem(a)
+
     def __init__(self, Wizard, parent=None):
         super(SubpackagesPage, self).__init__(parent)
 
