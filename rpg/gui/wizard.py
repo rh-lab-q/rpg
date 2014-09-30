@@ -384,7 +384,11 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        print(self.base.spec.scripts)
+        #self.bRequiresEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        self.bRequiresEdit.setPlaceholderText("BuildRequires")
+        self.requiresEdit.setPlaceholderText("Requires")
+        self.providesEdit.setPlaceholderText("Provides")
+
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
 
@@ -394,29 +398,29 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Write requires and provides"))
 
         buildRequiresLabel = QLabel("BuildRequires: ")
-        self.bRequiresEdit = QPlainTextEdit()
-        self.bRequiresEdit.setMaximumHeight(40)
+        self.bRequiresEdit = QTextEdit()
+        self.bRequiresEdit.setMaximumHeight(220)
 
         requiresLabel = QLabel("Requires: ")
-        self.requiresEdit = QPlainTextEdit()
-        self.requiresEdit.setMaximumHeight(40)
+        self.requiresEdit = QTextEdit()
+        self.requiresEdit.setMaximumHeight(220)
 
-        preovidesLabel = QLabel("Provides: ")
-        self.previdesEdit = QPlainTextEdit()
+        providesLabel = QLabel("Provides: ")
+        self.providesEdit = QTextEdit()
 
         grid = QGridLayout()
         grid.addWidget(buildRequiresLabel, 0, 0)
         grid.addWidget(self.bRequiresEdit, 1, 0)
         grid.addWidget(requiresLabel, 2, 0)
         grid.addWidget(self.requiresEdit, 3, 0,)
-        grid.addWidget(preovidesLabel, 4, 0)
-        grid.addWidget(self.previdesEdit, 5, 0)
+        grid.addWidget(providesLabel, 4, 0)
+        grid.addWidget(self.providesEdit, 5, 0)
         self.setLayout(grid)
 
     def validatePage(self):
         self.base.spec.tags["BuildRequires"] = self.bRequiresEdit.toPlainText()
         self.base.spec.tags["Requires"] = self.requiresEdit.toPlainText()
-        self.base.spec.tags["Provides"] = self.previdesEdit.toPlainText()
+        self.base.spec.tags["Provides"] = self.providesEdit.toPlainText()
         self.base.build_project()
         self.base.run_compiled_analysis()
         self.base.install_project()
