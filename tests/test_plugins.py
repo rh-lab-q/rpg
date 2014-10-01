@@ -18,11 +18,11 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = FindPatchPlugin()
         plugin.extracted(self.test_project_dir / "patch",
                          self.spec, self.sack)
-        patch_order = ['tests/project/patch/0.patch',
-                       'tests/project/patch/1.patch',
-                       'tests/project/patch/2.patch']
-        self.assertEqual(self.spec.tags.__setitem__.call_args_list,
-                         [mock.call('patch', patch_order)])
+        expected_patches = {'tests/project/patch/0.patch',
+                            'tests/project/patch/1.patch',
+                            'tests/project/patch/2.patch'}
+        called = tuple(self.spec.tags.__setitem__.call_args_list)[0][0][1]
+        self.assertEqual(expected_patches, set(called))
 
     def test_find_files(self):
         plugin = FindFilePlugin()
