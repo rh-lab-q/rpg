@@ -6,7 +6,7 @@ from rpg.copr_uploader import CoprUploader
 from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
-from subprocess import check_output
+from rpg.command import cmd_output
 import shutil
 
 
@@ -124,12 +124,9 @@ class Base(object):
         if sources.is_dir():
             cmd = "find %s -type f -print0 | sort -z | xargs " \
                   "-0 sha1sum | sha1sum" % sources.resolve()
-
-            shasum = check_output(["/bin/sh", "-c", cmd])
         else:
             cmd = "sha1sum %s" % sources.resolve()
-            shasum = check_output(["/bin/sh", "-c", cmd])
-        return shasum.decode("utf-8")[:7]
+        return cmd_output([cmd])[:7]
 
     @property
     def all_dirs(self):

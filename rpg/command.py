@@ -37,10 +37,10 @@ class Command:
             raise TypeError(msg)
 
     def execute(self):
+        """executes command in any dir, can raise CalledProcessError"""
+
         command_lines = self._assign_rpm_variables() + self._command_lines
-        o = check_output(["/bin/sh", "-c", " && ".join(command_lines)])
-        # TODO don't print stdout of commands
-        return o.decode('utf-8')
+        return cmd_output(command_lines)
 
     def execute_from(self, work_dir):
         """executes command in work_dir (instance of pathlib.Path),
@@ -49,9 +49,13 @@ class Command:
         cd_workdir = ["cd %s" % work_dir.resolve()]
         command_lines = self._assign_rpm_variables() + cd_workdir + \
             self._command_lines
-        o = check_output(["/bin/sh", "-c", " && ".join(command_lines)])
-        # TODO don't print stdout of commands
-        return o.decode('utf-8')
+        return cmd_output(command_lines)
 
     def _assign_rpm_variables(self):
         return ['%s="%s"' % (v, p) for (v, p) in self.rpm_variables]
+
+
+def cmd_output(cmdlines):
+    output = check_output(["/bin/sh", "-c", " && ".join(cmdlines)])
+    # TODO don't print stdout of commands
+    return output.decode('utf-8')
