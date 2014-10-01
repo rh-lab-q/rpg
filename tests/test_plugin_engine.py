@@ -16,6 +16,16 @@ class PluginEngineTest(PluginTestCase):
         self.assertTrue(
             isinstance(self.plugin_engine.plugins.pop(), TestPlugin))
 
+    def test_exclude_plugins(self):
+        self.plugin_dir = self.test_project_dir / "py"
+        self.plugin_engine.load_plugins(self.plugin_dir, ["TestPlugin"])
+        self.assertEqual(len(self.plugin_engine.plugins), 0)
+
+    def test_exclude_plugins_fail(self):
+        self.plugin_dir = self.test_project_dir / "py"
+        self.plugin_engine.load_plugins(self.plugin_dir, ["NotAPlugin"])
+        self.assertEqual(len(self.plugin_engine.plugins), 1)
+
     def test_execute_phase(self):
         self.plugin_engine.plugins = [mock.MagicMock()]
         self.plugin_engine.execute_phase(

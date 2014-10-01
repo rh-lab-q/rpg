@@ -7,6 +7,7 @@ from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from rpg.command import cmd_output
+from rpg.conf import Conf
 import shutil
 
 
@@ -15,6 +16,7 @@ class Base(object):
     """Base class that is controlled by RPM GUI"""
 
     def __init__(self):
+        self._conf = Conf()
         self._setup_logging()
         self._project_builder = ProjectBuilder()
         self.spec = Spec()
@@ -23,7 +25,6 @@ class Base(object):
         self._plugin_engine = PluginEngine(self.spec, self.sack)
         self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
-        self._plugin_engine.load_plugins(Path('rpg/plugins'))
 
     def _setup_logging(self):
         logging.basicConfig(level=logging.DEBUG,
@@ -32,6 +33,15 @@ class Base(object):
                             handlers=[logging.FileHandler("rpg.log"),
                                       logging.StreamHandler()],
                             datefmt='%H:%M:%S')
+
+    def load_plugins(self):
+        self._plugin_engine.load_plugins(
+            Path('rpg/plugins'),
+            self._conf.exclude)
+        for directory in self._conf.directories:
+            self._plugin_engine.load_plugins(
+                Path(directory),
+                self._conf.exclude)
 
     @property
     def base_dir(self):

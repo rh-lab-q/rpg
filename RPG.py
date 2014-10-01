@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
+from rpg import Base
 from rpg.gui.wizard import Wizard
 import logging
 import sys
@@ -7,7 +8,10 @@ import sys
 
 def main():
     app = QApplication(sys.argv)
-    wiz = Wizard()
+    base = Base()
+    base.conf.parse_cmdline()
+    base.load_plugins()
+    wiz = Wizard(base)
     wiz.setObjectName("RPG")
     wiz.resize(850, 650)
     wiz.setMinimumSize(QtCore.QSize(850, 650))

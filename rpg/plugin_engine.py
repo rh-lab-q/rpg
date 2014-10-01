@@ -53,18 +53,20 @@ class PluginEngine:
             imported_path = __import__(
                 path_to_file, fromlist=[splitted_path[-1]])
             imported_file = getattr(imported_path, splitted_path[-1])
+            plugin_file = imported_file.__name__
             for var_name in dir(imported_file):
                 attr = getattr(imported_file, var_name)
                 if inspect.isclass(attr) and attr != Plugin and \
                    issubclass(attr, Plugin):
-                    plugin_file = imported_file.__name__
                     try:
                         plugin = attr()
-                        self.plugins.add(plugin)
+                        if not plugin.__class__.__name__ in excludes:
+                            self.plugins.add(plugin)
+                            logging.info("plugin %s loaded (%s)" % (plugin.__class__.__name__, plugin_file))
+                        else:
+                            logging.info("plugin %s was excluded (%s)" % (plugin.__class__.__name__, plugin_file))
                     except Exception:
-                        logging.warn("plugin %s not loaded" % plugin_file)
-                    else:
-                        logging.info("plugin %s loaded" % plugin_file)
+                        logging.warn("plugin %s not loaded (%s)" % (plugin.__class__.__name__, plugin_file))
 
 
 def _os_path_split(path):

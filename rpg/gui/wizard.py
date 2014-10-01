@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
 from rpg.command import Command
-from rpg import Base
 
 
 class Wizard(QtWidgets.QWizard):
@@ -20,10 +19,10 @@ class Wizard(QtWidgets.QWizard):
         PageScriplets, PageSubpackages, PageDocsChangelog, PageBuild, PageCopr,
         PageFinal) = range(NUM_PAGES)
 
-    def __init__(self, parent=None):
+    def __init__(self, base, parent=None):
         super(Wizard, self).__init__(parent)
 
-        self.base = Base()
+        self.base = base
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
 
