@@ -28,3 +28,8 @@ class PluginEngineTest(RpgTestCase):
         expected = "Command '['/bin/sh', '-c', 'cd %s && pwd && cd c && pwd" \
             "']' returned non-zero exit status 1" % cur_dir.resolve()
         self.assertEqual(expected, str(ctx.exception))
+
+    def test_execute(self):
+        cmd = Command("echo bla")
+        output = cmd.execute()
+        self.assertEqual("bla\n", output)

@@ -43,7 +43,7 @@ class PluginEngine:
                 else:
                     logging.info("plugin %s executed" % plugin_name)
 
-    def load_plugins(self, path):
+    def load_plugins(self, path, excludes=[]):
         """finds all plugins in dir and it's subdirectories"""
 
         pyfiles = path.rglob('*.py')

@@ -36,6 +36,12 @@ class Command:
             msg = "Only list of command strings or command string is accepted"
             raise TypeError(msg)
 
+    def execute(self):
+        command_lines = self._assign_rpm_variables() + self._command_lines
+        o = check_output(["/bin/sh", "-c", " && ".join(command_lines)])
+        # TODO don't print stdout of commands
+        return o.decode('utf-8')
+
     def execute_from(self, work_dir):
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
