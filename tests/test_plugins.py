@@ -1,8 +1,11 @@
 from support import PluginTestCase
+from rpg.plugins.lang.python import PythonPlugin
 from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
+from rpg.utils import get_architecture
+import sys
 
 
 class FindPatchPluginTest(PluginTestCase):
@@ -54,3 +57,21 @@ class FindPatchPluginTest(PluginTestCase):
         lib = "-p /sbin/ldconfig"
         self.assertEqual(str(self.spec.post), lib)
         self.assertEqual(str(self.spec.postun), lib)
+
+    def test_python_find_requires(self):
+        # FIXME when ORed files considered
+        plugin = PythonPlugin()
+        plugin.patched(self.test_project_dir / "py" / "requires",
+                       self.spec, self.sack)
+        version = sys.version_info
+        arch = get_architecture()
+        if arch == 32:
+            arch = ""
+        imports = [("/usr/lib{0}/python{1}.{2}/" +
+                    "lib-dynload/math.cpython-{1}{2}m.so")
+                   .format(arch, version.major, version.minor),
+                   str(self.test_project_dir / "py" /
+                       "requires" / "sourcecode2.py")]
+        self.spec.Requires.sort()
+        imports.sort()
+        self.assertEqual(self.spec.Requires, imports)
