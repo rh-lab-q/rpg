@@ -195,20 +195,19 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        self.base.spec.tags['Name'] = self.nameEdit.text()
-        self.base.spec.tags['Version'] = self.versionEdit.text()
-        self.base.spec.tags['Release'] = self.releaseEdit.text()
-        self.base.spec.tags['License'] = self.licenseEdit.text()
-        self.base.spec.tags['URL'] = self.URLEdit.text()
-        self.base.spec.tags['Summary'] = self.summaryEdit.text()
-        self.base.spec.scripts['%description'] = self.descriptionEdit.text()
-        self.base.spec.tags['Vendor'] = self.vendorEdit.text()
-        self.base.spec.tags['Packager'] = self.packagerEdit.text()
-        self.base.spec.tags['Path'] = self.importEdit.text().strip()
-
         # Verifying path
         path = Path(self.importEdit.text())
         if(path.exists()):
+            self.base.spec.tags['Name'] = self.nameEdit.text()
+            self.base.spec.tags['Version'] = self.versionEdit.text()
+            self.base.spec.tags['Release'] = self.releaseEdit.text()
+            self.base.spec.tags['License'] = self.licenseEdit.text()
+            self.base.spec.tags['URL'] = self.URLEdit.text()
+            self.base.spec.tags['Summary'] = self.summaryEdit.text()
+            self.base.spec.scripts['%description'] = self.descriptionEdit.text()
+            self.base.spec.tags['Vendor'] = self.vendorEdit.text()
+            self.base.spec.tags['Packager'] = self.packagerEdit.text()
+            self.base.spec.tags['Path'] = self.importEdit.text().strip()
             self.base.process_archive_or_dir(self.base.spec.tags['Path'])
             self.base.run_raw_sources_analysis()
             self.importEdit.setStyleSheet("")
@@ -503,6 +502,7 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
 class SubpackagesPage(QtWidgets.QWizardPage):
     def initializePage(self):
+        print(type(self.base.spec.files))
         self.tree.addSubpackage(self.base.spec.tags['Name'])
         for a, b, c in self.base.spec.files:
             if ".lang" not in str(a):
@@ -512,6 +512,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
                                               a, "file")
 
     def cleanupPage(self):
+        self.base.spec.files = []
         self.tree.clear()
         self.filesListWidget.clear()
 
