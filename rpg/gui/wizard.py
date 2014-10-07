@@ -14,9 +14,9 @@ class Wizard(QtWidgets.QWizard):
         - to simply navigate between them
         - counted from 0 (PageGreetings) to 10 (PageFinal)'''
 
-    NUM_PAGES = 11
+    NUM_PAGES = 10
     (PageGreetings, PageImport, PageScripts, PagePatches, PageRequires,
-        PageScriplets, PageSubpackages, PageDocsChangelog, PageBuild, PageCopr,
+        PageScriplets, PageSubpackages, PageBuild, PageCopr,
         PageFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
@@ -36,7 +36,6 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageRequires, RequiresPage(self))
         self.setPage(self.PageScriplets, ScripletsPage(self))
         self.setPage(self.PageSubpackages, SubpackagesPage(self))
-        self.setPage(self.PageDocsChangelog, DocsChangelogPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
         self.setPage(self.PageCopr, CoprPage(self))
         self.setPage(self.PageFinal, FinalPage(self))
@@ -307,8 +306,8 @@ class PatchesPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Patches page"))
-        self.setSubTitle(self.tr("Select patches"))
+        self.setTitle(self.tr("Patches, documents and changelog page"))
+        self.setSubTitle(self.tr("Do it"))
 
         self.addButton = QPushButton("+")
         self.removeButton = QPushButton("-")
@@ -321,13 +320,14 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.removeButton.setMaximumHeight(60)
         self.removeButton.clicked.connect(self.removeItemFromListWidget)
 
-        grid = QGridLayout()
-        grid.addWidget(patchesLabel, 0, 0)
-        grid.addWidget(self.addButton, 0, 1,)
-        grid.addWidget(self.removeButton, 0, 2)
-        grid.addWidget(self.listPatches, 1, 0, 1, 0)
+    def openChangeLogDialog(self):
+        changelogWindow = QDialog()
+        changelog = DialogChangelog(changelogWindow, self)
+        changelog.exec_()
 
-        self.setLayout(grid)
+    def openDocsFileDialog(self):
+        brows = QFileDialog()
+        brows.getOpenFileName(self, "/home")
 
     def removeItemFromListWidget(self):
         self.item = self.listPatches.takeItem(self.listPatches.currentRow())
@@ -419,7 +419,6 @@ class ScripletsPage(QtWidgets.QWizardPage):
         super(ScripletsPage, self).__init__(parent)
 
         self.base = Wizard.base
-
         self.setTitle(self.tr("Scriplets page"))
         self.setSubTitle(self.tr("Write scriplets"))
 
@@ -466,14 +465,20 @@ class ScripletsPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
-        return Wizard.PageDocsChangelog
+        return Wizard.PageBuild
 
 
 class SubpackagesPage(QtWidgets.QWizardPage):
     def initializePage(self):
-    	for a, b, c in self.base.spec.files:
-    		if ".lang" not in str(a):
-        	    self.filesListWidget.addItem(a)
+        self.tree.addSubpackage(self.base.spec.tags['Name'])
+        for a, b, c in self.base.spec.files:
+            if ".lang" not in str(a):
+                self.tree.addFileToSubpackage(self.tree.invisibleRootItem().child(0),
+                                              a, "file")
+
+    def cleanupPage(self):
+        self.tree.clear()
+        self.filesListWidget.clear()
 
     def __init__(self, Wizard, parent=None):
         super(SubpackagesPage, self).__init__(parent)
@@ -484,8 +489,8 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         self.setTitle(self.tr("Subpackages page"))
         self.setSubTitle(self.tr("Choose subpackages"))
 
-        filesLabel = QLabel("Files")
-        subpackagesLabel = QLabel("Subpackages ")
+        filesLabel = QLabel("Do not include: ")
+        subpackagesLabel = QLabel("Packages: ")
 
         self.addPackButton = QPushButton("+")
         self.addPackButton.setMaximumWidth(68)
@@ -558,6 +563,9 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         def __init__(self, Page):
             self.page = Page
             QtWidgets.QWidget.__init__(self)
+
+            ''' TODO - drag and drop, someday'''
+            #self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
             self.column = 0  # only one column in each row
             self.setHeaderHidden(True)  # make invisible -1 row (with name)
 
@@ -581,52 +589,6 @@ class SubpackagesPage(QtWidgets.QWizardPage):
             item = QTreeWidgetItem(parent, [title])
             item.setData(self.column, QtCore.Qt.UserRole, data)
             return item
-
-
-class DocsChangelogPage(QtWidgets.QWizardPage):
-    def __init__(self, Wizard, parent=None):
-        super(DocsChangelogPage, self).__init__(parent)
-
-        self.base = Wizard.base
-        self.setTitle(self.tr("Document files page"))
-        self.setSubTitle(self.tr("Add documentation files"))
-
-        documentationFilesLabel = QLabel("Documentation files ")
-        self.addDocumentationButton = QPushButton("+")
-        self.addDocumentationButton.clicked.connect(self.openDocsFileDialog)
-        self.removeDocumentationButton = QPushButton("-")
-        self.openChangelogDialogButton = QPushButton("Changelog")
-        self.openChangelogDialogButton.clicked.connect(
-            self.openChangeLogDialog)
-        self.documentationFilesList = QListWidget()
-
-        mainLayout = QVBoxLayout()
-        upperLayout = QHBoxLayout()
-        midleLayout = QHBoxLayout()
-        lowerLayout = QHBoxLayout()
-        upperLayout.addWidget(self.addDocumentationButton)
-        upperLayout.addWidget(self.removeDocumentationButton)
-        upperLayout.addWidget(documentationFilesLabel)
-        upperLayout.addSpacing(500)
-        midleLayout.addWidget(self.documentationFilesList)
-        lowerLayout.addWidget(self.openChangelogDialogButton)
-        lowerLayout.addSpacing(700)
-        mainLayout.addLayout(upperLayout)
-        mainLayout.addLayout(midleLayout)
-        mainLayout.addLayout(lowerLayout)
-        self.setLayout(mainLayout)
-
-    def openChangeLogDialog(self):
-        changelogWindow = QDialog()
-        changelog = DialogChangelog(changelogWindow, self)
-        changelog.exec_()
-
-    def openDocsFileDialog(self):
-        brows = QFileDialog()
-        brows.getOpenFileName(self, "/home")
-
-    def nextId(self):
-        return Wizard.PageBuild
 
 
 class BuildPage(QtWidgets.QWizardPage):
