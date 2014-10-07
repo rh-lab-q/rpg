@@ -232,11 +232,10 @@ class ImportPage(QtWidgets.QWizardPage):
 
 class ScriptsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.prepareEdit.setText(str(self.base.spec.scripts['%prep']))
-        self.prepareEdit.setPlaceholderText("prep")
-        self.buildEdit.setPlaceholderText("build")
-        self.installEdit.setPlaceholderText("install")
-        self.checkEdit.setPlaceholderText("check")
+        self.prepareEdit.setText(self.base.spec.scripts['%prep'])
+        self.buildEdit.setText(self.base.spec.scripts['%build'])
+        self.installEdit.setText(self.base.spec.scripts['%install'])
+        self.checkEdit.setText(self.base.spec.scripts['%check'])
 
     def __init__(self, Wizard, parent=None):
         super(ScriptsPage, self).__init__(parent)
@@ -394,10 +393,9 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.bRequiresEdit.setText(str(self.base.spec.scripts['%prep']))
-        self.bRequiresEdit.setPlaceholderText("BuildRequires")
-        self.requiresEdit.setPlaceholderText("Requires")
-        self.providesEdit.setPlaceholderText("Provides")
+        self.bRequiresEdit.setText(self.base.spec.tags["BuildRequires"])
+        self.requiresEdit.setText(self.base.spec.tags["Requires"])
+        self.providesEdit.setText(self.base.spec.tags["Provides"])
 
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
@@ -443,13 +441,12 @@ class RequiresPage(QtWidgets.QWizardPage):
 
 class ScripletsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.prepareEdit.setText(str(self.base.spec.scripts['%prep']))
-        self.pretransEdit.setPlaceholderText("pretrans")
-        self.preEdit.setPlaceholderText("pre")
-        self.postEdit.setPlaceholderText("post")
-        self.postunEdit.setPlaceholderText("postun")
-        self.preunEdit.setPlaceholderText("preun")
-        self.posttransEdit.setPlaceholderText("posttrans")
+        self.pretransEdit.setText(self.base.spec.scripts['%pretrans'])
+        self.preEdit.setText(self.base.spec.scripts['%pre'])
+        self.postEdit.setText(self.base.spec.scripts['%post'])
+        self.postunEdit.setText(self.base.spec.scripts['%postun'])
+        self.preunEdit.setText(self.base.spec.scripts['%preun'])
+        self.posttransEdit.setText(self.base.spec.scripts['%posttrans'])
 
     def __init__(self, Wizard, parent=None):
         super(ScripletsPage, self).__init__(parent)
