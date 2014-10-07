@@ -232,7 +232,7 @@ class ImportPage(QtWidgets.QWizardPage):
 
 class ScriptsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.prepareEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        #self.prepareEdit.setText(str(self.base.spec.scripts['%prep']))
         self.prepareEdit.setPlaceholderText("prep")
         self.buildEdit.setPlaceholderText("build")
         self.installEdit.setPlaceholderText("install")
@@ -280,7 +280,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
                                                       .prepareEdit
                                                       .toPlainText())
         else:
-            self.base.spec.scripts['%prep'] = Command("Prep_test") # TODO
+            self.base.spec.scripts['%prep'] = Command("Prep_test")  # TODO
         self.base.spec.scripts['%build'] = Command(self
                                                    .buildEdit
                                                    .toPlainText())
@@ -394,7 +394,7 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.bRequiresEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        #self.bRequiresEdit.setText(str(self.base.spec.scripts['%prep']))
         self.bRequiresEdit.setPlaceholderText("BuildRequires")
         self.requiresEdit.setPlaceholderText("Requires")
         self.providesEdit.setPlaceholderText("Provides")
@@ -443,7 +443,7 @@ class RequiresPage(QtWidgets.QWizardPage):
 
 class ScripletsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        #self.prepareEdit.setPlaceholderText(str(self.base.spec.scripts['%prep']))
+        #self.prepareEdit.setText(str(self.base.spec.scripts['%prep']))
         self.pretransEdit.setPlaceholderText("pretrans")
         self.preEdit.setPlaceholderText("pre")
         self.postEdit.setPlaceholderText("post")
@@ -509,7 +509,9 @@ class SubpackagesPage(QtWidgets.QWizardPage):
         self.tree.addSubpackage(self.base.spec.tags['Name'])
         for a, b, c in self.base.spec.files:
             if ".lang" not in str(a):
-                self.tree.addFileToSubpackage(self.tree.invisibleRootItem().child(0),
+                self.tree.addFileToSubpackage(self.
+                                              tree.
+                                              invisibleRootItem().child(0),
                                               a, "file")
 
     def cleanupPage(self):
