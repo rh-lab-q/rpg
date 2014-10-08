@@ -1,43 +1,97 @@
-class Subpackage:
+from rpg.command import Command
 
-    # Holds the most common keywords used with SPEC file tags, along with the
-    # conventional order preserved
-    tag_keywords = ["Name", "Version", "Release", "Summary", "Group",
-                    "License", "URL", "Source", "Patch", "BuildArch",
-                    "BuildRoot", "BuildRequires", "Requires", "Provides",
-                    "Obsoletes", "Conflicts", "Vendor", "Packager"]
 
-    # Holds the most common keywords use with SPEC file scripts, along with the
-    # conventional order preserved
-    script_keywords = ["%description", "%package", "%prep", "%build", "%pre",
-                       "%install", "%check", "%post", "%preun", "%postun",
-                       "%pretrans", "%posttrans", "%clean", "%changelog"]
+class Subpackage(dict):
+    # list of tuple (src_file, tag, attr)
+    # e.g. %config, %doc, %ghost, %dir
+    files = []
 
-    _single_value_tags = {"Name", "Version", "Release", "Summary", "Group",
-                          "License", "URL", "BuildArch", "BuildRoot"}
+    # names of scripts
+    scripts = ["prep",
+               "build",
+               "pre",
+               "install",
+               "check",
+               "post",
+               "preun",
+               "postun",
+               "pretrans",
+               "posttrans",
+               "clean",
+               "changelog"]
+
+    # names of 'single' keys
+    singles = ["Name",
+               "Version",
+               "Release",
+               "Summary"
+               "Group"
+               "License"
+               "URL"
+               "BuildArch"
+               "BuildRoot"]
+
+    # lists that could be appended
+    appendants = ["Requires",
+                  "BuildRequires",
+                  "Provides"]
+
+    # list of generated translation files
+    files_translations = []
 
     def __init__(self):
-        # list of tuple (src_file, tag, attr)
-        # e.g. %config, %doc, %ghost, %dir
-        self.files = []
 
-        self.files_translations = []  # list of generated translation files
-
-        # dict of tags: "key" -> list[vals]
-        # e.g. "Requires" -> ["foo", "bar"]
-        # in case of single value tag, no list of values is
-        # needed, e.g. "Name" -> "foo", "Sumary" -> bar
-        self.tags = {}
-
-        # dict of scripts: "key" -> string
-        # e.g. "%prep" -> "%autosetup"
-        self.scripts = {}
+        tags = {"Name": "", "Version": "", "Release": "", "Summary": "",
+                "Group": "", "License": "", "URL": "", "Source": "",
+                "Patch": "", "BuildArch": "", "BuildRoot": "",
+                "Obsoletes": "", "Conflicts": "", "Vendor": "",
+                "Packager": "",
+                "description": "",
+                "package": "",
+                "BuildRequires": [], "Requires": [], "Provides": [],
+                "prep": Command(),
+                "build": Command(),
+                "pre": Command(),
+                "install": Command(),
+                "check": Command(),
+                "post": Command(),
+                "preun": Command(),
+                "postun": Command(),
+                "pretrans": Command(),
+                "posttrans": Command(),
+                "clean": Command(),
+                "changelog": Command()
+                }
+        dict.__init__(self, tags)
 
     def __getattr__(self, key):
-        pass
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            raise AttributeError(key)
 
     def __setattr__(self, key, value):
-        pass
+        try:
+            if key in self.singles:
+                if not isinstance(value, str):
+                    raise TypeError(value)
+
+            if key not in self.scripts and isinstance(value, type(Command())):
+                raise TypeError(value)
+
+            if not isinstance(value, (list, str, type(Command()))):
+                raise TypeError(value)
+
+            self.__getattr__(key)  # raises AttributeError
+            if key in self.scripts:
+                if isinstance(value, type(Command())):
+                    self.__setitem__(key, value)
+                else:
+                    self.__setitem__(key, Command(value))
+            else:
+                self.__setitem__(key, value)
+        except KeyError:
+            raise AttributeError(key)
 
     def _files_remove_duplicity(self):
         """Function checks for duplicity in files list, leaving only the last
@@ -61,7 +115,7 @@ class Subpackage:
 
                         # Patches aren't usually contained in subpackages.
                         if type(self) is Spec and tag == "Patch":
-                            print("{}: {}".format(tag+str(patch_index), val),
+                            print("{}: {}".format(tag + str(patch_index), val),
                                   file=out)
                             patch_index += 1
                         else:
@@ -78,7 +132,7 @@ class Subpackage:
     def _write_scripts(self, out):
         for script in self.script_keywords:
             if script in self.scripts.keys():
-                print("\n{}\n{}".format(script+" "+self.tags['Name'],
+                print("\n{}\n{}".format(script + " " + self.tags['Name'],
                                         self.scripts.get(script)), file=out)
 
     def _write_files(self, out):
@@ -126,14 +180,28 @@ class Subpackage:
 
 class Spec(Subpackage):
     """SPEC properties holder"""
+    subpackages = []
+    changelogs = []
 
     def __init__(self):
         super(Spec, self).__init__()
-        self.subpackages = []
-        self.changelogs = []
 
     def __str__(self):
-        pass
+        out = ''
+        for key, value in self.items():
+            str_key = str(key)
+            block = ''
+            if isinstance(value, (list, Command)) and str(value) is not "":
+                if str_key in self.scripts:
+                    block = '\n' + str_key + '\n' + str(value) + '\n'
+                elif str_key in self.appendants:
+                    for part in value:
+                        block += str_key + ':' + '\t' + part + '\n'
+            elif isinstance(value, (str, Command)) and str(value) is not "":
+                block = '\n' + str_key + '\n' + str(value) + '\n'
+            if value is not Command('') and value is not "":
+                out += block
+        return out.strip()
 
     def _files_remove_duplicity(self):
         return super(Spec, self)._files_remove_duplicity()
