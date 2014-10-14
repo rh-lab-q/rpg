@@ -1,9 +1,9 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
-                             QPlainTextEdit, QListWidget, QHBoxLayout,
+                             QTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog, QTreeWidget,
-                             QTreeWidgetItem, QTextEdit)
+                             QTreeWidgetItem)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
 from rpg.command import Command
@@ -198,17 +198,17 @@ class ImportPage(QtWidgets.QWizardPage):
         # Verifying path
         path = Path(self.importEdit.text())
         if(path.exists()):
-            self.base.spec.tags['Name'] = self.nameEdit.text()
-            self.base.spec.tags['Version'] = self.versionEdit.text()
-            self.base.spec.tags['Release'] = self.releaseEdit.text()
-            self.base.spec.tags['License'] = self.licenseEdit.text()
-            self.base.spec.tags['URL'] = self.URLEdit.text()
-            self.base.spec.tags['Summary'] = self.summaryEdit.text()
-            self.base.spec.scripts['%description'] = self.descriptionEdit.text()
-            self.base.spec.tags['Vendor'] = self.vendorEdit.text()
-            self.base.spec.tags['Packager'] = self.packagerEdit.text()
-            self.base.spec.tags['Path'] = self.importEdit.text().strip()
-            self.base.process_archive_or_dir(self.base.spec.tags['Path'])
+            self.base.spec.Name = self.nameEdit.text()
+            self.base.spec.Version = self.versionEdit.text()
+            self.base.spec.Release = self.releaseEdit.text()
+            self.base.spec.License = self.licenseEdit.text()
+            self.base.spec.URL = self.URLEdit.text()
+            self.base.spec.Summary = self.summaryEdit.text()
+            self.base.spec.description = self.descriptionEdit.text()
+            self.base.spec.Vendor = self.vendorEdit.text()
+            self.base.spec.Packager = self.packagerEdit.text()
+            self.base.spec.Source = self.importEdit.text().strip()
+            self.base.process_archive_or_dir(self.base.spec.Source)
             self.base.run_raw_sources_analysis()
             self.importEdit.setStyleSheet("")
             return True
@@ -231,10 +231,10 @@ class ImportPage(QtWidgets.QWizardPage):
 
 class ScriptsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.prepareEdit.setText(self.base.spec.scripts['%prep'])
-        self.buildEdit.setText(self.base.spec.scripts['%build'])
-        self.installEdit.setText(self.base.spec.scripts['%install'])
-        self.checkEdit.setText(self.base.spec.scripts['%check'])
+        self.prepareEdit.setText(str(self.base.spec.prep))
+        self.buildEdit.setText(str(self.base.spec.build))
+        self.installEdit.setText(str(self.base.spec.install))
+        self.checkEdit.setText(str(self.base.spec.check))
 
     def __init__(self, Wizard, parent=None):
         super(ScriptsPage, self).__init__(parent)
@@ -273,25 +273,12 @@ class ScriptsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        if (len(str(self.prepareEdit.toPlainText())) is not 0):
-            self.base.spec.scripts['%prep'] = Command(self
-                                                      .prepareEdit
-                                                      .toPlainText())
-        else:
-            self.base.spec.scripts['%prep'] = Command("Prep_test")  # TODO
-        self.base.spec.scripts['%build'] = Command(self
-                                                   .buildEdit
-                                                   .toPlainText())
-        self.base.spec.scripts['%install'] = Command(self
-                                                     .installEdit
-                                                     .toPlainText())
-        self.base.spec.scripts['%check'] = Command(self
-                                                   .checkEdit
-                                                   .toPlainText())
+        self.base.spec.prep = Command(self.prepareEdit.toPlainText())
+        self.base.spec.build = Command(self.buildEdit.toPlainText())
+        self.base.spec.install = Command(self.installEdit.toPlainText())
+        self.base.spec.check = Command(self.checkEdit.toPlainText())
         if self.buildArchCheckbox.isChecked():
-            self.base.spec.tags['BuildArch'] = "noarch"
-        else:
-            self.base.spec.tags.pop('BuildArch', None)
+            self.base.spec.BuildArch = "noarch"
         return True
 
     def nextId(self):
@@ -344,10 +331,8 @@ class PatchesPage(QtWidgets.QWizardPage):
         upperLayout.addWidget(self.addDocumentationButton)
         upperLayout.addWidget(self.removeDocumentationButton)
         upperLayout.addWidget(documentationFilesLabel)
-        #upperLayout.addSpacing(500)
         midleLayout.addWidget(self.documentationFilesList)
         lowerLayout.addWidget(self.openChangelogDialogButton)
-        #lowerLayout.addSpacing(700)
         mainLayout.addLayout(topLayout)
         mainLayout.addLayout(upperLayout)
         mainLayout.addLayout(midleLayout)
@@ -392,9 +377,9 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.bRequiresEdit.setText(self.base.spec.tags["BuildRequires"])
-        self.requiresEdit.setText(self.base.spec.tags["Requires"])
-        self.providesEdit.setText(self.base.spec.tags["Provides"])
+        self.bRequiresEdit.setText(str(self.base.spec.BuildRequires))
+        self.requiresEdit.setText(str(self.base.spec.Requires))
+        self.providesEdit.setText(str(self.base.spec.Provides))
 
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
@@ -425,9 +410,9 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.tags["BuildRequires"] = self.bRequiresEdit.toPlainText()
-        self.base.spec.tags["Requires"] = self.requiresEdit.toPlainText()
-        self.base.spec.tags["Provides"] = self.providesEdit.toPlainText()
+        self.base.spec.BuildRequires = self.bRequiresEdit.toPlainText()
+        self.base.spec.Requires = self.requiresEdit.toPlainText()
+        self.base.spec.Provides = self.providesEdit.toPlainText()
         self.base.build_project()
         self.base.run_compiled_analysis()
         self.base.install_project()
@@ -440,12 +425,12 @@ class RequiresPage(QtWidgets.QWizardPage):
 
 class ScripletsPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.pretransEdit.setText(self.base.spec.scripts['%pretrans'])
-        self.preEdit.setText(self.base.spec.scripts['%pre'])
-        self.postEdit.setText(self.base.spec.scripts['%post'])
-        self.postunEdit.setText(self.base.spec.scripts['%postun'])
-        self.preunEdit.setText(self.base.spec.scripts['%preun'])
-        self.posttransEdit.setText(self.base.spec.scripts['%posttrans'])
+        self.pretransEdit.setText(str(self.base.spec.pretrans))
+        self.preEdit.setText(str(self.base.spec.pre))
+        self.postEdit.setText(str(self.base.spec.post))
+        self.postunEdit.setText(str(self.base.spec.postun))
+        self.preunEdit.setText(str(self.base.spec.preun))
+        self.posttransEdit.setText(str(self.base.spec.posttrans))
 
     def __init__(self, Wizard, parent=None):
         super(ScripletsPage, self).__init__(parent)
@@ -455,22 +440,22 @@ class ScripletsPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Write scriplets"))
 
         pretransLabel = QLabel("%pretrans: ")
-        self.pretransEdit = QPlainTextEdit()
+        self.pretransEdit = QTextEdit()
 
         preLabel = QLabel("%pre: ")
-        self.preEdit = QPlainTextEdit()
+        self.preEdit = QTextEdit()
 
         postLabel = QLabel("%post: ")
-        self.postEdit = QPlainTextEdit()
+        self.postEdit = QTextEdit()
 
         postunLabel = QLabel("%postun: ")
-        self.postunEdit = QPlainTextEdit()
+        self.postunEdit = QTextEdit()
 
         preunLabel = QLabel("%preun: ")
-        self.preunEdit = QPlainTextEdit()
+        self.preunEdit = QTextEdit()
 
         posttransLabel = QLabel("%posttrans: ")
-        self.posttransEdit = QPlainTextEdit()
+        self.posttransEdit = QTextEdit()
 
         grid = QGridLayout()
         grid.addWidget(pretransLabel, 0, 0)
@@ -488,12 +473,12 @@ class ScripletsPage(QtWidgets.QWizardPage):
         self.setLayout(grid)
 
     def validatePage(self):
-        self.base.spec.scripts["%pretrans"] = self.pretransEdit.toPlainText()
-        self.base.spec.scripts["%pre"] = self.preEdit.toPlainText()
-        self.base.spec.scripts["%post"] = self.postEdit.toPlainText()
-        self.base.spec.scripts["%postun"] = self.postunEdit.toPlainText()
-        self.base.spec.scripts["%preun"] = self.preunEdit.toPlainText()
-        self.base.spec.scripts["%posttrans"] = self.posttransEdit.toPlainText()
+        self.base.spec.pretrans = Command(self.pretransEdit.toPlainText())
+        self.base.spec.pre = Command(self.preEdit.toPlainText())
+        self.base.spec.post = Command(self.postEdit.toPlainText())
+        self.base.spec.postun = Command(self.postunEdit.toPlainText())
+        self.base.spec.preun = Command(self.preunEdit.toPlainText())
+        self.base.spec.posttrans = Command(self.posttransEdit.toPlainText())
         return True
 
     def nextId(self):
@@ -502,8 +487,7 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
 class SubpackagesPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        print(type(self.base.spec.files))
-        self.tree.addSubpackage(self.base.spec.tags['Name'])
+        self.tree.addSubpackage(self.base.spec.Name)
         for a, b, c in self.base.spec.files:
             if ".lang" not in str(a):
                 self.tree.addFileToSubpackage(self.
@@ -849,3 +833,7 @@ class FinalPage(QtWidgets.QWizardPage):
         mainLayout.addSpacing(190)
 
         self.setLayout(mainLayout)
+
+    def validatePage(self):
+        print(self.base.spec)
+        return True

@@ -12,5 +12,5 @@ class CMakePlugin(Plugin):
             build.append_cmdlines("cmake " + str(project_dir))
             build.append_cmdlines("make")
             install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
-            spec.scripts["%build"] = build
-            spec.scripts["%install"] = install
+            spec.build = build
+            spec.install = install

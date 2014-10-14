@@ -65,7 +65,7 @@ class Base(object):
 
     @property
     def project_name(self):
-        return self.spec.tags["name"]
+        return self.spec.Name
 
     @property
     def spec_path(self):
@@ -105,7 +105,7 @@ class Base(object):
         """executed in background after filled requires screen"""
         self._project_builder.build(self.extracted_dir,
                                     self.compiled_dir,
-                                    self.spec.scripts["%build"])
+                                    self.spec.build)
 
     def run_compiled_analysis(self):
         """executed in background after patches are applied"""
@@ -116,7 +116,7 @@ class Base(object):
         """executed in background after filled requires screen"""
         self._project_builder.install(self.compiled_dir,
                                       self.installed_dir,
-                                      self.spec.scripts["%install"])
+                                      self.spec.install)
 
     def run_installed_analysis(self):
         """executed in background after successful project build"""
