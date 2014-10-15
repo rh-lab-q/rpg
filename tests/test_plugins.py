@@ -1,16 +1,19 @@
 from support import PluginTestCase
-from rpg.command import Command
 from rpg.plugins.lang.python import PythonPlugin
 from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
-from rpg.plugins.project_builder.make import MakePlugin
 from rpg.utils import get_architecture
 import sys
+from rpg.plugins.lang.c import CPlugin
+from rpg.spec import Spec
 
 
 class FindPatchPluginTest(PluginTestCase):
+
+    def setUp(self):
+        self.spec = Spec()
 
     def test_is_patch(self):
         patch = self.test_project_dir / "patch" / "0.patch"
@@ -79,3 +82,10 @@ class FindPatchPluginTest(PluginTestCase):
         self.spec.Requires.sort()
         imports.sort()
         self.assertEqual(self.spec.Requires, imports)
+
+    def test_c(self):
+        c_plug = CPlugin()
+        c_plug.patched(self.test_project_dir, self.spec, self.sack)
+        self.assertEqual(self.spec.Requires.sort(),
+                         ['/usr/include/gnu', '/usr/include/sys',
+                          '/usr/include', '/usr/include/bits'].sort())

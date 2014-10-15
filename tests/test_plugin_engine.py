@@ -2,6 +2,8 @@ from support import PluginTestCase
 from rpg import plugin_engine as engine
 from tests.project.py.plugin0 import TestPlugin
 from unittest import mock
+from rpg.plugins.lang.c import CPlugin
+from rpg.spec import Spec
 
 
 class PluginEngineTest(PluginTestCase):
