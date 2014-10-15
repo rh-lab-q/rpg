@@ -1,9 +1,11 @@
 from support import PluginTestCase
+from rpg.command import Command
 from rpg.plugins.lang.python import PythonPlugin
 from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
+from rpg.plugins.project_builder.make import MakePlugin
 from rpg.utils import get_architecture
 import sys
 
