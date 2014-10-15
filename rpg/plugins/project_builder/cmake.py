@@ -9,8 +9,8 @@ class CMakePlugin(Plugin):
         if (project_dir / "CMakeLists.txt").is_file():
             logging.debug('CMakeLists.txt found')
             build = Command()
-            build.append_cmdlines("cmake " + str(project_dir))
-            build.append_cmdlines("make")
+            build.append("cmake " + str(project_dir))
+            build.append("make")
             install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
             spec.build = build
             spec.install = install

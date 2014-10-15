@@ -12,7 +12,7 @@ class Command:
         self.rpm_variables = []
         self._command_lines = []
         if cmdline:
-            self.append_cmdlines(cmdline)
+            self.append(cmdline)
 
     def __str__(self):
         """join command lines together. Returns one string that will be saved
@@ -26,7 +26,7 @@ class Command:
     def __eq__(self, other):
         return self._command_lines == other._command_lines
 
-    def append_cmdlines(self, cmdline):
+    def append(self, cmdline):
         """adds cmdline at the end of command sequence
            cmdline could be list of strings or string containing multiple lines
            """

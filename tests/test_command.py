@@ -8,9 +8,9 @@ class PluginEngineTest(RpgTestCase):
 
     def test_command_concat(self):
         cmd = Command("cd %s" % self.test_project_dir)
-        cmd.append_cmdlines("cmake ..")
-        cmd.append_cmdlines(["make", "make test"])
-        self.assertRaises(TypeError, cmd.append_cmdlines, 4)
+        cmd.append("cmake ..")
+        cmd.append(["make", "make test"])
+        self.assertRaises(TypeError, cmd.append, 4)
         expected = "cd %s\ncmake ..\nmake\nmake test" % self.test_project_dir
         self.assertEqual(expected, str(cmd))
 
