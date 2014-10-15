@@ -33,3 +33,8 @@ class PluginEngineTest(RpgTestCase):
         cmd = Command("echo bla")
         output = cmd.execute()
         self.assertEqual("bla\n", output)
+
+    def test_compare(self):
+        cmd1 = Command("test")
+        cmd2 = Command("test")
+        self.assertEqual(cmd1, cmd2)

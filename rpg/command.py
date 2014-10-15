@@ -23,6 +23,9 @@ class Command:
     def __repr__(self):
         return "Command(%s)" % repr(str(self))
 
+    def __eq__(self, other):
+        return self._command_lines == other._command_lines
+
     def append_cmdlines(self, cmdline):
         """adds cmdline at the end of command sequence
            cmdline could be list of strings or string containing multiple lines
