@@ -39,7 +39,9 @@ class FindPatchPluginTest(PluginTestCase):
                  ('tests/project/py/sourcecode.py', None, None),
                  ('tests/project/translation/CZ.mo', None, None),
                  ('tests/project/libs/libstatic.a', None, None),
-                 ('tests/project/libs/libdynamic.so.1', None, None)]
+                 ('tests/project/libs/libdynamic.so.1', None, None),
+                 ('tests/project/Makefile', None, None),
+                 ('tests/project/py/requires/sourcecode2.py', None, None)]
         sorted_files = sorted(files, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)
