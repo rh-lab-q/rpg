@@ -160,23 +160,27 @@ class Base(object):
     # by their rank
 
     def guess_name(self):
+        # returns name of project root folder
         pass
 
     def guess_provide(self):
-        pass
+        # returns list of all known provides
+        provides = set()
+        for pkg in self.sack.query():
+            provides.update(pkg.provides)
+        return sorted(provides)
 
-    def guess_group(self):
-        pass
-
-    def guess_chagelog_data(self):
-        # returns list of tuples (author, email)
-        pass
-
-    def guess_build_dependency(self):
+    def guess_changelog_data(self):
+        # returns list of tuples (author, email) from git
         pass
 
     def guess_dependency(self):
+        # returns guess_provide() + all package names from repos
         pass
 
     def guess_license(self):
-        pass
+        # returns list of all known licenses
+        licenses = set()
+        for pkg in self.sack.query():
+            licenses.update(pkg.license)
+        return sorted(licenses)
