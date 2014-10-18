@@ -6,41 +6,40 @@ class Subpackage(dict):
     # e.g. %config, %doc, %ghost, %dir
     files = []
 
-    # names of scripts
-    scripts = ["prep",
-               "build",
-               "pre",
-               "install",
-               "check",
-               "post",
-               "preun",
-               "postun",
-               "pretrans",
-               "posttrans",
-               "clean",
-               "changelog"]
-
-    # names of 'single' keys
-    singles = ["Name",
-               "Version",
-               "Release",
-               "Summary"
-               "Group"
-               "License"
-               "URL"
-               "BuildArch"
-               "BuildRoot"]
-
-    # lists that could be appended
-    appendants = ["Requires",
-                  "BuildRequires",
-                  "Provides"]
-
     # list of generated translation files
     files_translations = []
 
-    def __init__(self):
+    # names of 'single' keys
+    _singles = ["Name",
+                "Version",
+                "Release",
+                "Summary"
+                "Group"
+                "License"
+                "URL"
+                "BuildArch"
+                "BuildRoot"]
 
+    # names of scripts
+    _scripts = ["prep",
+                "build",
+                "pre",
+                "install",
+                "check",
+                "post",
+                "preun",
+                "postun",
+                "pretrans",
+                "posttrans",
+                "clean",
+                "changelog"]
+
+    # lists that could be appended
+    _appendants = ["Requires",
+                   "BuildRequires",
+                   "Provides"]
+
+    def __init__(self):
         tags = {"Name": "", "Version": "", "Release": "", "Summary": "",
                 "Group": "", "License": "", "URL": "", "Source": "",
                 "Patch": "", "BuildArch": "", "BuildRoot": "",
@@ -65,25 +64,27 @@ class Subpackage(dict):
         dict.__init__(self, tags)
 
     def __getattr__(self, key):
+        ''' Returns attribute of chosen key from dict '''
         try:
             return self.__getitem__(key)
         except KeyError:
             raise AttributeError(key)
 
     def __setattr__(self, key, value):
+        ''' Set's attribute to key in dict '''
         try:
-            if key in self.singles:
+            if key in self._singles:
                 if not isinstance(value, str):
                     raise TypeError(value)
 
-            if key not in self.scripts and isinstance(value, type(Command())):
+            if key not in self._scripts and isinstance(value, type(Command())):
                 raise TypeError(value)
 
             if not isinstance(value, (list, str, type(Command()))):
                 raise TypeError(value)
 
             self.__getattr__(key)  # raises AttributeError
-            if key in self.scripts:
+            if key in self._scripts:
                 if isinstance(value, type(Command())):
                     self.__setitem__(key, value)
                 else:
@@ -92,15 +93,6 @@ class Subpackage(dict):
                 self.__setitem__(key, value)
         except KeyError:
             raise AttributeError(key)
-
-    def _files_remove_duplicity(self):
-        """Function checks for duplicity in files list, leaving only the last
-        occurence of that specific file. Function is not order preserving."""
-
-        seen = {}
-        for file, tags, attr in self.files:
-            seen[file] = (file, tags, attr)
-        return seen.values()
 
     def _write_tags(self, out):
         patch_index = 1   # Used for patch numbering
@@ -192,9 +184,9 @@ class Spec(Subpackage):
             str_key = str(key)
             block = ''
             if isinstance(value, (list, Command)) and str(value) is not "":
-                if str_key in self.scripts:
+                if str_key in self._scripts:
                     block = '\n' + str_key + '\n' + str(value) + '\n'
-                elif str_key in self.appendants:
+                elif str_key in self._appendants:
                     for part in value:
                         block += str_key + ':' + '\t' + part + '\n'
             elif isinstance(value, (str, Command)) and str(value) is not "":
@@ -202,9 +194,6 @@ class Spec(Subpackage):
             if value is not Command('') and value is not "":
                 out += block
         return out.strip()
-
-    def _files_remove_duplicity(self):
-        return super(Spec, self)._files_remove_duplicity()
 
     def _write_tags(self, out):
         return super(Spec, self)._write_tags(out)
