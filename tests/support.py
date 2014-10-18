@@ -1,5 +1,6 @@
 from pathlib import Path
 from unittest import mock, TestCase
+from rpg.spec import Spec
 
 
 class RpgTestCase(TestCase):
@@ -8,4 +9,4 @@ class RpgTestCase(TestCase):
 
 class PluginTestCase(RpgTestCase):
     sack = mock.MagicMock()
-    spec = mock.MagicMock()
+    spec = Spec()

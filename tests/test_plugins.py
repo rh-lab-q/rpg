@@ -18,11 +18,10 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = FindPatchPlugin()
         plugin.extracted(self.test_project_dir / "patch",
                          self.spec, self.sack)
-        expected_patches = {'tests/project/patch/0.patch',
-                            'tests/project/patch/1.patch',
-                            'tests/project/patch/2.patch'}
-        called = tuple(self.spec.tags.__setitem__.call_args_list)[0][0][1]
-        self.assertEqual(expected_patches, set(called))
+        expected_patches = ['tests/project/patch/2.patch',
+                            'tests/project/patch/0.patch',
+                            'tests/project/patch/1.patch']
+        self.assertEqual(expected_patches, self.spec.Patch)
 
     def test_find_files(self):
         plugin = FindFilePlugin()
@@ -38,21 +37,21 @@ class FindPatchPluginTest(PluginTestCase):
                  ('tests/project/libs/libstatic.a', None, None),
                  ('tests/project/libs/libdynamic.so.1', None, None)]
         sorted_files = sorted(files, key=lambda e: e[0])
-        self.assertEqual(self.spec.files.append.call_args_list,
-                         mock.call(sorted_files))
+        self.assertEqual(self.spec.files,
+                         sorted_files)
 
     def test_find_translation_file(self):
         plugin = FindTranslationPlugin()
         plugin.installed(self.test_project_dir,
                          self.spec, self.sack)
         translation_file = ("-f %{CZ.mo}.lang")
-        self.assertEqual(self.spec.files.insert.call_args,
-                         mock.call(0, (translation_file, None, None)))
+        self.assertEqual(self.spec.files[0],
+                        (translation_file, None, None))
 
     def test_find_library(self):
         plugin = FindLibraryPlugin()
         plugin.installed(self.test_project_dir,
                          self.spec, self.sack)
         lib = "-p /sbin/ldconfig"
-        self.assertEqual(self.spec.scripts.__setitem__.call_args_list,
-                         [mock.call('post', lib), mock.call('postun', lib)])
+        self.assertEqual(str(self.spec.post), lib)
+        self.assertEqual(str(self.spec.postun), lib)
