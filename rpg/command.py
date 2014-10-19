@@ -46,7 +46,7 @@ class Command:
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
 
-        cd_workdir = ["cd %s" % work_dir.resolve()]
+        cd_workdir = ["cd %s" % str(work_dir.resolve()).replace(" ", "\\ ")]
         command_lines = self._assign_rpm_variables() + cd_workdir + \
             self._command_lines
         return cmd_output(command_lines)

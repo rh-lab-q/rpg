@@ -30,7 +30,6 @@ class Wizard(QtWidgets.QWizard):
         self.setOption(0x00000800)
 
         # Setting pages to wizard
-        # self.setPage(self.PageGreetings, GreetingsPage())
         self.setPage(self.PageImport, ImportPage(self))
         self.setPage(self.PageScripts, ScriptsPage(self))
         self.setPage(self.PagePatches, PatchesPage(self))
@@ -42,34 +41,6 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageCopr, CoprPage(self))
         self.setPage(self.PageFinal, FinalPage(self))
         self.setStartId(self.PageImport)
-
-
-class GreetingsPage(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
-        super(GreetingsPage, self).__init__(parent)
-        self.setTitle(self.tr("RPG"))
-        self.setSubTitle(self.tr("RPM package generator"))
-
-        greetingsLabel = QLabel("<html><head/><body><p align=\"center\">" +
-                                "<span style=\" font-size:36pt;\">RPG - " +
-                                "RPM Package Generator</span></p></body>" +
-                                "</html><p align=\"center\">RPG is tool," +
-                                " that guides people through the creation" +
-                                " of a RPM package.</p><p align=\"center\">" +
-                                " RPG makes packaging much easier due to" +
-                                " the automatic analysis of packaged " +
-                                "files.</p><p align=\"center\">" +
-                                "Beginners can get familiar with" +
-                                " packaging process </p><p align=\"center\">" +
-                                "or the advanced users can use our tool for" +
-                                " a quick creation of a package.</p>")
-        grid = QVBoxLayout()
-        grid.addSpacing(150)
-        grid.addWidget(greetingsLabel)
-        self.setLayout(grid)
-
-    def nextId(self):
-            return Wizard.PageImport
 
 
 class ImportPage(QtWidgets.QWizardPage):
@@ -234,10 +205,10 @@ class ImportPage(QtWidgets.QWizardPage):
         self.base.spec.scripts['%description'] = self.descriptionEdit.text()
         self.base.spec.tags['Vendor'] = self.vendorEdit.text()
         self.base.spec.tags['Packager'] = self.packagerEdit.text()
-        self.base.spec.tags['Path'] = self.importEdit.text()
+        self.base.spec.tags['Path'] = self.importEdit.text().strip()
 
         # Verifying path
-        path = Path(self.base.spec.tags['Path'])
+        path = Path(self.importEdit.text())
         if(path.exists()):
             self.base.process_archive_or_dir(self.base.spec.tags['Path'])
             self.base.run_raw_sources_analysis()
@@ -310,7 +281,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
                                                       .prepareEdit
                                                       .toPlainText())
         else:
-        	self.base.spec.scripts['%prep'] = Command("Prep_test") # TODO
+            self.base.spec.scripts['%prep'] = Command("Prep_test") # TODO
         self.base.spec.scripts['%build'] = Command(self
                                                    .buildEdit
                                                    .toPlainText())
