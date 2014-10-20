@@ -3,7 +3,6 @@ from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
-from unittest import mock
 
 
 class FindPatchPluginTest(PluginTestCase):
@@ -18,10 +17,10 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = FindPatchPlugin()
         plugin.extracted(self.test_project_dir / "patch",
                          self.spec, self.sack)
-        expected_patches = ['tests/project/patch/2.patch',
+        expected_patches = {'tests/project/patch/2.patch',
                             'tests/project/patch/0.patch',
-                            'tests/project/patch/1.patch']
-        self.assertEqual(expected_patches, self.spec.Patch)
+                            'tests/project/patch/1.patch'}
+        self.assertEqual(expected_patches, set(self.spec.Patch))
 
     def test_find_files(self):
         plugin = FindFilePlugin()
