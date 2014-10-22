@@ -8,6 +8,7 @@ from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from rpg.command import cmd_output
 from rpg.conf import Conf
+from os.path import isdir
 import shutil
 
 
@@ -160,8 +161,14 @@ class Base(object):
     # by their rank
 
     def guess_name(self):
-        # returns name of project root folder
-        pass
+        if isdir(self._input_name):
+            return self._input_name
+        else:
+            if "zip" in self._input_name:
+                return self._input_name.split(str=".zip")[0]
+            else:
+                if "tar" in self._input_name:
+                    return self._input_name.split(str=".tar")[0]
 
     def guess_provide(self):
         # returns list of all known provides
