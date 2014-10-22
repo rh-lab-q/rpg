@@ -176,7 +176,8 @@ class Base(object):
 
     def guess_dependency(self):
         # returns guess_provide() + all package names from repos
-        pass
+        names = map(lambda pkg: pkg.name, self.sack.query())
+        return sorted(set(names).union(set(self.guess_provide())))
 
     def guess_license(self):
         # returns list of all known licenses
