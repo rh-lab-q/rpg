@@ -16,7 +16,7 @@ class Base(object):
     """Base class that is controlled by RPM GUI"""
 
     def __init__(self):
-        self._conf = Conf()
+        self.conf = Conf()
         self._setup_logging()
         self._project_builder = ProjectBuilder()
         self.spec = Spec()
@@ -37,11 +37,11 @@ class Base(object):
     def load_plugins(self):
         self._plugin_engine.load_plugins(
             Path('rpg/plugins'),
-            self._conf.exclude)
-        for directory in self._conf.directories:
+            self.conf.exclude)
+        for directory in self.conf.directories:
             self._plugin_engine.load_plugins(
                 Path(directory),
-                self._conf.exclude)
+                self.conf.exclude)
 
     @property
     def base_dir(self):
