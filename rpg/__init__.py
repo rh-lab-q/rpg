@@ -128,7 +128,7 @@ class Base(object):
         """builds packages for desired distributions"""
         for distro in distros:
             self._package_builder.build(self.spec_path, self.tarball_path,
-                                        self.distro)
+                                        distro)
 
     @staticmethod
     def compute_checksum(sources):
