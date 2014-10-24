@@ -161,14 +161,16 @@ class Base(object):
     # by their rank
 
     def guess_name(self):
-        if isdir(self._input_name):
-            return self._input_name
+        name = str(self._input_name)
+        if isdir(name):
+            return name
         else:
-            if "zip" in self._input_name:
-                return self._input_name.split(str=".zip")[0]
+            if name[-4:] == ".zip":
+                return name[:-4]
             else:
-                if "tar" in self._input_name:
-                    return self._input_name.split(str=".tar")[0]
+                if "tar" in name:
+                    return name.split(".tar")[0]
+        return ""
 
     def guess_provide(self):
         # returns list of all known provides
