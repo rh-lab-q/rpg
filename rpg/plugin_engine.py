@@ -60,14 +60,17 @@ class PluginEngine:
                    issubclass(attr, Plugin):
                     try:
                         plugin = attr()
-                        if not plugin.__class__.__name__ in excludes:
+                        plugin_name = plugin.__class__.__name__
+                        if not plugin_name in excludes:
                             self.plugins.add(plugin)
-                            logging.info("plugin %s loaded (%s)" % (plugin.__class__.__name__, plugin_file))
+                            logging.info("plugin %s loaded (%s)" %
+                                         (plugin_name, plugin_file))
                         else:
-                            logging.info("plugin %s was excluded (%s)" % (plugin.__class__.__name__, plugin_file))
-                    except Exception as e:
-                        print("### exc = ", e)
-                        logging.warn("plugin %s not loaded (%s)" % (plugin.__class__.__name__, plugin_file))
+                            logging.info("plugin %s was excluded (%s)" %
+                                         (plugin_name, plugin_file))
+                    except Exception:
+                        logging.warn("plugin %s not loaded (%s)" %
+                                     (plugin_name, plugin_file))
 
 
 def _os_path_split(path):
