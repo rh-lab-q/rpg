@@ -65,7 +65,8 @@ class PluginEngine:
                             logging.info("plugin %s loaded (%s)" % (plugin.__class__.__name__, plugin_file))
                         else:
                             logging.info("plugin %s was excluded (%s)" % (plugin.__class__.__name__, plugin_file))
-                    except Exception:
+                    except Exception as e:
+                        print("### exc = ", e)
                         logging.warn("plugin %s not loaded (%s)" % (plugin.__class__.__name__, plugin_file))
 
 

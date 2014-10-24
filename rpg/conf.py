@@ -19,7 +19,7 @@ class Conf:
             metavar='<dir>', nargs='+')
         self.parser.add_argument(
             '--disable-plugin', type=str, dest='exc_plug',
-            help='Exclude specific plugin',
+            help='Exclude specific plugin', default=[],
             metavar='<plugin-name>', nargs='+')
         args = self.parser.parse_args()
         if args.plug_dir:
