@@ -122,7 +122,7 @@ class Base(object):
     def run_installed_analysis(self):
         """executed in background after successful project build"""
         self._plugin_engine.execute_phase(phases[3],
-                                          self.compiled_dir)
+                                          self.installed_dir)
 
     def build_packages(self, *distros):
         """builds packages for desired distributions"""
