@@ -1,5 +1,4 @@
 from rpg.plugin import Plugin
-from pathlib import PurePath
 
 
 class FindFilePlugin(Plugin):
@@ -8,7 +7,8 @@ class FindFilePlugin(Plugin):
         self.files = []
         for item in list(project_dir.glob('**/*')):
             if (item.is_file() and '__pycache__' not in str(item)):
-                self.files.append((str(PurePath(item)), None, None))
+                self.files.append(("/" + str(item.relative_to(project_dir)),
+                                  None, None))
         sorted_files = sorted(self.files, key=lambda e: e[0])
         for one_file in sorted_files:
             spec.files.append(one_file)
