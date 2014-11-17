@@ -495,11 +495,6 @@ class SubpackagesPage(QtWidgets.QWizardPage):
                                               invisibleRootItem().child(0),
                                               a, "file")
 
-    def cleanupPage(self):
-        self.base.spec.files = []
-        self.tree.clear()
-        self.filesListWidget.clear()
-
     def __init__(self, Wizard, parent=None):
         super(SubpackagesPage, self).__init__(parent)
 
@@ -664,7 +659,6 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def openBuildPathFileDialog(self):
         brows = QFileDialog()
-        #brows.setOption(0x00000001, True)
         self.getPath = brows.getExistingDirectory(self,
                                                   "Select Directory",
                                                   "/home",

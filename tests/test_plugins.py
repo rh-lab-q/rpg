@@ -34,17 +34,17 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = FindFilePlugin()
         plugin.installed(self.test_project_dir,
                          self.spec, self.sack)
-        files = [('tests/project/patch/0.patch', None, None),
-                 ('tests/project/patch/1.patch', None, None),
-                 ('tests/project/patch/2.patch', None, None),
-                 ('tests/project/c/sourcecode.c', None, None),
-                 ('tests/project/py/plugin0.py', None, None),
-                 ('tests/project/py/sourcecode.py', None, None),
-                 ('tests/project/translation/CZ.mo', None, None),
-                 ('tests/project/libs/libstatic.a', None, None),
-                 ('tests/project/libs/libdynamic.so.1', None, None),
-                 ('tests/project/Makefile', None, None),
-                 ('tests/project/py/requires/sourcecode2.py', None, None)]
+        files = [('/patch/0.patch', None, None),
+                 ('/patch/1.patch', None, None),
+                 ('/patch/2.patch', None, None),
+                 ('/c/sourcecode.c', None, None),
+                 ('/py/plugin0.py', None, None),
+                 ('/py/sourcecode.py', None, None),
+                 ('/translation/CZ.mo', None, None),
+                 ('/libs/libstatic.a', None, None),
+                 ('/libs/libdynamic.so.1', None, None),
+                 ('/Makefile', None, None),
+                 ('/py/requires/sourcecode2.py', None, None)]
         sorted_files = sorted(files, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)
