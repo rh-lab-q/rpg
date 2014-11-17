@@ -586,8 +586,10 @@ class SubpackagesPage(QtWidgets.QWizardPage):
 
             ''' TODO - drag and drop, someday'''
             #self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
-            self.column = 0  # only one column in each row
+            self.setColumnCount = 1  # only one column in each row
+            self.column = 1
             self.setHeaderHidden(True)  # make invisible -1 row (with name)
+            self.header().setSectionResizeMode(3)
 
         def addSubpackage(self, Name):
             self.name = Name
@@ -595,6 +597,7 @@ class SubpackagesPage(QtWidgets.QWizardPage):
             self.addParent(self.invisibleRootItem(),
                            self.name,
                            self.name + " Subpackage")
+            self.resizeColumnToContents(0)
 
         def addParent(self, parent, title, data):
             item = QTreeWidgetItem(parent, [title])
@@ -603,11 +606,13 @@ class SubpackagesPage(QtWidgets.QWizardPage):
             ''' Dropdown arrows near subpackages '''
             item.setChildIndicatorPolicy(QTreeWidgetItem.ShowIndicator)
             item.setExpanded(True)  # To look like a tree (expanding items)
+            self.resizeColumnToContents(0)
             return item
 
         def addFileToSubpackage(self, parent, title, data):
             item = QTreeWidgetItem(parent, [title])
             item.setData(self.column, QtCore.Qt.UserRole, data)
+            self.resizeColumnToContents(0)
             return item
 
 
