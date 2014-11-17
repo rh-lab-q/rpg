@@ -659,7 +659,12 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def openBuildPathFileDialog(self):
         brows = QFileDialog()
-        brows.getOpenFileName(self, "/home")
+        #brows.setOption(0x00000001, True)
+        self.getPath = brows.getExistingDirectory(self,
+                                                  "Select Directory",
+                                                  "/home",
+                                                  QFileDialog.ShowDirsOnly)
+        self.buildLocationEdit.setText(self.getPath)
 
     def nextId(self):
         if (self.nextPageIsFinal):
