@@ -1,6 +1,6 @@
 from getpass import getuser
 from subprocess import call, check_output, PIPE, Popen, STDOUT
-from rpg.utils import move_file
+from rpg.utils import copy_file
 
 
 class PackageBuilder:
@@ -26,11 +26,10 @@ class PackageBuilder:
            returns None or string in case of error occurrence"""
         call(["rpmdev-setuptree", ""])
         user = getuser()
-        move_file(str(spec_file), "/home/" + user + "/rpmbuild/SPECS/")
-        move_file(str(tarball), "/home/" + user + "/rpmbuild/SOURCES/")
-        spec_name = self._get_last_word(str(spec_file))
+        copy_file(str(spec_file), "/home/" + user + "/rpmbuild/SPECS/")
+        copy_file(str(tarball), "/home/" + user + "/rpmbuild/SOURCES/")
         result = check_output(
-            ["rpmbuild", "-bs", "/home/" + user + "/rpmbuild/SPECS/" + spec_name])
+            ["rpmbuild", "-bs", "/home/" + user + "/rpmbuild/SPECS/" + spec_file.name])
         srpm_path = self._get_last_word(result)
         p = Popen(
             ["mock", "-r", distro, srpm_path], stdout=PIPE, stderr=STDOUT)

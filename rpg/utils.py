@@ -2,8 +2,8 @@ from subprocess import call
 import ctypes
 
 
-def move_file(location, target):
-    call(["mv", location, target])
+def copy_file(location, target):
+    call(["cp", location, target])
 
 
 def get_architecture():
