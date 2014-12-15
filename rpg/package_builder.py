@@ -21,17 +21,19 @@ class PackageBuilder:
                 _ret.append(str(line).replace('\n', ''))
         return _ret
 
-    def build(self, spec_file, tarball, distro):
+    def build(self, spec_file, tarball, distro=None, arch=None):
         """builds RPM package in mock from given spec_file and tarball,
            returns None or string in case of error occurrence"""
         call(["rpmdev-setuptree", ""])
         user = getuser()
-        move_file(spec_file, "/home/"+user+"/rpmbuild/SPECS/")
-        move_file(tarball, "/home/"+user+"/rpmbuild/SOURCES/")
-        spec_name = self._get_last_word(spec_file)
-        result = check_output(["rpmbuild", "-bs", "/home/"+user+"/rpmbuild/SPECS/" + spec_name])
-        srpm_path = self._get_last_word(result) 
-        p = Popen(["mock", "-r", distro, srpm_path], stdout=PIPE, stderr=STDOUT)
+        move_file(str(spec_file), "/home/" + user + "/rpmbuild/SPECS/")
+        move_file(str(tarball), "/home/" + user + "/rpmbuild/SOURCES/")
+        spec_name = self._get_last_word(str(spec_file))
+        result = check_output(
+            ["rpmbuild", "-bs", "/home/" + user + "/rpmbuild/SPECS/" + spec_name])
+        srpm_path = self._get_last_word(result)
+        p = Popen(
+            ["mock", "-r", distro, srpm_path], stdout=PIPE, stderr=STDOUT)
         line = ""
         logs = ""
         while p.poll() is None:

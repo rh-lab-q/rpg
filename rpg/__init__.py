@@ -1,4 +1,5 @@
 import logging
+import platform
 from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.project_builder import ProjectBuilder
@@ -124,11 +125,17 @@ class Base(object):
         self._plugin_engine.execute_phase(phases[3],
                                           self.installed_dir)
 
-    def build_packages(self, *distros):
+    def create_spec_and_archive(self):
+        self._source_loader.create_archive(self.base_dir, self.extracted_dir)
+        with open(str(self.spec_path), 'w') as spec_file:
+            spec_file.write(str(self.spec))
+
+    def build_packages(self, distros, archs=platform.machine()):
         """builds packages for desired distributions"""
-        for distro in distros:
-            self._package_builder.build(self.spec_path, self.tarball_path,
-                                        distro)
+        for arch in archs:
+            for distro in distros:
+                self._package_builder.build(self.spec_path, self.tarball_path,
+                                            distro, arch)
 
     @staticmethod
     def compute_checksum(sources):

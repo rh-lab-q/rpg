@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
 from rpg import Base
@@ -7,8 +9,8 @@ import sys
 
 
 def main():
-    app = QApplication(sys.argv)
     base = Base()
+    app = QApplication(sys.argv)
     base.conf.parse_cmdline()
     base.load_plugins()
     wiz = Wizard(base)

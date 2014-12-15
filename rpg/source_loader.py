@@ -43,12 +43,12 @@ class SourceLoader:
                 return filetype
         return None
 
-    def _create_archive(self, path, extracted_dir, compression=TAR_GZIP):
-        name = os.path.basename(path) + ".tar.gz"
+    def create_archive(self, path, extracted_dir, compression=TAR_GZIP):
+        name = os.path.basename(str(path)) + ".tar.gz"
         mode = self._tar_compression_mode.get(
             self._tar_compression_type.get(compression))
         with tar.open(name, 'w:' + mode) as tarfile:
-            tarfile.add(path, arcname=os.path.basename(path))
+            tarfile.add(str(extracted_dir), arcname=os.path.basename(str(path)))
         return name
 
     def load_sources(self, source_path, extracted_dir, compression=TAR_GZIP):
@@ -77,8 +77,7 @@ class SourceLoader:
 
             else:
                 print("error: File is either not an archive or the archive is \
-                not supported",
-                      file=sys.stderr)
+                not supported", file=sys.stderr)
 
             # test for root directory
             head = members.pop(0)

@@ -649,7 +649,8 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
-        self.base.build_packages()
+        self.base.create_spec_and_archive()
+        self.base.build_packages("fedora-21-x86_64")
         return True
 
     def switchToCOPR(self):
