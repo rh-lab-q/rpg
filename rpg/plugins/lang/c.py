@@ -29,3 +29,4 @@ class CPlugin(Plugin):
                               if regex.match(s) and not regex2.match(s)]))
         unlink(fname)
         spec.Requires += _ret_paths
+        spec.BuildRequires += _ret_paths
