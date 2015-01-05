@@ -24,9 +24,8 @@ class CPlugin(Plugin):
         regex = compile(".*\.h")
         regex2 = compile(str(project_dir) + ".*")
         unlink(fname + ".bak")
-        foo = open(fname, "r")
-        _ret_paths = list(set([path.dirname(s) for s in foo.read().split()
-                          if (regex.match(s) and not regex2.match(s))]))
-        foo.close()
+        with open(fname, "r") as f:
+            _ret_paths = list(set([path.dirname(s) for s in f.read().split()
+                              if regex.match(s) and not regex2.match(s)]))
         unlink(fname)
         spec.Requires += _ret_paths
