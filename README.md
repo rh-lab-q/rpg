@@ -11,13 +11,13 @@ Building for Fedora
 ===================
 
 Packages needed for the build, or the build requires:
-* python3 >= 3.4 or pathlib python 3 module (`pip-python3 install pathlib`)
+* coreutils
+* file
+* makedepend
+* python3 >= 3.4
 * python3-qt5
 * qt5-qtbase-gui
-* file
-* dnf
 * rpmdevtools
-* coreutils
 
 Start RPG
 =========
