@@ -1,0 +1,3 @@
+ADD_SUBDIRECTORY (lang)
+ADD_SUBDIRECTORY (misc)
+ADD_SUBDIRECTORY (project_builder)

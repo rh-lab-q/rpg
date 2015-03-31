@@ -1,0 +1,5 @@
+FILE (GLOB rpg_srcs *.py)
+INSTALL (FILES ${rpg_srcs} DESTINATION ${PYTHON_INSTALL_DIR}/rpg)
+
+ADD_SUBDIRECTORY (gui)
+ADD_SUBDIRECTORY (plugins)

@@ -1,0 +1,2 @@
+#!/bin/bash
+find . \( -name '*.cmake' -o -name Makefile -o -name CMakeFiles -o -name CMakeCache.txt \) -exec rm -rf {} \;
