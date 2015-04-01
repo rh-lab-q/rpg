@@ -2,7 +2,6 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0)
 PROJECT (RPG)
 
 # Python search:
-# FIND_PACKAGE (PythonLibs 3.0) doesn't work properly
 FIND_PACKAGE (PythonInterp 3.4 REQUIRED)
 
 # QT5 search:
@@ -61,18 +60,18 @@ ELSE ()
     MESSAGE (FATAL_ERROR "Rpm developer tools is missing!")
 ENDIF ()
 
-# Nosetests search:
-SET (NoseProg)
-FIND_PROGRAM (NoseProg nosetests-3.4)
-IF (NoseProg)
-    MESSAGE (STATUS "Nosestests exists")
-    ENABLE_TESTING ()
-    FILE (GLOB tests "./tests/test_*.py")
-    FOREACH (file ${tests})
-        ADD_TEST (NAME ${file} COMMAND nosetests-3.4 ${file})
-    ENDFOREACH ()
+# nosetests search:
+IF (EXISTS ${PROJECT_SOURCE_DIR}/tests)
+    FIND_PROGRAM (NoseProg nosetests-3.4)
+    IF (NoseProg)
+        MESSAGE (STATUS "Nosestests exists")
+        ENABLE_TESTING ()
+        ADD_SUBDIRECTORY (tests)
+    ELSE ()
+        MESSAGE (WARNING "Nosetests is missing! - no tests available")
+    ENDIF ()
 ELSE ()
-    MESSAGE (WARNING "Nosetests is missing! - no tests available")
+    MESSAGE (WARNING "No tests available")
 ENDIF ()
 
 # Set install directory:
