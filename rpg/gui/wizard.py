@@ -12,7 +12,8 @@ from rpg.command import Command
 class Wizard(QtWidgets.QWizard):
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageGreetings) to 10 (PageFinal)'''
+        - counted from 0 (PageGreetings) to 10 (PageFinal)
+        - tooltips are from: https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
     NUM_PAGES = 10
     (PageGreetings, PageImport, PageScripts, PagePatches, PageRequires,
@@ -25,9 +26,6 @@ class Wizard(QtWidgets.QWizard):
         self.base = base
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
-
-        # Enables -HELP- button
-        self.setOption(0x00000800)
 
         # Setting pages to wizard
         self.setPage(self.PageImport, ImportPage(self))
@@ -57,42 +55,42 @@ class ImportPage(QtWidgets.QWizardPage):
         self.nameEdit.setMinimumHeight(30)
         self.nameLabel.setBuddy(self.nameEdit)
         self.nameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.nameLabel.setToolTip("Text for name label")
+        self.nameLabel.setToolTip("The (base) name of the package, which should match the SPEC file name")
 
         self.versionLabel = QLabel("Version<font color=\'red\'>*</font>")
         self.versionEdit = QLineEdit()
         self.versionEdit.setMinimumHeight(30)
         self.versionLabel.setBuddy(self.versionEdit)
         self.versionLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.versionLabel.setToolTip("Text for verion label")
+        self.versionLabel.setToolTip("The upstream version number in form yy.mm[dd] (e.g. 2008-05-01 becomes 8.05)")
 
         self.releaseLabel = QLabel("Release<font color=\'red\'>*</font>")
         self.releaseEdit = QLineEdit()
         self.releaseEdit.setMinimumHeight(30)
         self.releaseLabel.setBuddy(self.releaseEdit)
         self.releaseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.releaseLabel.setToolTip("Text for release label")
+        self.releaseLabel.setToolTip("The initial value should normally be 1%{?dist}. Increment the number every time you release a new package")
 
         self.licenseLabel = QLabel("License<font color=\'red\'>*</font>")
         self.licenseEdit = QLineEdit()
         self.licenseEdit.setMinimumHeight(30)
         self.licenseLabel.setBuddy(self.licenseEdit)
         self.licenseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.licenseLabel.setToolTip("Text for license label")
+        self.licenseLabel.setToolTip("The license, which must be an open source software license")
 
         self.summaryLabel = QLabel("Summary<font color=\'red\'>*</font>")
         self.summaryEdit = QLineEdit()
         self.summaryEdit.setMinimumHeight(30)
         self.summaryLabel.setBuddy(self.summaryEdit)
         self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.summaryLabel.setToolTip("Text for summary label")
+        self.summaryLabel.setToolTip("A brief, one-line summary of the package. Use American English")
 
         self.URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
         self.URLEdit.setMinimumHeight(30)
         self.URLLabel.setBuddy(self.URLEdit)
         self.URLLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.URLLabel.setToolTip("Text for URL label")
+        self.URLLabel.setToolTip("The full URL for more information about the program (e.g. the project website)")
 
         self.descriptionLabel = QLabel("Description: ")
         self.descriptionEdit = QLineEdit()
@@ -100,28 +98,28 @@ class ImportPage(QtWidgets.QWizardPage):
         self.descriptionLabel.setBuddy(self.descriptionEdit)
         self.descriptionLabel.setCursor(QtGui.
                                         QCursor(QtCore.Qt.WhatsThisCursor))
-        self.descriptionLabel.setToolTip("Text for description label")
+        self.descriptionLabel.setToolTip("A longer, multi-line description of the program")
 
         self.vendorLabel = QLabel("Vendor: ")
         self.vendorEdit = QLineEdit()
         self.vendorEdit.setMinimumHeight(30)
         self.vendorLabel.setBuddy(self.vendorEdit)
         self.vendorLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.vendorLabel.setToolTip("Text for vendor label")
+        self.vendorLabel.setToolTip("Do NOT use these tags")
 
         self.packagerLabel = QLabel("Packager: ")
         self.packagerEdit = QLineEdit()
         self.packagerEdit.setMinimumHeight(30)
         self.packagerLabel.setBuddy(self.packagerEdit)
         self.packagerLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packagerLabel.setToolTip("Text for packager label")
+        self.packagerLabel.setToolTip("Do NOT use these tags")
 
         self.importLabel = QLabel("Source<font color=\'red\'>*</font>")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
         self.importLabel.setBuddy(self.importEdit)
         self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.importLabel.setToolTip("Text for import label")
+        self.importLabel.setToolTip("Pristine source package (e.g. tarballs) and patches")
         self.importEdit.textChanged.connect(self.checkPath)
         self.importEdit.setMinimumHeight(34)
 
@@ -246,18 +244,28 @@ class ScriptsPage(QtWidgets.QWizardPage):
 
         prepareLabel = QLabel("%prepare: ")
         self.prepareEdit = QTextEdit()
+        prepareLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        prepareLabel.setToolTip("Script commands to prepare the program (e.g. to uncompress it) so that it will be ready for building. Typically this is just %autosetup; a common variation is %autosetup -n NAME if the source file unpacks into NAME")
 
         buildLabel = QLabel("%build: ")
         self.buildEdit = QTextEdit()
+        buildLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        buildLabel.setToolTip("Script commands to build the program (e.g. to compile it) and get it ready for installing")
 
         installLabel = QLabel("%install: ")
         self.installEdit = QTextEdit()
+        installLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        installLabel.setToolTip("Script commands to install the program")
 
         checkLabel = QLabel("%check: ")
         self.checkEdit = QTextEdit()
+        checkLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        checkLabel.setToolTip("Script commands to test the program")
 
         buildArchLabel = QLabel("BuildArch: ")
         self.buildArchCheckbox = QCheckBox("noarch")
+        buildArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        buildArchLabel.setToolTip("If you're packaging files that are architecture-independent (e.g. shell scripts, data files), then add BuildArch: noarch. The architecture for the binary RPM will then be noarch")
 
         grid = QGridLayout()
         grid.addWidget(prepareLabel, 0, 0)
@@ -296,6 +304,8 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.addButton = QPushButton("+")
         self.removeButton = QPushButton("-")
         patchesLabel = QLabel("Patches")
+        patchesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        patchesLabel.setToolTip("Patches should make only one logical change each, so it's quite possible to have multiple patch files")
         self.listPatches = QListWidget()
         self.addButton.setMaximumWidth(68)
         self.addButton.setMaximumHeight(60)
@@ -305,6 +315,8 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.removeButton.clicked.connect(self.removeItemFromListWidget)
 
         documentationFilesLabel = QLabel("Documentation files ")
+        documentationFilesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        documentationFilesLabel.setToolTip("Documentation files that you wish to include")
         self.addDocumentationButton = QPushButton("+")
         self.addDocumentationButton.clicked.connect(self.openDocsFileDialog)
         self.addDocumentationButton.setMaximumWidth(68)
@@ -313,6 +325,8 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.removeDocumentationButton.setMaximumWidth(68)
         self.removeDocumentationButton.setMaximumHeight(60)
         self.openChangelogDialogButton = QPushButton("Changelog")
+        self.openChangelogDialogButton.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.openChangelogDialogButton.setToolTip("Changes in the package. Do NOT put software's changelog at here.This changelog is for RPM itself")
         self.openChangelogDialogButton.clicked.connect(
             self.openChangeLogDialog)
         self.documentationFilesList = QListWidget()
@@ -391,13 +405,19 @@ class RequiresPage(QtWidgets.QWizardPage):
         buildRequiresLabel = QLabel("BuildRequires: ")
         self.bRequiresEdit = QTextEdit()
         self.bRequiresEdit.setMaximumHeight(220)
+        buildRequiresLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        buildRequiresLabel.setToolTip("A comma-separated list of packages required for building (compiling) the program")
 
         requiresLabel = QLabel("Requires: ")
         self.requiresEdit = QTextEdit()
         self.requiresEdit.setMaximumHeight(220)
+        requiresLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        requiresLabel.setToolTip("A comma-separate list of packages that are required when the program is installed")
 
         providesLabel = QLabel("Provides: ")
         self.providesEdit = QTextEdit()
+        providesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        providesLabel.setToolTip("List virtual package names that this package provides")
 
         grid = QGridLayout()
         grid.addWidget(buildRequiresLabel, 0, 0)
@@ -440,21 +460,33 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
         pretransLabel = QLabel("%pretrans: ")
         self.pretransEdit = QTextEdit()
+        pretransLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        pretransLabel.setToolTip("At the start of transaction")
 
         preLabel = QLabel("%pre: ")
         self.preEdit = QTextEdit()
+        preLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        preLabel.setToolTip("Before a packages is installed")
 
         postLabel = QLabel("%post: ")
         self.postEdit = QTextEdit()
+        postLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        postLabel.setToolTip("After a packages is installed")
 
         postunLabel = QLabel("%postun: ")
         self.postunEdit = QTextEdit()
+        postunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        postunLabel.setToolTip("After a packages is uninstalled")
 
         preunLabel = QLabel("%preun: ")
         self.preunEdit = QTextEdit()
+        preunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        preunLabel.setToolTip("Before a packages is uninstalled")
 
         posttransLabel = QLabel("%posttrans: ")
         self.posttransEdit = QTextEdit()
+        posttransLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        posttransLabel.setToolTip("At the end of transaction")
 
         grid = QGridLayout()
         grid.addWidget(pretransLabel, 0, 0)
