@@ -280,6 +280,7 @@ class PatchesPage(QtWidgets.QWizardPage):
         self.base = Wizard.base
 
         self.setTitle(self.tr("Patches, documents and changelog page"))
+        self.setSubTitle(self.tr("\n"))
 
         self.addButton = QPushButton("+")
         self.removeButton = QPushButton("-")
