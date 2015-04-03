@@ -370,9 +370,9 @@ class PatchesPage(QtWidgets.QWizardPage):
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.bRequiresEdit.setText(str(self.base.spec.BuildRequires))
-        self.requiresEdit.setText(str(self.base.spec.Requires))
-        self.providesEdit.setText(str(self.base.spec.Provides))
+        self.bRequiresEdit.setText('\n'.join(self.base.spec.BuildRequires))
+        self.requiresEdit.setText('\n'.join(self.base.spec.Requires))
+        self.providesEdit.setText('\n'.join(self.base.spec.Provides))
 
     def __init__(self, Wizard, parent=None):
         super(RequiresPage, self).__init__(parent)
@@ -412,6 +412,9 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.base.spec.BuildRequires = self.bRequiresEdit.toPlainText()
         self.base.spec.Requires = self.requiresEdit.toPlainText()
         self.base.spec.Provides = self.providesEdit.toPlainText()
+        self.base.spec.BuildRequires = self.base.spec.BuildRequires.splitlines()
+        self.base.spec.Requires = self.base.spec.Requires.splitlines()
+        self.base.spec.Provides = self.base.spec.Provides.splitlines() 
         self.base.build_project()
         self.base.run_compiled_analysis()
         self.base.install_project()
