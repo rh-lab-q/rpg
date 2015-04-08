@@ -10,6 +10,8 @@ from rpg.spec import Spec
 from rpg.command import cmd_output
 from rpg.conf import Conf
 from os.path import isdir
+from os import makedirs
+from os import geteuid
 import shutil
 
 
@@ -29,10 +31,14 @@ class Base(object):
         self._copr_uploader = CoprUploader()
 
     def _setup_logging(self):
+        if geteuid() == 0:
+            log_dir = "/var/log/rpg/"
+        else:
+            log_dir = "/var/tmp/rpg/"
         logging.basicConfig(level=logging.DEBUG,
                             format='[%(asctime)s] {%(pathname)s:%(lineno)d} '
                                    '%(levelname)s - %(message)s',
-                            handlers=[logging.FileHandler("rpg.log"),
+                            handlers=[logging.FileHandler(log_dir + "rpg.log"),
                                       logging.StreamHandler()],
                             datefmt='%H:%M:%S')
 
