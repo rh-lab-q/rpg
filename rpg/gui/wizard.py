@@ -48,7 +48,7 @@ class ImportPage(QtWidgets.QWizardPage):
 
         self.setTitle(self.tr("Beginning"))
         self.setSubTitle(self.tr("Fill in fields and import " +
-                                 "your SRPM or source folder"))
+                                 "tarball or folder with source code"))
         ''' Creating widgets and setting them to layout'''
         self.nameLabel = QLabel("Name<font color=\'red\'>*</font>")
         self.nameEdit = QLineEdit()
