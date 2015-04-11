@@ -1,3 +1,4 @@
+import dnf
 import logging
 import platform
 from pathlib import Path
@@ -15,6 +16,7 @@ from os import geteuid
 import shutil
 
 
+
 class Base(object):
 
     """Base class that is controlled by RPM GUI"""
@@ -24,11 +26,18 @@ class Base(object):
         self._setup_logging()
         self._project_builder = ProjectBuilder()
         self.spec = Spec()
-        self.sack = None  # TODO dnf sack
+        self.sack = self._init_sack()
         self._package_builder = PackageBuilder()
         self._plugin_engine = PluginEngine(self.spec, self.sack)
         self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
+        
+    def _init_sack(self):
+        with dnf.Base() as self._dnf_base:
+            self._dnf_base.conf.releasever = dnf.rpm.detect_releasever(self._dnf_base.conf.installroot)
+            self._dnf_base.read_all_repos()
+            self._dnf_base.fill_sack()
+            return self._dnf_base
 
     def _setup_logging(self):
         if geteuid() == 0:

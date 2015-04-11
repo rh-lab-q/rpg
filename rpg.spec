@@ -7,6 +7,8 @@ URL:            https://github.com/rh-lab-q/rpg
 Source:         %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  python3-devel
+BuildRequires:  dnf
+BuildRequires:  python3-dnf
 BuildArch:      noarch
 
 Requires:       python3 >= 3.4
@@ -16,6 +18,8 @@ Requires:       coreutils
 Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
+Requires:       dnf
+Requires:       python3-dnf
 
 %description
 RPG is tool, that guides people through the creation of a RPM
