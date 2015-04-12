@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
 from rpg.command import Command
+import subprocess
 
 
 class Wizard(QtWidgets.QWizard):
@@ -647,6 +648,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.buildToButton.clicked.connect(self.openBuildPathFileDialog)
         self.uploadToCOPR_Button = QPushButton("Upload to COPR")
         self.editSpecButton = QPushButton("Edit SPEC file")
+        self.editSpecButton.clicked.connect(self.editSpecFile)
         self.uploadToCOPR_Button.clicked.connect(self.switchToCOPR)
         self.uploadToCOPR_Button.clicked.connect(self.Wizard.next)
         specWarningLabel = QLabel("* Edit SPEC file on your own risk")
@@ -673,6 +675,10 @@ class BuildPage(QtWidgets.QWizardPage):
         self.base.create_spec_and_archive()
         self.base.build_packages("fedora-21-x86_64")
         return True
+        
+    def editSpecFile(self):
+        '''If user clicked Edit SPACE file, default text editor with the file is open'''
+        subprocess.call(('gedit', str(self.base.spec_path)))
 
     def switchToCOPR(self):
         '''If user clicked uplodad to copr button, so next page is not final'''
