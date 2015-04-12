@@ -35,6 +35,8 @@ class Base(object):
             log_dir = "/var/log/rpg/"
         else:
             log_dir = "/var/tmp/rpg/"
+        if not isdir(log_dir):
+            makedirs(log_dir)
         logging.basicConfig(level=logging.DEBUG,
                             format='[%(asctime)s] {%(pathname)s:%(lineno)d} '
                                    '%(levelname)s - %(message)s',
