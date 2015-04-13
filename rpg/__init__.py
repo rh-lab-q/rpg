@@ -37,7 +37,7 @@ class Base(object):
             self._dnf_base.conf.releasever = dnf.rpm.detect_releasever(self._dnf_base.conf.installroot)
             self._dnf_base.read_all_repos()
             self._dnf_base.fill_sack()
-            return self._dnf_base
+            return self._dnf_base.sack
 
     def _setup_logging(self):
         if geteuid() == 0:
