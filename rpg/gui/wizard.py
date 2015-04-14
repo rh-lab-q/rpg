@@ -631,6 +631,8 @@ class SubpackagesPage(QtWidgets.QWizardPage):
 
 
 class BuildPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+        self.buildLocationEdit.setText(str(self.base.rpm_path))
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
 
@@ -795,30 +797,30 @@ class CoprPage(QtWidgets.QWizardPage):
 
 
 class FinalPage(QtWidgets.QWizardPage):
+    def initializePage(self):
+        self.buildPath = (str(self.base.rpm_path))
+        self.finalLabel.setText("<html><head/><body><p align=\"center\"><span" +
+                            "style=\" font-size:24pt;\">Thank you for " +
+                            "using RPG!</span></p><p align=\"center\">" +
+                            "<span style=\" font-size:24pt;\">Your" +
+                            " package was built in:</span></p>"+
+                            "<p align=\"center\">"+ self.buildPath +
+                            "<p></body></html>")
     def __init__(self, Wizard, parent=None):
         super(FinalPage, self).__init__(parent)
 
         self.base = Wizard.base
         ''' On this page will be "Finish button" instead of "Next" '''
         FinalPage.setFinalPage(self, True)
-
         self.setTitle(self.tr("Final page"))
         self.setSubTitle(self.tr("Your package was successfully created"))
-        finalLabel = QLabel("<html><head/><body><p align=\"center\"><span" +
-                            "style=\" font-size:24pt;\">Thank you for " +
-                            "using RPG!</span></p><p align=\"center\">" +
-                            "<span style=\" font-size:24pt;\">Your" +
-                            " package was built in:</span></p></body></html>")
-        self.finalEdit = QLineEdit()
+        self.finalLabel = QLabel()
         grid = QGridLayout()
-        grid.addWidget(finalLabel, 0, 0)
-        grid.addWidget(self.finalEdit, 1, 0)
+        grid.addWidget(self.finalLabel, 0, 0)
 
         mainLayout = QVBoxLayout()
         mainLayout.addSpacing(190)
-        mainLayout.addWidget(finalLabel)
-        mainLayout.addSpacing(190)
-        mainLayout.addWidget(self.finalEdit)
+        mainLayout.addWidget(self.finalLabel)
         mainLayout.addSpacing(190)
 
         self.setLayout(mainLayout)
