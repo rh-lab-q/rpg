@@ -168,7 +168,10 @@ class ImportPage(QtWidgets.QWizardPage):
             path = self.import_dialog.filesSelected()
         else:
             path = self.import_dialog.selectedFiles()
-        self.importEdit.setText(path[0])
+        try:
+            self.importEdit.setText(path[0])
+        except IndexError:
+            msq = "Source file or archive is not selected"
 
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button

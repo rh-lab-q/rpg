@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QPlainTextEdit,
                              QCalendarWidget, QHBoxLayout, QFileDialog,
                              QComboBox, QTreeView)
 import os
+from os.path import expanduser
 
 
 class DialogChangelog(QtWidgets.QDialog):
@@ -196,6 +197,7 @@ class DialogSubpackage(QtWidgets.QDialog):
 class DialogImport(QFileDialog):
     def __init__(self):
         QFileDialog.__init__(self)
+        self.setDirectory(expanduser("~"))
         self.setOption(self.DontUseNativeDialog, True)
         self.setFileMode(self.ExistingFiles)
         butns = self.findChildren(QPushButton)
