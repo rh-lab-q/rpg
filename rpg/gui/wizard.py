@@ -678,7 +678,7 @@ class BuildPage(QtWidgets.QWizardPage):
         
     def editSpecFile(self):
         '''If user clicked Edit SPACE file, default text editor with the file is open'''
-        subprocess.call(('gedit', str(self.base.spec_path)))
+        subprocess.call(('xdg-open', str(self.base.spec_path)))
 
     def switchToCOPR(self):
         '''If user clicked uplodad to copr button, so next page is not final'''
