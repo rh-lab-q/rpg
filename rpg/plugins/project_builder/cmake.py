@@ -10,7 +10,7 @@ class CMakePlugin(Plugin):
             spec.BuildRequires.append("cmake")
             logging.debug('CMakeLists.txt found')
             build = Command()
-            build.append("cmake " + str(project_dir))
+            build.append("cmake .")
             build.append("make")
             install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
             spec.build = build
