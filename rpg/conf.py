@@ -7,6 +7,7 @@ class Conf:
 
     directories = []
     exclude = []
+    load_dnf = True
 
     def parse_cmdline(self):
 
@@ -21,7 +22,11 @@ class Conf:
             '--disable-plugin', type=str, dest='exc_plug',
             help='Exclude specific plugin', default=[],
             metavar='<plugin-name>', nargs='+')
+        self.parser.add_argument(
+            '--disable-dnf', dest='load_dnf', action='store_false',
+            default=True, help='Disable loading DNF sack')
         args = self.parser.parse_args()
+        self.load_dnf = args.load_dnf
         if args.plug_dir:
             for arg in args.plug_dir:
                 if path.isdir(arg):

@@ -26,15 +26,16 @@ class Base(object):
         self._setup_logging()
         self._project_builder = ProjectBuilder()
         self.spec = Spec()
-        self.sack = self._init_sack()
+        self.sack = None
         self._package_builder = PackageBuilder()
-        self._plugin_engine = PluginEngine(self.spec, self.sack)
         self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
         
-    def _init_sack(self):
+    def dnf_load_sack(self):
+        logging.info('DNF sack is loading')
         with dnf.Base() as self._dnf_base:
-            self._dnf_base.conf.releasever = dnf.rpm.detect_releasever(self._dnf_base.conf.installroot)
+            self._dnf_base.conf.releasever = dnf.rpm.detect_releasever(
+                self._dnf_base.conf.installroot)
             self._dnf_base.read_all_repos()
             self._dnf_base.fill_sack()
             return self._dnf_base.sack
@@ -54,6 +55,7 @@ class Base(object):
                             datefmt='%H:%M:%S')
 
     def load_plugins(self):
+        self._plugin_engine = PluginEngine(self.spec, self.sack)
         self._plugin_engine.load_plugins(
             Path('rpg/plugins'),
             self.conf.exclude)

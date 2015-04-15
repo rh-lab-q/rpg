@@ -13,6 +13,8 @@ def main():
     app = QApplication(sys.argv)
     base.conf.parse_cmdline()
     base.load_plugins()
+    if base.conf.load_dnf:
+        base.sack = base.dnf_load_sack()
     wiz = Wizard(base)
     wiz.setObjectName("RPG")
     wiz.resize(850, 650)
