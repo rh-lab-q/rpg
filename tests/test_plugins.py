@@ -43,6 +43,8 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/translation/CZ.mo', None, None),
                  ('/libs/libstatic.a', None, None),
                  ('/libs/libdynamic.so.1', None, None),
+                 ('/archives/sample.tar.gz', None, None),
+                 ('/archives/sample.tar.xz', None, None),
                  ('/Makefile', None, None),
                  ('/py/requires/sourcecode2.py', None, None)]
         sorted_files = sorted(files, key=lambda e: e[0])

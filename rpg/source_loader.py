@@ -17,8 +17,7 @@ class SourceLoader:
 
     _tar_compression_mode = {"\x1f\x8b\x08": "gz",
                              "\x42\x5a\x68": "bz2",
-                             "\xfd\x37\x7a\x58\x5a\x00": "xz",
-                             }
+                             "\xfd\x37\x7a\x58\x5a\x00": "xz"}
 
     _tar_compression_type = {TAR_GZIP: "\x1f\x8b\x08",
                              TAR_BZIP2: "\x42\x5a\x68",
@@ -44,20 +43,26 @@ class SourceLoader:
         return None
 
     def create_archive(self, path, extracted_dir, compression=TAR_GZIP):
-        name = os.path.basename(str(path)) + ".tar.gz"
+        name = str(path) + ".tar.gz"
         mode = self._tar_compression_mode.get(
             self._tar_compression_type.get(compression))
-        with tar.open(name, 'w:' + mode) as tarfile:
-            tarfile.add(str(extracted_dir), arcname=os.path.basename(str(path)))
+        if os.path.isdir(str(extracted_dir)) or \
+                os.path.isfile(str(extracted_dir)):
+            with tar.open(name, 'w:' + mode) as tarfile:
+                tarfile.add(
+                    str(extracted_dir),
+                    arcname=os.path.basename(str(path)))
+        else:
+            raise IOError("File/directory was not found!", 1)
         return name
 
     def load_sources(self, source_path, extracted_dir, compression=TAR_GZIP):
         """Extracts archive to extracted_dir and adds a flag for %prep section
         to create root directory if necessary. If argument is a directory,
-        copy the directory to desired location."""
+        copy the directory to desired location. May raise IOError """
 
         logging.debug('load_sources(%s, %s) called' % (repr(source_path),
-                      repr(extracted_dir)))
+                                                       repr(extracted_dir)))
         path = str(source_path)
         extracted_dir = str(extracted_dir)
 
@@ -67,8 +72,8 @@ class SourceLoader:
             zip_archive = zip.is_zipfile(path)
 
             if tar_archive:
-                type = self._get_compression_method(path)
-                tarfile = tar.open(path, 'r:' + type)
+                t = self._get_compression_method(path)
+                tarfile = tar.open(path, 'r:' + t)
                 members = tarfile.getmembers()
 
             elif zip_archive:
@@ -76,8 +81,10 @@ class SourceLoader:
                 members = zipfile.infolist()
 
             else:
-                print("error: File is either not an archive or the archive is \
-                not supported", file=sys.stderr)
+                raise IOError(
+                    "File is neither an archive \
+                     or the archive is not supported",
+                    file=sys.stderr)
 
             # test for root directory
             head = members.pop(0)
@@ -99,11 +106,10 @@ class SourceLoader:
             try:
                 archive.extractall(extracted_dir)  # same API for ZIP and TAR
             except OSError as e:
-                print("error: Extraction of '{}' failed: {}"
-                      .format(path,
-                              os.strerror(e.errno)),
-                      file=sys.stderr)
-                return -1
+                raise IOError(
+                    "Extraction of '{}' failed: {}"
+                    .format(path,
+                            os.strerror(e.errno)))
 
         elif (os.path.isdir(path)):
             try:
@@ -115,14 +121,13 @@ class SourceLoader:
                         shutil.copytree(path, extracted_dir)
                     except OSError as e:
                         if e.errno == errno.EPERM or e.errno == errno.EACCES:
-                            print("error: failed creating directory tree at \
-                            {}: {}".format(extracted_dir,
-                                           os.strerror(e.errno)),
-                                  file=sys.stderr)
+                            raise IOError(
+                                "Failed to creating directory tree at \
+                                 {}: {}".format(extracted_dir,
+                                                os.strerror(e.errno)))
                         return -1
                 else:
                     return -1
 
         else:
-            print("error: not an archive, nor a dir", file=sys.stderr)
-            return -1
+            raise IOError("File is not an archive nor a dir", 1)

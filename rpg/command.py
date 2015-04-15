@@ -39,11 +39,11 @@ class Command:
             msg = "Only list of command strings or command string is accepted"
             raise TypeError(msg)
 
-    def execute(self):
+    def execute(self, binary=False):
         """executes command in any dir, can raise CalledProcessError"""
 
         command_lines = self._assign_rpm_variables() + self._command_lines
-        return cmd_output(command_lines)
+        return cmd_output(command_lines, binary)
 
     def execute_from(self, work_dir):
         """executes command in work_dir (instance of pathlib.Path),
@@ -58,7 +58,7 @@ class Command:
         return ['%s="%s"' % (v, p) for (v, p) in self.rpm_variables]
 
 
-def cmd_output(cmdlines):
+def cmd_output(cmdlines, binary=False):
     output = check_output(["/bin/sh", "-c", " 2>/dev/null && ".join(cmdlines) +
                            " 2>/dev/null" ])
-    return output.decode('utf-8')
+    return output if binary else output.decode('utf-8')
