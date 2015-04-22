@@ -33,6 +33,7 @@ class PluginEngine:
                 continue
             if callable(method):
                 plugin_name = plugin.__class__.__name__
+                logging.info("executing %s plugin" % plugin_name)
                 try:
                     method(project_dir, self.spec, self.sack)
                 except Exception as err:
@@ -40,8 +41,6 @@ class PluginEngine:
                     logging.warn(
                         "error during executing plugin %s:\n%s"
                         % (plugin_name, msg))
-                else:
-                    logging.info("plugin %s executed" % plugin_name)
 
     def load_plugins(self, path, excludes=[]):
         """finds all plugins in dir and it's subdirectories"""
