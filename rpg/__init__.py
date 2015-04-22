@@ -105,7 +105,7 @@ class Base(object):
         p = Path(path)
         self._hash = self.compute_checksum(p)
         self._input_name = p.name
-        self.setup_workspace()
+        self._setup_workspace()
         self._source_loader.load_sources(p, self.extracted_dir)
 
     def run_raw_sources_analysis(self):
@@ -173,7 +173,7 @@ class Base(object):
             self.installed_dir
         ]
 
-    def setup_workspace(self):
+    def _setup_workspace(self):
         """make sure all directories used later will exist"""
         try:
             shutil.rmtree(str(self.base_dir))
