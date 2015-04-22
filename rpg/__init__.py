@@ -1,4 +1,3 @@
-import dnf
 import logging
 import platform
 from pathlib import Path
@@ -30,9 +29,10 @@ class Base(object):
         self._package_builder = PackageBuilder()
         self._source_loader = SourceLoader()
         self._copr_uploader = CoprUploader()
-        
+
     def dnf_load_sack(self):
         logging.info('DNF sack is loading')
+        import dnf
         with dnf.Base() as self._dnf_base:
             self._dnf_base.conf.releasever = dnf.rpm.detect_releasever(
                 self._dnf_base.conf.installroot)
