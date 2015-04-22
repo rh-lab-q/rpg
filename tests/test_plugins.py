@@ -86,7 +86,10 @@ class FindPatchPluginTest(PluginTestCase):
     def test_c(self):
         c_plug = CPlugin()
         c_plug.patched(self.test_project_dir, self.spec, self.sack)
-        expected = ['/usr/include/gnu', '/usr/include/sys',
-                    '/usr/include', '/usr/include/bits'].sort()
-        self.assertEqual(self.spec.Requires.sort(), expected)
-        self.assertEqual(self.spec.BuildRequires.sort(), expected)
+        expected = ['/usr/include', '/usr/include/bits',
+                    '/usr/include/gnu', '/usr/include/sys']
+        expected.sort()
+        self.spec.Requires.sort()
+        self.spec.BuildRequires.sort()
+        self.assertEqual(self.spec.Requires, expected)
+        self.assertEqual(self.spec.BuildRequires, expected)

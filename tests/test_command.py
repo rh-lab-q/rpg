@@ -25,8 +25,10 @@ class PluginEngineTest(RpgTestCase):
         cur_dir = Path('.')
         with self.assertRaises(subprocess.CalledProcessError) as ctx:
             cmd.execute_from(cur_dir)
-        expected = "Command '['/bin/sh', '-c', 'cd %s && pwd && cd c && pwd" \
-            "']' returned non-zero exit status 1" % cur_dir.resolve()
+        expected = "Command '['/bin/sh', '-c', 'cd %s 2>/dev/null " \
+                   "&& pwd 2>/dev/null && cd c 2>/dev/null " \
+                   "&& pwd 2>/dev/null']' returned non-zero exit status 1"\
+                   % cur_dir.resolve()
         self.assertEqual(expected, str(ctx.exception))
 
     def test_execute(self):
