@@ -34,7 +34,7 @@ Start RPG
 
 From project root directory execute::
 
-    python3 RPG.py
+    python3 rpg.py
 
 
 Running tests
