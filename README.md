@@ -7,27 +7,42 @@ RPG makes packaging much easier due to the automatic analysis of packaged files.
 Beginners can get familiar with packaging process or the advanced users can use our tool for a quick creation of a package.
 
 
-Building for Fedora
-===================
+Requirements
+============
 
-Packages needed for the build, or the build requires:
+You need these packages in order to satisfy RPG dependencies:
 * coreutils
 * file
 * makedepend
 * python3 >= 3.4
-* python3-qt5
 * qt5-qtbase-gui
+* python3-qt5
 * rpmdevtools
+
+Building in Fedora 21+
+======================
+
+To get project and satisfy all dependencies, run::
+
+    git clone https://github.com/rh-lab-q/rpg
+    cd rpg
+    sudo dnf builddep rpg.spec
 
 Start RPG
 =========
-execute `python3 RPG.py` from project root directory
+
+From project root directory execute::
+
+    python3 RPG.py
 
 
 Running tests
 =============
 
-execute `nosetests-3.4 tests` from project root directory
+From project root directory execute::
+
+    cmake .
+    make test
 
 
 Documentation
