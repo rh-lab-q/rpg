@@ -9,7 +9,6 @@ class SpecTest(RpgTestCase):
         self.spec = Spec()
 
     def test_spec_assignment(self):
-        self.maxDiff = None
         self.assertEqual("", self.spec.Name)
         self.assertTrue(isinstance(self.spec["build"], Command))
         self.assertEqual("", str(self.spec["build"]))
