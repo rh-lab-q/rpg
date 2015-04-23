@@ -93,8 +93,8 @@ class Base(object):
         return self.base_dir / (self.project_name + ".spec")
 
     @property
-    def tarball_path(self):
-        return self.base_dir / (self.project_name + ".tar.gz")
+    def archive_path(self):
+        return self.base_dir / self.spec.Source
 
     @property
     def rpm_path(self):
@@ -153,7 +153,7 @@ class Base(object):
         """builds packages for desired distributions"""
         for arch in archs:
             for distro in distros:
-                self._package_builder.build(self.spec_path, self.tarball_path,
+                self._package_builder.build(self.spec_path, self.archive_path,
                                             distro, arch)
 
     @staticmethod

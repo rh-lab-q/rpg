@@ -14,6 +14,7 @@ class Subpackage(dict):
                 "Version",
                 "Release",
                 "Summary",
+                "Source",
                 "Group",
                 "License",
                 "URL",
