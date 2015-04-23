@@ -174,6 +174,7 @@ class Subpackage(dict):
 
 
 class Spec(Subpackage):
+
     """SPEC properties holder"""
     subpackages = []
     changelogs = []
@@ -182,14 +183,13 @@ class Spec(Subpackage):
         super(Spec, self).__init__()
 
     def __str__(self):
-        tags = self._get_tags();
-        requires = self._get_requires();
+        tags = self._get_tags()
+        requires = self._get_requires()
         scripts = self._get_scripts()
         return tags + requires + scripts
-    
+
     def _get_tags(self):
         return super(Spec, self)._get_tags()
-
 
     def _get_requires(self):
         return super(Spec, self)._get_requires()
