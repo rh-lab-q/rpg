@@ -7,6 +7,7 @@ URL:            https://github.com/rh-lab-q/rpg
 Source:         %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  python3-devel
+BuildRequires:  python3-nose
 BuildArch:      noarch
 
 Requires:       python3 >= 3.4
