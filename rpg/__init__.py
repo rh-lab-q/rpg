@@ -97,8 +97,8 @@ class Base(object):
         return self.base_dir / self.spec.Source
 
     @property
-    def rpm_path(self):
-        return next(self.base_dir.glob(self.project_name + "*.rpm"))
+    def srpm_path(self):
+        return next(self.base_dir.glob(self.project_name + "*src.rpm"))
 
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""

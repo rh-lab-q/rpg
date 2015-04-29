@@ -804,7 +804,7 @@ class CoprPage(QtWidgets.QWizardPage):
 
 class FinalPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.buildPath = (str(self.base.rpm_path))
+        self.buildPath = (str(self.base.srpm_path))
         self.finalLabel.setText("<html><head/><body><p align=\"center\"><span" +
                             "style=\" font-size:24pt;\">Thank you for " +
                             "using RPG!</span></p><p align=\"center\">" +
