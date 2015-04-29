@@ -144,8 +144,7 @@ class Base(object):
         self._plugin_engine.execute_phase(phases[3],
                                           self.installed_dir)
 
-    def create_spec_and_archive(self):
-        self._source_loader.create_archive(self.base_dir, self.extracted_dir)
+    def write_spec(self):
         with open(str(self.spec_path), 'w') as spec_file:
             spec_file.write(str(self.spec))
 

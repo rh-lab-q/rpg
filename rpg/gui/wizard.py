@@ -672,7 +672,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
-        self.base.create_spec_and_archive()
+        self.base.write_spec()
         self.base.build_packages("fedora-21-x86_64")
         return True
         
