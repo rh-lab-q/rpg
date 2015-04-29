@@ -1,133 +1,117 @@
-import errno
 import logging
-import os
-import os.path
+from os.path import isfile
+from os.path import isdir
 import re
-import shutil
-import sys
-import tarfile as tar
-import zipfile as zip
+from rpg.command import Command
+from pathlib import Path
 
 
-class SourceLoader:
+class SourceLoader(object):
 
-    TAR_GZIP = 0
-    TAR_BZIP2 = 1
-    TAR_LZMA = 2
+    def __init__(self):
+        self.prep = Command()
 
-    _tar_compression_mode = {"\x1f\x8b\x08": "gz",
-                             "\x42\x5a\x68": "bz2",
-                             "\xfd\x37\x7a\x58\x5a\x00": "xz"}
+    def extract(self, arch, extract, compr):
+        """ Extracts files from archive """
 
-    _tar_compression_type = {TAR_GZIP: "\x1f\x8b\x08",
-                             TAR_BZIP2: "\x42\x5a\x68",
-                             TAR_LZMA: "\xfd\x37\x7a\x58\x5a\x00"}
-
-    def _get_compression_method(self, name):
-        """determine the compression method used for a tar file. For this purpose,
-        a dictionary holds magic signatures of common compressed archives.
-        """
-
-        with open(name, 'rb') as f:
-            header = f.read(max(len(mode) for mode in
-                                self._tar_compression_mode.keys()))
-        for magic, filetype in self._tar_compression_mode.items():
-
-            # !!!
-            # latin_1 encoding works fine compared to utf-8, which used
-            # additional bytes, thus the startswith method was unable to match
-            # the header against the dictionary keys
-            # !!!
-            if header.startswith(magic.encode('latin_1')):
-                return filetype
-        return None
-
-    def create_archive(self, path, extracted_dir, compression=TAR_GZIP):
-        name = str(path) + ".tar.gz"
-        mode = self._tar_compression_mode.get(
-            self._tar_compression_type.get(compression))
-        if os.path.isdir(str(extracted_dir)) or \
-                os.path.isfile(str(extracted_dir)):
-            with tar.open(name, 'w:' + mode) as tarfile:
-                tarfile.add(
-                    str(extracted_dir),
-                    arcname=os.path.basename(str(path)))
+        prep = Command()
+        if compr[0] == "tar":
+            tar_compr = ""
+            if compr[1] == "xz":
+                tar_compr = "J"
+            elif compr[1] == "gz":
+                tar_compr = "z"
+            elif compr[1] == "bz2":
+                tar_compr = "j"
+            elif compr[1] == "lz":
+                tar_compr = "--lzip "
+            elif compr[1] == "xz":
+                tar_compr = "z"
+            elif compr[1] == "lzma":
+                tar_compr = "--lzma "
+            else:
+                raise SystemExit("Internal error: Unknown compression \
+                    method: " + compr)
+            prep.append("tar " + tar_compr + "xf " +
+                        arch + " -C " + extract)
+        elif compr[0] == "tgz":
+            prep.append("tar xzf " + arch + " -C " + extract)
+        elif compr[0] == "tbz2":
+            prep.append("tar xjf " + arch + " -C " + extract)
+        elif compr[0] == "zip":
+            prep.append("unzip " + arch + " -d " + extract)
+        elif compr[0] == "rar":
+            prep.append("unrar x " + arch + " " + extract)
+        elif compr[0] == "7z":
+            prep.append("7z x " + arch + " -o " + extract)
         else:
-            raise IOError("File/directory was not found!", 1)
-        return name
+            raise SystemExit("Internal error: Unknown compression \
+                method: " + compr[0] + "." + compr[1])
+        prep.execute()
+        self.prep.append(str(prep))
 
-    def load_sources(self, source_path, extracted_dir, compression=TAR_GZIP):
-        """Extracts archive to extracted_dir and adds a flag for %prep section
+    def copy_dir(self, path, ex_dir):
+        """ Copies directory tree and adds command to
+            prep macro """
+
+        prep = Command("cp -rf " + path + " " + ex_dir)
+        prep.execute()
+        self.prep.append(str(prep))
+
+    def process(self, ext_dir):
+        i = 0
+        direc = ""
+        for path in Path(ext_dir).iterdir():
+            i += 1
+            direc = str(path)
+        if i < 2:
+            if isdir(direc):
+                Command('mv ' + direc + '/* ' + ext_dir +
+                        'rmdir ' + direc)
+
+    def load_sources(self, source_path, extraction_dir):
+        """Extracts archive to extraction_dir and adds a flag for %prep section
         to create root directory if necessary. If argument is a directory,
         copy the directory to desired location. May raise IOError """
 
-        logging.debug('load_sources(%s, %s) called' % (repr(source_path),
-                                                       repr(extracted_dir)))
+        logging.debug('load_sources({}, {}) called'
+                      .format(str(source_path), str(extraction_dir)))
         path = str(source_path)
-        extracted_dir = str(extracted_dir)
-
-        # first we need to test, if target is a directory or an archive
-        if (os.path.isfile(path)):
-            tar_archive = tar.is_tarfile(path)
-            zip_archive = zip.is_zipfile(path)
-
-            if tar_archive:
-                t = self._get_compression_method(path)
-                tarfile = tar.open(path, 'r:' + t)
-                members = tarfile.getmembers()
-
-            elif zip_archive:
-                zipfile = zip.ZipFile(path)
-                members = zipfile.infolist()
-
-            else:
-                raise IOError(
-                    "File is neither an archive \
-                     or the archive is not supported",
-                    file=sys.stderr)
-
-            # test for root directory
-            head = members.pop(0)
-            if tar_archive:
-                head_is_dir = head.isdir()
-            elif zip_archive:
-                head_is_dir = lambda zipinfo: zipinfo.filename.endswith('/')
-
-            if head_is_dir:  # the very first element is dir, test it for root
-                root = re.compile(head.name if tar_archive else head.filename)
-                for m in members:
-                    if not root.match(m.name if tar_archive else m.filename):
-                        # archive does not have a rootdir
-                        # add flag to SPEC, that in %prep a rootdir must be
-                        # created
-                        break
-
-            archive = tarfile if tar_archive else zipfile
-            try:
-                archive.extractall(extracted_dir)  # same API for ZIP and TAR
-            except OSError as e:
-                raise IOError(
-                    "Extraction of '{}' failed: {}"
-                    .format(path,
-                            os.strerror(e.errno)))
-
-        elif (os.path.isdir(path)):
-            try:
-                shutil.copytree(path, extracted_dir)
-            except OSError as e:
-                if e.errno == errno.EEXIST:
-                    try:
-                        shutil.rmtree(extracted_dir)
-                        shutil.copytree(path, extracted_dir)
-                    except OSError as e:
-                        if e.errno == errno.EPERM or e.errno == errno.EACCES:
-                            raise IOError(
-                                "Failed to creating directory tree at \
-                                 {}: {}".format(extracted_dir,
-                                                os.strerror(e.errno)))
-                        return -1
-                else:
-                    return -1
-
+        extraction_dir = str(extraction_dir)
+        if isfile(path):
+            compression = self.get_compression_method(path)
+            if not compression:
+                raise IOError("Input source archive '{}' is incompatible!"
+                              .format(path))
+            self.extract(path, extraction_dir, compression)
+        elif isdir(path):
+            self.copy_dir(path, extraction_dir)
         else:
-            raise IOError("File is not an archive nor a dir", 1)
+            raise IOError("Input source archive/directory '{}' doesn't exists!"
+                          .format(path))
+        self.process(extraction_dir)
+        return self.prep
+
+    @staticmethod
+    def create_archive(path, output_dir):
+        """ Creates archive from folder """
+
+        name = str(path) + ".tar.gz"
+        if isdir(str(output_dir)) or \
+                isfile(str(output_dir)):
+            Command("tar czf " + name + " " + str(output_dir)).execute()
+            return name
+        else:
+            raise IOError("File/directory was not found!")
+
+    @staticmethod
+    def get_compression_method(name):
+        """ determine the compression method used for a tar file. """
+
+        arch_t = re.match(r".+?\.([^.]+)(?:\.([^.]+)|)$", name)
+        if not arch_t.group(1) in ["", "tar", "zip",
+                                   "rar", "7z", "tgz", "tbz2"] \
+            and not arch_t.group(2) in ["gz", "xz", "lz",
+                                        "bz2", "Z", "lzma"]:
+            return None
+        return (arch_t.group(1), arch_t.group(2))

@@ -21,12 +21,15 @@ class SourceLoaderTest(RpgTestCase):
         self._tar_gz = self.test_project_dir / "archives" / "sample.tar.gz"
         self._tar_xz = self.test_project_dir / "archives" / "sample.tar.xz"
         self._tar_temp = "/var/tmp/rpg_test/"
-        self._tar_extracted = self._tar_temp + "sample"
+        self._tar_extracted = self._tar_temp + "extracted"
         self._archive = self._tar_temp + "sample"
         self._hasher = None
+        if path.isdir(self._tar_extracted):
+            rmtree(self._tar_extracted)
         if path.isdir(self._tar_temp):
             rmtree(self._tar_temp)
         makedirs(self._tar_temp)
+        makedirs(self._tar_extracted)
 
     def tearDown(self):
         if self._tar:
@@ -58,15 +61,15 @@ class SourceLoaderTest(RpgTestCase):
 
     def test_tar_gz_method(self):
         self.assertEqual(
-            self._source_loader._get_compression_method(
+            self._source_loader.get_compression_method(
                 str(self._tar_gz)),
-            "gz")
+            ("tar", "gz"))
 
     def test_tar_xz_method(self):
         self.assertEqual(
-            self._source_loader._get_compression_method(
+            self._source_loader.get_compression_method(
                 str(self._tar_xz)),
-            "xz")
+            ("tar", "xz"))
 
     def test_tar_gz_extract(self):
         self._source_loader.load_sources(
