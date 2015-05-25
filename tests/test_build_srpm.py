@@ -3,7 +3,7 @@ from rpg import Base
 from rpg.package_builder import PackageBuilder
 from rpg.spec import Spec
 from pathlib import Path
-import shutil
+import os
 
 
 class FakeBase(Base):
@@ -27,5 +27,5 @@ class BuildSrpmTest(RpgTestCase):
         self.fbase.build_srpm()
         self.assertTrue(self.fbase.srpm_path.exists())
 
-    def TearDown(self):
-        shutil.rmtree(str(self.fbase.base_dir))
+    def tearDown(self):
+        os.remove(str(self.fbase.srpm_path))
