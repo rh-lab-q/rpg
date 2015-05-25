@@ -15,7 +15,6 @@ from os import geteuid
 import shutil
 
 
-
 class Base(object):
 
     """Base class that is controlled by RPM GUI"""
@@ -147,6 +146,12 @@ class Base(object):
     def write_spec(self):
         with open(str(self.spec_path), 'w') as spec_file:
             spec_file.write(str(self.spec))
+
+    def build_srpm(self):
+        if not self.spec_path.exists():
+            self.write_spec()
+        self._package_builder.build_srpm(
+            self.spec_path, self.archive_path, self.base_dir)
 
     def build_packages(self, distros, archs=platform.machine()):
         """builds packages for desired distributions"""

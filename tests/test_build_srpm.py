@@ -12,6 +12,7 @@ class FakeBase(Base):
         pass
 
     base_dir = Path(RpgTestCase.test_project_dir / "hello_project")
+    _package_builder = PackageBuilder()
     project_name = "hello"
     spec = Spec()
     spec.Source = "hello-1.4.tar.gz"
@@ -23,8 +24,7 @@ class BuildSrpmTest(RpgTestCase):
         self.fbase = FakeBase()
 
     def test_build_srpm(self):
-        PackageBuilder.build_srpm(
-            self.fbase.spec_path, self.fbase.archive_path, self.fbase.base_dir)
+        self.fbase.build_srpm()
         self.assertTrue(self.fbase.srpm_path.exists())
 
     def TearDown(self):
