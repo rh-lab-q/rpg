@@ -19,6 +19,7 @@ You need these packages in order to satisfy RPG dependencies:
 * python3-qt5
 * rpmdevtools
 * python3-nose (for tests)
+* python3-argcomplete (optional)
 
 Building in Fedora 21+
 ======================

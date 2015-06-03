@@ -1,7 +1,10 @@
 import argparse
 import logging
 from os import path
-
+try:
+    import argcomplete
+except ImportError:
+    pass
 
 class Conf:
 
@@ -12,8 +15,10 @@ class Conf:
     def parse_cmdline(self):
 
         self.parser = argparse.ArgumentParser(
-            description="Command Line parser",
-            prog='Argument Parser Plugin')
+            description="RPG is tool, that guides people through the creation of a RPM package. "
+                        "RPG makes packaging much easier due to the automatic analysis of packaged files. "
+                        "Beginners can get familiar with packaging process or the advanced users can use our tool for a quick creation of a package.",
+            prog='rpg')
         self.parser.add_argument(
             '--plugin-dir', type=str, dest='plug_dir',
             help='Include plugin directory',
@@ -25,6 +30,10 @@ class Conf:
         self.parser.add_argument(
             '--disable-dnf', dest='load_dnf', action='store_false',
             default=True, help='Disable loading DNF sack')
+        try:
+            argcomplete.autocomplete(self.parser)
+        except:
+            pass
         args = self.parser.parse_args()
         self.load_dnf = args.load_dnf
         if args.plug_dir:

@@ -18,6 +18,7 @@ Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
 Requires:       python3-dnf
+Recommends:     python3-argcomplete
 
 %description
 RPG is tool, that guides people through the creation of a RPM
