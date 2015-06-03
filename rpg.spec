@@ -32,6 +32,10 @@ advanced users can use our tool for a quick creation of a package.
 %build
 %cmake .
 
+%post
+activate-global-python-argcomplete
+exec bash
+
 %install
 make install DESTDIR=%{RPM_BUILD_ROOT}
 %make_install
