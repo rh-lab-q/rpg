@@ -8,6 +8,7 @@ from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from rpg.command import cmd_output
+from rpg.command import Command
 from rpg.conf import Conf
 from os.path import isdir
 from os import makedirs
@@ -63,6 +64,13 @@ class Base(object):
                 Path(directory),
                 self.conf.exclude)
 
+    def create_archive(self):
+        """ Creates archive (archvie_path) from Source folder """
+
+        Command("tar zfc " + str(self.spec.Source) + " " +
+                self.archive_path).execute()
+        self.spec.prep.append('%autosetup')
+
     @property
     def base_dir(self):
         try:
@@ -101,11 +109,11 @@ class Base(object):
 
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
-        p = Path(path)
-        self._hash = self.compute_checksum(p)
-        self._input_name = p.name
+        path = Path(path)
+        self._hash = self.compute_checksum(path)
+        self._input_name = path.name
         self._setup_workspace()
-        self._source_loader.load_sources(p, self.extracted_dir)
+        self._source_loader.load_sources(path, self.extracted_dir)
 
     def run_raw_sources_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
