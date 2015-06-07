@@ -98,6 +98,18 @@ class SourceLoaderTest(RpgTestCase):
         self.assertExistInDir(["sample.tar.gz", "sample.tar.xz"],
                               self._tar_extracted)
 
+    def test_git_download(self):
+        SourceLoader.download_git_repo(
+            "https://github.com/rh-lab-q/rpg",
+            self._download)
+        self.assertTrue(Path(str(self._download)).exists())
+
+    def test_download(self):
+        SourceLoader.download_archive(
+            "https://github.com/rh-lab-q/rpg/archive/master.tar.gz",
+            self._download)
+        self.assertTrue(Path(str(self._download)).exists())
+
     @expectedFailure
     def test_tar_xz_method_fail(self):
         self._tar_xz = self._tar_gz
