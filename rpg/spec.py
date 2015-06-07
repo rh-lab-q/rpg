@@ -20,13 +20,13 @@ class Subpackage(dict):
                 "URL",
                 "Vendor",
                 "Packager",
-                "description",
                 "BuildArch",
                 "BuildRoot",
                 ]
 
     # names of scripts
-    _scripts = ["prep",
+    _scripts = ["description",
+                "prep",
                 "build",
                 "pre",
                 "install",
@@ -50,9 +50,9 @@ class Subpackage(dict):
                 "Patch": "", "BuildArch": "", "BuildRoot": "",
                 "Obsoletes": "", "Conflicts": "", "Vendor": "",
                 "Packager": "",
-                "description": "",
                 "package": "",
                 "BuildRequires": [], "Requires": [], "Provides": [],
+                "description": "",
                 "prep": Command(),
                 "build": Command(),
                 "pre": Command(),
@@ -104,10 +104,7 @@ class Subpackage(dict):
         for ordered_key in self._singles:
             for key, value in self.items():
                 if value and key is ordered_key:
-                    if value and key is "description":
-                        block += "%" + key + ': ' + value + '\n'
-                    else:
-                        block += key + ': ' + value + '\n'
+                    block += key + ': ' + value + '\n'
         return block
 
     def _get_requires(self):
