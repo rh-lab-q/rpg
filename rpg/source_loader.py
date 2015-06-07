@@ -1,117 +1,177 @@
 import logging
 from os.path import isfile
 from os.path import isdir
+from pathlib import Path
 import re
 from rpg.command import Command
-from pathlib import Path
+from shutil import rmtree
+from shutil import copytree
+from tempfile import mkdtemp
+from urllib.request import urlopen
 
 
 class SourceLoader(object):
 
-    def __init__(self):
-        self.prep = Command()
+    # _compressions = {
+    #   compr_extension: [compr_prog, extract_switch, output_set_switch,
+    #    { addition_compr_ext: [compr_prog, switch] }, ...
+    # }
+    _compressions = {
+        "tar": [
+            "tar",
+            "xf",
+            "-C",
+            {
+                "gz": [
+                    "gunzip",
+                    "-c"
+                ],
+                "xz": [
+                    "xz",
+                    "--decompress --stdout"
+                ],
+                "lz": [
+                    "xz",
+                    "--format=lzma --decompress --stdout"
+                ],
+                "lzma": [
+                    "xz",
+                    "--format=lzma --decompress --stdout"
+                ],
+                "bz2": [
+                    "bzip2",
+                    "-dc"
+                ],
+                "Z": [
+                    "uncompress",
+                    "-c"
+                ]
+            }
+        ],
+        "zip": [
+            "unzip",
+            "",
+            "-d"
+        ],
+        "rar": [
+            "unrar",
+            "x",
+            ""
+        ],
+        "7z": [
+            "7z",
+            "x",
+            "-o"
+        ],
+        "tgz": [
+            "tar",
+            "xzf",
+            "-C"
+        ],
+        "tbz2": [
+            "tar",
+            "xjf",
+            "-C"
+        ]
+    }
 
-    def extract(self, arch, extract, compr):
-        """ Extracts files from archive """
-
-        prep = Command()
-        if compr[0] == "tar":
-            tar_compr = ""
-            if compr[1] == "xz":
-                tar_compr = "J"
-            elif compr[1] == "gz":
-                tar_compr = "z"
-            elif compr[1] == "bz2":
-                tar_compr = "j"
-            elif compr[1] == "lz":
-                tar_compr = "--lzip "
-            elif compr[1] == "xz":
-                tar_compr = "z"
-            elif compr[1] == "lzma":
-                tar_compr = "--lzma "
-            else:
-                raise SystemExit("Internal error: Unknown compression \
-                    method: " + compr)
-            prep.append("tar " + tar_compr + "xf " +
-                        arch + " -C " + extract)
-        elif compr[0] == "tgz":
-            prep.append("tar xzf " + arch + " -C " + extract)
-        elif compr[0] == "tbz2":
-            prep.append("tar xjf " + arch + " -C " + extract)
-        elif compr[0] == "zip":
-            prep.append("unzip " + arch + " -d " + extract)
-        elif compr[0] == "rar":
-            prep.append("unrar x " + arch + " " + extract)
-        elif compr[0] == "7z":
-            prep.append("7z x " + arch + " -o " + extract)
-        else:
-            raise SystemExit("Internal error: Unknown compression \
-                method: " + compr[0] + "." + compr[1])
-        prep.execute()
-        self.prep.append(str(prep))
-
-    def copy_dir(self, path, ex_dir):
-        """ Copies directory tree and adds command to
-            prep macro """
-
-        prep = Command("cp -rf " + path + " " + ex_dir)
-        prep.execute()
-        self.prep.append(str(prep))
-
-    def process(self, ext_dir):
-        i = 0
-        direc = ""
-        for path in Path(ext_dir).iterdir():
-            i += 1
-            direc = str(path)
-        if i < 2:
-            if isdir(direc):
-                Command('mv ' + direc + '/* ' + ext_dir +
-                        'rmdir ' + direc)
+    _download_block_size = 1024
 
     def load_sources(self, source_path, extraction_dir):
-        """Extracts archive to extraction_dir and adds a flag for %prep section
-        to create root directory if necessary. If argument is a directory,
-        copy the directory to desired location. May raise IOError """
+        """ If source_path is a directory, path tree will be
+            copied to extraction_dir. If it is archive
+            May raise IOError """
 
         logging.debug('load_sources({}, {}) called'
                       .format(str(source_path), str(extraction_dir)))
         path = str(source_path)
         extraction_dir = str(extraction_dir)
         if isfile(path):
-            compression = self.get_compression_method(path)
+            compression = self._get_compression_method(path)
             if not compression:
                 raise IOError("Input source archive '{}' is incompatible!"
                               .format(path))
-            self.extract(path, extraction_dir, compression)
+            self._extract(path, extraction_dir, compression)
+            self._process_dir(extraction_dir)
         elif isdir(path):
-            self.copy_dir(path, extraction_dir)
+            self._copy_dir(path, extraction_dir)
         else:
             raise IOError("Input source archive/directory '{}' doesn't exists!"
                           .format(path))
-        self.process(extraction_dir)
-        return self.prep
 
-    @staticmethod
-    def create_archive(path, output_dir):
-        """ Creates archive from folder """
+    @classmethod
+    def _extract(cls, arch, extraction_dir, compr):
+        """ Extracts files from archive
+            (can be combinated like tar and gz) """
 
-        name = str(path) + ".tar.gz"
-        if isdir(str(output_dir)) or \
-                isfile(str(output_dir)):
-            Command("tar czf " + name + " " + str(output_dir)).execute()
-            return name
-        else:
-            raise IOError("File/directory was not found!")
+        extr_cmd = cls._compressions[compr[0]]
+        _cmd = ""
+        if extr_cmd[3]:
+            ext_cmd = extr_cmd[3][compr[1]]
+            _cmd += ext_cmd[0] + " " + ext_cmd[1] + " " + arch + " | "
+            arch = "-"
+        Command(_cmd + extr_cmd[0] + " " + extr_cmd[1] + " " +
+                arch + " " + extr_cmd[2] + " " + extraction_dir).execute()
 
-    @staticmethod
-    def get_compression_method(name):
+    @classmethod
+    def _get_compression_method(cls, name):
         """ determine the compression method used for a tar file. """
 
         arch_t = re.match(r".+?\.([^.]+)(?:\.([^.]+)|)$", name)
-        if not arch_t.group(1) in ["", "tar", "zip",
-                                   "rar", "7z", "tgz", "tbz2"] \
-            and not arch_t.group(2) in ["gz", "xz", "lz",
-                                        "bz2", "Z", "lzma"]:
+        if not arch_t.group(1) in cls._compressions \
+                and not arch_t.group(2) in cls._compressions[arch_t.group(1)]:
             return None
         return (arch_t.group(1), arch_t.group(2))
+
+    @classmethod
+    def download_git_repo(cls, url, arch_name,
+                          callback=None, branch='master'):
+        """ Downloads archive from github (url) """
+        compr = cls._get_compression_method(str(arch_name))
+        cls.download_archive(
+            str(url) + "/archive/" + branch + "." + compr[0] +
+            (("." + compr[1]) if compr[1] else ""),
+            arch_name,
+            callback)
+
+    @classmethod
+    def download_archive(cls, url, arch_name,
+                         callback=None):
+        """ Download file from 'url' and sets file name to 'arch_name'
+            Every progress change will call callback function """
+        header_error = True
+        while header_error:
+            with open(str(arch_name), 'wb') as out_handle,\
+                    urlopen(url) as in_handle:
+                try:
+                    file_size = int(in_handle.info()['Content-Length'])
+                except TypeError:
+                    continue
+                progress = 0
+                buff = in_handle.read(cls._download_block_size)
+                while buff:
+                    out_handle.write(buff)
+                    progress += len(buff)
+                    if callback:
+                        callback(progress, file_size)
+                    buff = in_handle.read(cls._download_block_size)
+                header_error = False
+
+    @staticmethod
+    def _copy_dir(path, ex_dir):
+        """ Copies directory tree """
+        rmtree(ex_dir)
+        copytree(path, ex_dir)
+
+    @staticmethod
+    def _process_dir(ext_dir):
+        """ Pops dir from ext_dir when needed """
+
+        direc = [str(path) for path in Path(ext_dir).iterdir()]
+        if len(direc) == 1 and isdir(direc[0]):
+            direc = direc[0]
+            temp = mkdtemp()
+            Command('mv ' + direc + '/* ' + temp +
+                    ' && rm -rf ' + direc +
+                    ' && mv ' + temp + '/* ' + ext_dir).execute()
+            rmtree(temp)
