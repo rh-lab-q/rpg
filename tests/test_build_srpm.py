@@ -25,7 +25,7 @@ class BuildSrpmTest(RpgTestCase):
 
     def test_build_srpm(self):
         self.fbase.build_srpm()
-        self.assertTrue(self.fbase.srpm_path.exists())
+        self.fbase.srpm_path
 
     def tearDown(self):
         os.remove(str(self.fbase.srpm_path))

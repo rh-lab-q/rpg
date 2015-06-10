@@ -2,70 +2,87 @@ from rpg.command import Command
 
 
 class Subpackage(dict):
-    # list of tuple (src_file, tag, attr)
-    # e.g. %config, %doc, %ghost, %dir
-    files = []
 
     # list of generated translation files
     files_translations = []
 
     # names of 'single' keys
-    _singles = ["Name",
-                "Version",
-                "Release",
-                "Summary",
-                "Source",
-                "Group",
-                "License",
-                "URL",
-                "Vendor",
-                "Packager",
-                "BuildArch",
-                "BuildRoot",
-                ]
+    _singles = [
+        "Name",
+        "Version",
+        "Release",
+        "Summary",
+        "Source",
+        "Group",
+        "License",
+        "URL",
+        "Vendor",
+        "Packager",
+        "BuildArch",
+        "BuildRoot"
+    ]
 
     # names of scripts
-    _scripts = ["description",
-                "prep",
-                "build",
-                "pre",
-                "install",
-                "check",
-                "post",
-                "preun",
-                "postun",
-                "pretrans",
-                "posttrans",
-                "clean",
-                "changelog"]
+    _scripts = [
+        "description",
+        "prep",
+        "build",
+        "pre",
+        "install",
+        "check",
+        "post",
+        "preun",
+        "postun",
+        "pretrans",
+        "posttrans",
+        "clean",
+        "changelog",
+        "files"
+    ]
 
     # lists that could be appended
-    _appendants = ["Requires",
-                   "BuildRequires",
-                   "Provides"]
+    _appendants = [
+        "Requires",
+        "BuildRequires",
+        "Provides"
+    ]
 
     def __init__(self):
-        tags = {"Name": "", "Version": "", "Release": "", "Summary": "",
-                "Group": "", "License": "", "URL": "", "Source": "",
-                "Patch": "", "BuildArch": "", "BuildRoot": "",
-                "Obsoletes": "", "Conflicts": "", "Vendor": "",
-                "Packager": "",
-                "package": "",
-                "BuildRequires": [], "Requires": [], "Provides": [],
-                "description": "",
-                "prep": Command(),
-                "build": Command(),
-                "pre": Command(),
-                "install": Command(),
-                "check": Command(),
-                "post": Command(),
-                "preun": Command(),
-                "postun": Command(),
-                "pretrans": Command(),
-                "posttrans": Command(),
-                "clean": Command(),
-                "changelog": Command()
-                }
+        tags = {
+            "Name": "",
+            "Version": "",
+            "Release": "",
+            "Summary": "",
+            "Group": "",
+            "License": "",
+            "URL": "",
+            "Source": "",
+            "Patch": "",
+            "BuildArch": "",
+            "BuildRoot": "",
+            "Obsoletes": "",
+            "Conflicts": "",
+            "Vendor": "",
+            "Packager": "",
+            "package": "",
+            "BuildRequires": [],
+            "Requires": [],
+            "Provides": [],
+            "description": "",
+            "prep": Command(),
+            "build": Command(),
+            "pre": Command(),
+            "install": Command(),
+            "check": Command(),
+            "post": Command(),
+            "preun": Command(),
+            "postun": Command(),
+            "pretrans": Command(),
+            "posttrans": Command(),
+            "clean": Command(),
+            "changelog": Command(),
+            "files": []
+        }
         dict.__init__(self, tags)
 
     def __getattr__(self, key):
@@ -88,14 +105,20 @@ class Subpackage(dict):
             if not isinstance(value, (list, str, type(Command()))):
                 raise TypeError(value)
 
+            if key == "files" and not isinstance(value, list):
+                raise TypeError(value)
+
+            if key == "description" and not isinstance(value, str):
+                raise TypeError(value)
+
+            if key != "files" and \
+                    key != "description" and \
+                    not isinstance(value, Command) and \
+                    key in self._scripts:
+                value = Command(value)
+
             self.__getattr__(key)  # raises AttributeError
-            if key in self._scripts:
-                if isinstance(value, type(Command())):
-                    self.__setitem__(key, value)
-                else:
-                    self.__setitem__(key, Command(value))
-            else:
-                self.__setitem__(key, value)
+            self.__setitem__(key, value)
         except KeyError:
             raise AttributeError(key)
 
@@ -122,41 +145,14 @@ class Subpackage(dict):
             for key, value in self.items():
                 if str(value) and str(key) is ordered_key:
                     if isinstance(value, Command):
-                        block += '%' + str(key) + '\n'
-                        for part in str(value):
-                            block += part
-                        block += '\n\n'
+                        block += '%' + str(key) + '\n' + str(value) + '\n\n'
+                    elif isinstance(value, list):
+                        block += '%' + str(key) + '\n' + '\n'.join(
+                            [(val[1] + " " if val[1] else "") + str(val[0])
+                                for val in value]) + '\n\n' if value else ""
+                    else:
+                        block += '%' + str(key) + '\n' + str(value) + '\n\n'
         return block
-
-    def _write_files(self, out):
-        if not self.files:
-            return
-
-        self.files = self._files_remove_duplicity()
-
-        files_suffixes = ""
-        for sfx in self.files_translations:
-            files_suffixes += "-f " + sfx + " "
-
-        print("\n%files {name} {suffixes}".format(name=self.tags.get("Name"),
-                                                  suffixes=files_suffixes),
-              file=out)
-
-        for file in self.files:
-            if file[2] is not None:  # file does have explicit attributes
-                print("%attr" + str(file[2]), file=out, end=" ")
-            if file[1] is not [] and file[1] is not None:
-                for tag in file[1]:
-                    print(tag, file=out, end=" ")
-            print(file[0], file=out)
-
-    def write(self, out):
-        """Default write method used for packages. Packages usually do not use
-        all the tags nor scripts available, e.g. patches, thus these are
-        omitted from the writing process."""
-
-        self._write_tags(out)
-        self._write_scripts(out)
 
     def mark_doc(self, file):
         """Helper function for GUI to mark additional files as documentation.
@@ -181,10 +177,19 @@ class Spec(Subpackage):
         super(Spec, self).__init__()
 
     def __str__(self):
-        tags = self._get_tags()
-        requires = self._get_requires()
-        scripts = self._get_scripts()
-        return tags + requires + scripts
+        return (
+            self._get_tags() +
+            self._get_requires() +
+            self._get_scripts()
+        )
+
+    def _write_changelog(self, out):
+        print("\n%changelog", file=out)
+        for changelog in self.changelogs:
+            print("{}\n".format(changelog), file=out)
+
+    def load(source_file):
+        pass
 
     def _get_tags(self):
         return super(Spec, self)._get_tags()
@@ -194,55 +199,6 @@ class Spec(Subpackage):
 
     def _get_scripts(self):
         return super(Spec, self)._get_scripts()
-
-    def _write_changelog(self, out):
-        print("\n%changelog", file=out)
-        for changelog in self.changelogs:
-            print("{}\n".format(changelog), file=out)
-
-    def _write_files(self, out):
-        if not self.files:
-            return
-
-        self.files = self._files_remove_duplicity()
-
-        files_suffixes = ""
-        for sfx in self.files_translations:
-            files_suffixes += "-f " + sfx + " "
-
-        print("\n%files {suffixes}".format(suffixes=files_suffixes),
-              file=out)
-
-        for file in self.files:
-            if file[2] is not None:  # file does have explicit attributes
-                print("%attr" + str(file[2]), file=out, end=" ")
-            if file[1] is not [] and file[1] is not None:
-                for tag in file[1]:
-                    print(tag, file=out, end=" ")
-            print(file[0], file=out)
-
-    def load(source_file):
-        pass
-
-    def write(self, out):
-        """Modified inherited write method. See Subpackage.write() for more
-        information."""
-
-        # first tags need to written
-        self._write_tags(out)
-
-        # second packages and scripts need to be written
-        self._write_scripts(out)
-
-        # next all the files and appropriate attributes need to written
-        self._write_files(out)
-
-        # Print all files related to subpackages
-        for subpkg in self.subpackages:
-            subpkg._write_files(out)
-
-        # Changelog is the last to be written at the end of file
-        self._write_changelog(out)
 
     class Changelog:
         _weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
