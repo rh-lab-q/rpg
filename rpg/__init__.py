@@ -105,7 +105,12 @@ class Base(object):
 
     @property
     def srpm_path(self):
-        return next(self.base_dir.glob(self.project_name + "*src.rpm"))
+        try:
+            return next(self.base_dir.glob(self.project_name + "*src.rpm"))
+        except StopIteration:
+            raise RuntimeError(
+                "Can't find '{}'! You need to call build_srpm first."
+                .format(str(self.base_dir / (self.project_name + "*src.rpm"))))
 
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
@@ -114,6 +119,7 @@ class Base(object):
         self._input_name = path.name
         self._setup_workspace()
         self._source_loader.load_sources(path, self.extracted_dir)
+        self.spec.prep = Command("%autosetup")
 
     def run_raw_sources_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
@@ -128,12 +134,6 @@ class Base(object):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[1],
                                           self.extracted_dir)
-
-    def build_project(self):
-        """executed in background after filled requires screen"""
-        self._project_builder.build(self.extracted_dir,
-                                    self.compiled_dir,
-                                    self.spec.build)
 
     def run_compiled_analysis(self):
         """executed in background after patches are applied"""
@@ -161,12 +161,11 @@ class Base(object):
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
 
-    def build_packages(self, distros, archs=platform.machine()):
-        """builds packages for desired distributions"""
-        for arch in archs:
-            for distro in distros:
-                self._package_builder.build(self.spec_path, self.archive_path,
-                                            distro, arch)
+    def build_project(self):
+        """executed in background after filled requires screen"""
+        self._project_builder.build(self.extracted_dir,
+                                    self.compiled_dir,
+                                    self.spec.build)
 
     @staticmethod
     def compute_checksum(sources):

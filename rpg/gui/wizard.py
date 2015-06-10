@@ -1,3 +1,4 @@
+from os.path import expanduser
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
@@ -420,7 +421,7 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.base.spec.Provides = self.providesEdit.toPlainText()
         self.base.spec.BuildRequires = self.base.spec.BuildRequires.splitlines()
         self.base.spec.Requires = self.base.spec.Requires.splitlines()
-        self.base.spec.Provides = self.base.spec.Provides.splitlines() 
+        self.base.spec.Provides = self.base.spec.Provides.splitlines()
         self.base.build_project()
         self.base.run_compiled_analysis()
         self.base.install_project()
@@ -632,8 +633,10 @@ class SubpackagesPage(QtWidgets.QWizardPage):
 
 
 class BuildPage(QtWidgets.QWizardPage):
+
     def initializePage(self):
-        self.buildLocationEdit.setText(str(self.base.rpm_path))
+        self.buildLocationEdit.setText(expanduser("~"))
+
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
 
@@ -673,9 +676,11 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def validatePage(self):
         self.base.write_spec()
-        self.base.build_packages("fedora-21-x86_64")
+        self.base.build_srpm()
+        Command("mv " + str(self.base.srpm_path) + " " +
+                self.buildLocationEdit.getText())
         return True
-        
+
     def editSpecFile(self):
         '''If user clicked Edit SPACE file, default text editor with the file is open'''
         subprocess.call(('xdg-open', str(self.base.spec_path)))
