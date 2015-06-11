@@ -67,8 +67,8 @@ class Base(object):
     def create_archive(self):
         """ Creates archive (archvie_path) from Source folder """
 
-        Command("tar zfc " + str(self.spec.Source) + " " +
-                self.archive_path).execute()
+        Command("tar zcf " + str(self.spec.Source) + " " +
+                str(self.extracted_dir)).execute()
         self.spec.prep.append('%autosetup')
 
     @property
