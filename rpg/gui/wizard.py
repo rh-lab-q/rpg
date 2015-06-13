@@ -191,8 +191,7 @@ class ImportPage(QtWidgets.QWizardPage):
             self.base.spec.URL = self.URLEdit.text()
             self.base.spec.Summary = self.summaryEdit.text()
             self.base.spec.description = self.descriptionEdit.text()
-            self.base.spec.Source = self.importEdit.text().strip()
-            self.base.process_archive_or_dir(self.base.spec.Source)
+            self.base.process_archive_or_dir(self.importEdit.text().strip())
             self.base.run_raw_sources_analysis()
             self.importEdit.setStyleSheet("")
             return True
@@ -500,6 +499,7 @@ class ScripletsPage(QtWidgets.QWizardPage):
         self.base.spec.postun = Command(self.postunEdit.toPlainText())
         self.base.spec.preun = Command(self.preunEdit.toPlainText())
         self.base.spec.posttrans = Command(self.posttransEdit.toPlainText())
+        self.base.write_spec()
         return True
 
     def nextId(self):
@@ -675,10 +675,9 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
-        self.base.write_spec()
         self.base.build_srpm()
         Command("mv " + str(self.base.srpm_path) + " " +
-                self.buildLocationEdit.getText())
+                self.buildLocationEdit.text())
         return True
 
     def editSpecFile(self):

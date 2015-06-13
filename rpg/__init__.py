@@ -115,6 +115,7 @@ class Base(object):
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
         path = Path(path)
+        self.spec.Source = str(path)
         self._hash = self.compute_checksum(path)
         self._input_name = path.name
         self._setup_workspace()
