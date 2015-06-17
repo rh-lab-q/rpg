@@ -24,6 +24,7 @@ class PackageBuilder(object):
 
         # Build srpm pakcage from given spec_file and tarball
         call(["rpmdev-setuptree", ""])
+        Command("cp " + str(tarball) + " ~/rpmbuild/SOURCES").execute()
         output = Command("rpmbuild -bs " + str(spec_file)).execute()
         Command("mv " + str(output.split()[-1]) +
                 " " + str(output_file)).execute()
