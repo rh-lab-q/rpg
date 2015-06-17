@@ -1,0 +1,19 @@
+branches:
+  only:
+  - master
+notifications:
+  email: false
+sudo: required
+before_install:
+- echo "deb http://us.archive.ubuntu.com/ubuntu trusty main universe" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get update
+- wget https://github.com/dgoodwin/tito/archive/tito-0.4.18-1.tar.gz -O /tmp/tito.tar.gz
+install:
+- sudo apt-get install mock pigz python-lzma
+- sudo pip install /tmp/tito.tar.gz
+- sudo groupadd mock
+- sudo usermod -a -G mock travis
+before_script:
+- sudo cp rel-eng/travis/mock/rpg.cfg /etc/mock/
+- git config user.email "travis@localhost" && git config user.name "Travis"
+script: rel-eng/travis/build.sh
