@@ -158,6 +158,8 @@ class Base(object):
     def build_srpm(self):
         if not self.spec_path.exists():
             self.write_spec()
+        if not self.archive_path.exists():
+            self.create_archive()
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
 
