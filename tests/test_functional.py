@@ -7,7 +7,7 @@ class FunctionalTest(RpgTestCase):
     def test_c_project(self):
         base = Base()
         base.load_plugins()
-        base.process_archive_or_dir(
+        base.load_project_from_url(
             self.test_project_dir / "hello_project/hello-1.4.tar.gz")
         base.spec.Name = "hello"
         base.spec.Version = "1.4"
@@ -48,6 +48,5 @@ class FunctionalTest(RpgTestCase):
         base.run_installed_analysis()
         self.assertEqual(
             [("/hello", None, None)], base.spec.files)
-        base.write_spec()
         base.build_srpm()
         self.assertTrue(base.srpm_path.exists())

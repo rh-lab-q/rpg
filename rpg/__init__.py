@@ -67,7 +67,7 @@ class Base(object):
 
     def create_archive(self):
         """ Creates archive (archvie_path) from Source folder """
-        self.spec.Source = self.Spec.Name + "-" + self.Spec.Version + ".tar.gz"
+        self.spec.Source = self.spec.Name + "-" + self.spec.Version + ".tar.gz"
         Command("tar zcf " + str(self.spec.Source) + " " +
                 str(self.extracted_dir)).execute()
         self.spec.prep.append('%autosetup')
@@ -166,10 +166,10 @@ class Base(object):
             spec_file.write(str(self.spec))
 
     def build_srpm(self):
+        if not self.spec.Source or not self.archive_path.exists():
+            self.create_archive()
         if not self.spec_path.exists():
             self.write_spec()
-        if not self.archive_path.exists():
-            self.create_archive()
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
 
