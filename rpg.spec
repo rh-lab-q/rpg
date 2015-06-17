@@ -1,4 +1,4 @@
-Name:           RPG
+Name:           rpg
 Version:        0.0.1
 Release:        1%{?snapshot}%{?dist}
 Summary:        RPM Package Generator
