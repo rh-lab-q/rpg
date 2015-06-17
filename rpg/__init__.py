@@ -66,7 +66,7 @@ class Base(object):
 
     def create_archive(self):
         """ Creates archive (archvie_path) from Source folder """
-
+        self.spec.Source = self.Spec.Name + "-" + self.Spec.Version + ".tar.gz"
         Command("tar zcf " + str(self.spec.Source) + " " +
                 str(self.extracted_dir)).execute()
         self.spec.prep.append('%autosetup')
@@ -115,7 +115,6 @@ class Base(object):
     def process_archive_or_dir(self, path):
         """executed in background after dir/tarball/SRPM selection"""
         path = Path(path)
-        self.spec.Source = str(path)
         self._hash = self.compute_checksum(path)
         self._input_name = path.name
         self._setup_workspace()
