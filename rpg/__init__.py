@@ -13,6 +13,7 @@ from rpg.conf import Conf
 from os.path import isdir
 from os import makedirs
 from os import geteuid
+from os import remove
 import shutil
 
 
@@ -76,7 +77,7 @@ class Base(object):
         try:
             return Path("/tmp/rpg-%s-%s" % (self._input_name, self._hash))
         except AttributeError:
-            msg = "`process_archive_or_dir` method needs to be called first"
+            msg = "`load_project_from_url` method needs to be called first"
             raise RuntimeError(msg)
 
     @property
@@ -112,14 +113,23 @@ class Base(object):
                 "Can't find '{}'! You need to call build_srpm first."
                 .format(str(self.base_dir / (self.project_name + "*src.rpm"))))
 
-    def process_archive_or_dir(self, path):
+    def load_project_from_url(self, path):
         """executed in background after dir/tarball/SRPM selection"""
         path = Path(path)
+        temp_arch = "downloaded_archive.tar.gz"
+        if "github" in str(path):
+            self._source_loader.download_git_repo(str(path), temp_arch)
+        elif str(path).startswith("http"):
+            self._source_loader.download_archive(str(path), temp_arch)
+        else:
+            temp_arch = None
         self._hash = self.compute_checksum(path)
         self._input_name = path.name
         self._setup_workspace()
         self._source_loader.load_sources(path, self.extracted_dir)
         self.spec.prep = Command("%autosetup")
+        if temp_arch:
+            remove(temp_arch)
 
     def run_raw_sources_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""

@@ -193,7 +193,7 @@ class ImportPage(QtWidgets.QWizardPage):
             self.base.spec.URL = self.URLEdit.text()
             self.base.spec.Summary = self.summaryEdit.text()
             self.base.spec.description = self.descriptionEdit.text()
-            self.base.process_archive_or_dir(self.importEdit.text().strip())
+            self.base.load_project_from_url(self.importEdit.text().strip())
             self.base.run_raw_sources_analysis()
             self.importEdit.setStyleSheet("")
             return True

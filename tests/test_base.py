@@ -19,6 +19,6 @@ class BaseTest(RpgTestCase):
 
     def test_base_dir(self):
         self.assertRaises(RuntimeError, getattr, self.base, "base_dir")
-        self.base.process_archive_or_dir(self.test_project_dir / "c")
+        self.base.load_project_from_url(self.test_project_dir / "c")
         self.assertTrue(re.match(r"^\/tmp\/rpg-c-[0-9a-fA-F]+$",
                                  str(self.base.base_dir)))
