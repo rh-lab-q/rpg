@@ -30,7 +30,7 @@ packaged files. Beginners can get familiar with packaging process or the
 advanced users can use our tool for a quick creation of a package.
 
 %prep
-%autosetup
+%setup -q -n rpg-%{version}
 
 %build
 %cmake .
