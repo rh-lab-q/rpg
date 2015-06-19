@@ -17,9 +17,11 @@ Requires:       coreutils
 Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
+%if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
 Recommends:     copr-cli
+%endif
 
 %description
 RPG is tool, that guides people through the creation of a RPM
