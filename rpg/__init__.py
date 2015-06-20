@@ -168,8 +168,7 @@ class Base(object):
     def build_srpm(self):
         if not self.spec.Source or not self.archive_path.exists():
             self.create_archive()
-        if not self.spec_path.exists():
-            self.write_spec()
+        self.write_spec()
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
 
@@ -182,11 +181,11 @@ class Base(object):
     def copr_set_config(self, username, login, token):
         self.copr = CoprUploader()
         self.copr.setup_config(username, login, token)
-        
+
     def copr_create_project(self, name, chroots, desc, intro):
         self.copr = CoprUploader()
         self.copr.create_copr(name, chroots, desc, intro)
-        
+
     def copr_build(self, name, url):
         self.copr = CoprUploader()
         self.copr.build_copr(name, url)

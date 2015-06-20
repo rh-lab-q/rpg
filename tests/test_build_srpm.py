@@ -15,7 +15,16 @@ class FakeBase(Base):
     _package_builder = PackageBuilder()
     project_name = "hello"
     spec = Spec()
+    spec.Name = "hello"
+    spec.Version = "1.4"
+    spec.Release = "1%{?dist}"
+    spec.Summary = "Hello World test program"
+    spec.License = "GPLv2"
     spec.Source = "hello-1.4.tar.gz"
+    spec.description = "Hello World C project for testing RPG."
+    spec.prep = r'%autosetup'
+    spec.build = "make"
+    spec.install = r"make install DESTDIR=%{RPM_BUILD_ROOT}"
 
 
 class BuildSrpmTest(RpgTestCase):
