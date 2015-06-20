@@ -1,3 +1,4 @@
+import hawkey
 import logging
 import platform
 from pathlib import Path

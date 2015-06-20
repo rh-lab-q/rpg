@@ -4,16 +4,37 @@ from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
+from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 from rpg.utils import get_architecture
 import sys
 from rpg.plugins.lang.c import CPlugin
 from rpg.spec import Spec
 
 
+class MockSack:
+
+    def query(self):
+        return MockedDNFQuery()
+
+
+class MockedPackage:
+    name = "python3-dnf"
+
+
+class MockedDNFQuery:
+
+    def filter(self, **kwd):
+        return [MockedPackage()]
+
+    def available(self):
+        return self
+
+
 class FindPatchPluginTest(PluginTestCase):
 
     def setUp(self):
         self.spec = Spec()
+        self.sack = None
 
     def test_is_patch(self):
         patch = self.test_project_dir / "patch" / "0.patch"
@@ -83,6 +104,17 @@ class FindPatchPluginTest(PluginTestCase):
         self.spec.Requires.sort()
         imports.sort()
         self.assertEqual(self.spec.Requires, imports)
+
+    def test_files_to_pkgs(self):
+        ftpp = FilesToPkgsPlugin()
+        self.spec.Requires = [
+            "/usr/lib/python3.4/site-packages/dnf/conf/read.py",
+            "/usr/lib/python3.4/site-packages/dnf/yum/sqlutils.py",
+            "/usr/lib/python3.4/site-packages/dnf/query.py"
+        ]
+        ftpp.installed(None, self.spec, MockSack())
+        self.assertEqual(len(self.spec.Requires), 1)
+        self.assertEqual(["python3-dnf"], self.spec.Requires)
 
     def test_c(self):
         c_plug = CPlugin()
