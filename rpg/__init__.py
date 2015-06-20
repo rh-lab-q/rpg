@@ -209,10 +209,7 @@ class Base(object):
 
     def _setup_workspace(self):
         """make sure all directories used later will exist"""
-        try:
-            shutil.rmtree(str(self.base_dir))
-        except FileNotFoundError:
-            pass
+        shutil.rmtree(str(self.base_dir), True)
         for d in self.all_dirs:
             d.mkdir(parents=True)
 
