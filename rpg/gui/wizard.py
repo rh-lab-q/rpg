@@ -370,6 +370,12 @@ class PatchesPage(QtWidgets.QWizardPage):
 
         self.base.apply_patches(self.pathes)
         self.base.run_patched_sources_analysis()
+
+        self.base.build_project()
+        self.base.run_compiled_analysis()
+        self.base.install_project()
+        self.base.run_installed_analysis()
+
         return True
 
     def nextId(self):
@@ -423,10 +429,6 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.base.spec.BuildRequires = self.base.spec.BuildRequires.splitlines()
         self.base.spec.Requires = self.base.spec.Requires.splitlines()
         self.base.spec.Provides = self.base.spec.Provides.splitlines()
-        self.base.build_project()
-        self.base.run_compiled_analysis()
-        self.base.install_project()
-        self.base.run_installed_analysis()
         return True
 
     def nextId(self):
