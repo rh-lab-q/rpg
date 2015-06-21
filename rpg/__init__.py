@@ -68,8 +68,12 @@ class Base(object):
     def create_archive(self):
         """ Creates archive (archvie_path) from Source folder """
         self.spec.Source = self.spec.Name + "-" + self.spec.Version + ".tar.gz"
-        Command("tar zcf " + str(self.archive_path) + " " +
-                str(self.extracted_dir)).execute()
+        _tar = Command("tar zcf " + str(self.archive_path) +
+                       " -C " + str(self.extracted_dir) +
+                       " . --transform='s/^\./" +
+                       self.spec.Name + "-" + self.spec.Version + "/g'")
+        _tar.execute()
+        logging.debug(str(_tar))
 
     @property
     def base_dir(self):
