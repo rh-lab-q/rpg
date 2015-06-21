@@ -70,7 +70,6 @@ class Base(object):
         self.spec.Source = self.spec.Name + "-" + self.spec.Version + ".tar.gz"
         Command("tar zcf " + str(self.archive_path) + " " +
                 str(self.extracted_dir)).execute()
-        self.spec.prep.append('%autosetup')
 
     @property
     def base_dir(self):
