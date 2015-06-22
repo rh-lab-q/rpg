@@ -12,6 +12,6 @@ class PythonPlugin(Plugin):
             for item in files:
                 mod.run_script(str(item))
 
-            for name, mod in mod.modules.items():
-                if mod.__file__:
+            for _, mod in mod.modules.items():
+                if mod.__file__ and mod.__file__.startswith("/usr/lib"):
                     spec.Requires.append(mod.__file__)

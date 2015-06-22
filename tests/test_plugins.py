@@ -80,9 +80,7 @@ class FindPatchPluginTest(PluginTestCase):
             arch = ""
         imports = [("/usr/lib{0}/python{1}.{2}/" +
                     "lib-dynload/math.cpython-{1}{2}m.so")
-                   .format(arch, version.major, version.minor),
-                   str(self.test_project_dir / "py" /
-                       "requires" / "sourcecode2.py")]
+                   .format(arch, version.major, version.minor)]
         self.spec.Requires.sort()
         imports.sort()
         self.assertEqual(self.spec.Requires, imports)
