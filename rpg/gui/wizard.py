@@ -693,7 +693,8 @@ class BuildPage(QtWidgets.QWizardPage):
     def validatePage(self):
         self.base.build_srpm()
         Command("mv " + str(self.base.srpm_path) + " " +
-                self.buildLocationEdit.text())
+                self.buildLocationEdit.text()).execute()
+        self.base.final_path = self.buildLocationEdit.text()
         return True
 
     def editSpecFile(self):
@@ -987,7 +988,7 @@ class CoprFinalPage(QtWidgets.QWizardPage):
         
 class FinalPage(QtWidgets.QWizardPage):
     def initializePage(self):
-        self.buildPath = (str(self.base.srpm_path))
+        self.buildPath = (str(self.base.final_path))
         self.finalLabel.setText("<html><head/><body><p align=\"center\"><span" +
                             "style=\" font-size:24pt;\">Thank you for " +
                             "using RPG!</span></p><p align=\"center\">" +
