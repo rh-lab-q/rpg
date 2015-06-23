@@ -44,7 +44,7 @@ make install DESTDIR=%{RPM_BUILD_ROOT}
 %make_install
 
 %check
-make test
+make ARGS="-V" test
 
 %files
 %{_bindir}/rpg
