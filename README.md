@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rh-lab-q/rpg.svg?branch=master)](https://travis-ci.org/rh-lab-q/rpg)
+
 ===========================
 RPG - RPM Package Generator
 ===========================
