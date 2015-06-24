@@ -39,7 +39,6 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/patch/2.patch', None, None),
                  ('/c/sourcecode.c', None, None),
                  ('/hello_project/hello-1.4.tar.gz', None, None),
-                 ('/hello_project/hello.spec', None, None),
                  ('/py/plugin0.py', None, None),
                  ('/py/sourcecode.py', None, None),
                  ('/translation/CZ.mo', None, None),
