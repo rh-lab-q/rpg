@@ -28,3 +28,7 @@ class PackageBuilder(object):
         output = Command("rpmbuild -bs " + str(spec_file)).execute()
         Command("mv " + str(output.split()[-1]) +
                 " " + str(output_file)).execute()
+                
+    def fetch_repos(self, dist, arch):
+        config_file = dist + '-' + arch
+        Command("mock --init --no-clean -r " + config_file).execute()
