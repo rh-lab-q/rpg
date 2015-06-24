@@ -738,7 +738,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.usernameEdit.setMinimumHeight(30)
         self.usernameLabel.setBuddy(self.usernameEdit)
         self.usernameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.usernameLabel.setToolTip("Your username for Copr API")
+        self.usernameLabel.setToolTip("Your username from Copr API")
         
         self.loginLabel = QLabel("Login<font color=\'red\'>*</font>")
         self.loginEdit = QLineEdit()
@@ -759,14 +759,14 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageNameEdit.setMinimumHeight(30)
         self.packageNameLabel.setBuddy(self.packageNameEdit)
         self.packageNameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageNameLabel.setToolTip("Name of your package. MUST be unique!")
+        self.packageNameLabel.setToolTip("Name of your package. It MUST be unique!")
         
         self.packageUrlLabel = QLabel("Url<font color=\'red\'>*</font>")
         self.packageUrlEdit = QLineEdit()
         self.packageUrlEdit.setMinimumHeight(30)
         self.packageUrlLabel.setBuddy(self.packageUrlEdit)
         self.packageUrlLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageUrlLabel.setToolTip("An Url of your package")
+        self.packageUrlLabel.setToolTip("An url of your package. It must be some public web site")
         
         self.Fedora22_i386_CheckBox = QCheckBox("fedora-22-i386")
         self.Fedora22_x64_CheckBox = QCheckBox("fedora-22-x86_64")
@@ -872,7 +872,7 @@ class CoprBuildPage(QtWidgets.QWizardPage):
         self.textBuildLabel.setText("<html><head/><body><p align=\"left\"><span" +
                             "style=\" font-size:24pt;\">" +
                             "New project " + self.newproject + " will be created. <br>" + 
-                            "You can also add description and instructions" + 
+                            "You can also add descriptions and instructions" + 
                             " for your package. <br>" +
                             "Next step will build package with Copr." +
                             "</span></p></body></html>")
@@ -890,12 +890,13 @@ class CoprBuildPage(QtWidgets.QWizardPage):
         self.packageDescLabel = QLabel("Description ")
         self.packageDescEdit = QTextEdit()
         self.packageDescLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageDescLabel.setToolTip("A description for your package")
+        self.packageDescLabel.setToolTip("Description for your package, optional")
         
         self.packageInstuctionLabel = QLabel("Instructions ")
         self.packageInstuctionEdit = QTextEdit()
         self.packageInstuctionLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageInstuctionLabel.setToolTip("A instructions for your package")
+        self.packageInstuctionLabel.setToolTip(
+            "How install your project, where users can report bugs and issues. Or wiki link, optional")
         
         mainLayout = QVBoxLayout()
         gridBuildText = QGridLayout()
