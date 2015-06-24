@@ -38,3 +38,4 @@ class BuildSrpmTest(RpgTestCase):
 
     def tearDown(self):
         os.remove(str(self.fbase.srpm_path))
+        os.remove(str(self.fbase.spec_path))
