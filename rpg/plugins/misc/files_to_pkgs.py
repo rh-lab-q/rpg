@@ -20,6 +20,6 @@ class FilesToPkgsPlugin(Plugin):
 
         _query = sack.query().available()
         logging.info("Resolving Requires")
-        spec.Requires = _uniq(_resolve(spec.Requires, _query))
+        spec.Requires = _uniq(_resolve(spec.required_files, _query))
         logging.info("Resolving BuildRequires")
-        spec.BuildRequires = _uniq(_resolve(spec.BuildRequires, _query))
+        spec.BuildRequires = _uniq(_resolve(spec.build_required_files, _query))

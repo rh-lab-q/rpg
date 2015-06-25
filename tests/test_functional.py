@@ -18,29 +18,30 @@ class FunctionalTest(RpgTestCase):
         base.spec.build = "make"
         base.run_raw_sources_analysis()
         base.run_patched_sources_analysis()
-        expected_requires = {
+        expected_required_files = {
             "/usr/include/gnu",
             "/usr/include",
             "/usr/include/sys",
             "/usr/include/bits"
         }
-        expected_build_requires = {
+        expected_build_required_files = {
             "/usr/include/gnu",
             "/usr/include",
             "/usr/include/sys",
-            "/usr/include/bits",
-            "make"
+            "/usr/include/bits"
         }
         dirs = [
-            "Makefile", 
+            "Makefile",
             "hello.c",
             "hello"
         ]
         base.run_installed_analysis()
-        self.assertEqual("make", str(base.spec.build))
-        self.assertEqual(expected_requires, set(base.spec.Requires))
-        self.assertEqual(expected_build_requires, set(base.spec.BuildRequires))
-        self.assertExistInDir(["Makefile","hello.c"], base.extracted_dir)
+        self.assertEqual(["make"], base.spec.BuildRequires)
+        self.assertEqual(expected_required_files,
+                         set(base.spec.required_files))
+        self.assertEqual(expected_build_required_files,
+                         set(base.spec.build_required_files))
+        self.assertExistInDir(["Makefile", "hello.c"], base.extracted_dir)
         base.build_project()
         self.assertExistInDir(dirs, base.compiled_dir)
         base.run_compiled_analysis()

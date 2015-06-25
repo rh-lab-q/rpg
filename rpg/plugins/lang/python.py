@@ -14,4 +14,4 @@ class PythonPlugin(Plugin):
 
             for _, mod in mod.modules.items():
                 if mod.__file__ and mod.__file__.startswith("/usr/lib"):
-                    spec.Requires.append(mod.__file__)
+                    spec.required_files.append(mod.__file__)

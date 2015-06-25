@@ -110,13 +110,13 @@ class FindPatchPluginTest(PluginTestCase):
         imports = [("/usr/lib{0}/python{1}.{2}/" +
                     "lib-dynload/math.cpython-{1}{2}m.so")
                    .format(arch, version.major, version.minor)]
-        self.spec.Requires.sort()
+        self.spec.required_files.sort()
         imports.sort()
-        self.assertEqual(self.spec.Requires, imports)
+        self.assertEqual(self.spec.required_files, imports)
 
     def test_files_to_pkgs(self):
         ftpp = FilesToPkgsPlugin()
-        self.spec.Requires = [
+        self.spec.required_files = [
             "/usr/lib/python3.4/site-packages/dnf/conf/read.py",
             "/usr/lib/python3.4/site-packages/dnf/yum/sqlutils.py",
             "/usr/lib/python3.4/site-packages/dnf/query.py"
@@ -131,7 +131,7 @@ class FindPatchPluginTest(PluginTestCase):
         expected = ['/usr/include', '/usr/include/bits',
                     '/usr/include/gnu', '/usr/include/sys']
         expected.sort()
-        self.spec.Requires.sort()
-        self.spec.BuildRequires.sort()
-        self.assertEqual(self.spec.Requires, expected)
-        self.assertEqual(self.spec.BuildRequires, expected)
+        self.spec.required_files.sort()
+        self.spec.build_required_files.sort()
+        self.assertEqual(self.spec.required_files, expected)
+        self.assertEqual(self.spec.build_required_files, expected)

@@ -3,9 +3,6 @@ from rpg.command import Command
 
 class Subpackage(dict):
 
-    # list of generated translation files
-    files_translations = []
-
     # names of 'single' keys
     _singles = [
         "Name",
@@ -83,6 +80,13 @@ class Subpackage(dict):
             "changelog": Command(),
             "files": []
         }
+        # list of generated translation files
+        self.files_translations = []
+
+        # (Build)Required file list that will be traslated into packages
+        self.build_required_files = []
+        self.required_files = []
+
         dict.__init__(self, tags)
 
     def __getattr__(self, key):
@@ -116,6 +120,14 @@ class Subpackage(dict):
                     not isinstance(value, Command) and \
                     key in self._scripts:
                 value = Command(value)
+
+            if key in [
+                "files_translations",
+                "build_required_files",
+                "required_files"
+            ]:
+                super(Subpackage, self).__setattr__(key, value)
+                return
 
             self.__getattr__(key)  # raises AttributeError
             self.__setitem__(key, value)
