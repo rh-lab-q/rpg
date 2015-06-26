@@ -175,6 +175,9 @@ class Base(object):
         self.write_spec()
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
+            
+    def fetch_repos(self, dist, arch):
+        self._package_builder.fetch_repos(dist, arch)
 
     def build_project(self):
         """executed in background after filled requires screen"""

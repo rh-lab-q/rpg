@@ -10,6 +10,7 @@ from pathlib import Path
 from rpg.command import Command
 import subprocess
 import platform
+from threading import Thread
 
 
 class Wizard(QtWidgets.QWizard):
@@ -152,6 +153,9 @@ class ImportPage(QtWidgets.QWizardPage):
             self.base.target_arch = self.ArchEdit.currentText()
             self.base.target_distro = self.DistroEdit.currentText()
             self.base.load_project_from_url(self.importEdit.text().strip())
+            new_thread = Thread(
+                target=self.base.fetch_repos, args=(self.base.target_distro, self.base.target_arch))
+            new_thread.start()
             self.importEdit.setStyleSheet("")
             return True
         else:
