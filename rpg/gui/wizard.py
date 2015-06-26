@@ -4,11 +4,12 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QTextEdit, QListWidget, QHBoxLayout,
                              QDialog, QFileDialog, QTreeWidget,
-                             QTreeWidgetItem)
+                             QTreeWidgetItem, QComboBox)
 from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
 from pathlib import Path
 from rpg.command import Command
 import subprocess
+import platform
 
 
 class Wizard(QtWidgets.QWizard):
@@ -18,8 +19,8 @@ class Wizard(QtWidgets.QWizard):
         - tooltips are from: https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
     NUM_PAGES = 12
-    (PageGreetings, PageImport, PageScripts, PagePatches, PageRequires,
-        PageScriplets, PageSubpackages, PageBuild, PageFinal,
+    (PageGreetings, PageImport, PageMandatory, PageScripts, 
+        PageRequires, PageScriplets, PageSubpackages, PageBuild, PageFinal,
         PageCoprLogin, PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
@@ -31,8 +32,8 @@ class Wizard(QtWidgets.QWizard):
 
         # Setting pages to wizard
         self.setPage(self.PageImport, ImportPage(self))
+        self.setPage(self.PageMandatory, MandatoryPage(self))
         self.setPage(self.PageScripts, ScriptsPage(self))
-        self.setPage(self.PagePatches, PatchesPage(self))
         self.setPage(self.PageRequires, RequiresPage(self))
         self.setPage(self.PageScriplets, ScripletsPage(self))
         self.setPage(self.PageSubpackages, SubpackagesPage(self))
@@ -49,10 +50,135 @@ class ImportPage(QtWidgets.QWizardPage):
         super(ImportPage, self).__init__(parent)
 
         self.base = Wizard.base
-
+        
         self.setTitle(self.tr("Beginning"))
-        self.setSubTitle(self.tr("Fill in fields and import " +
+        self.setSubTitle(self.tr("Choose distribution and import " +
                                  "tarball or folder with source code"))
+
+        self.importLabel = QLabel("Source<font color=\'red\'>*</font>")
+        self.importEdit = QLineEdit()
+        self.importEdit.setMinimumHeight(30)
+        self.importLabel.setBuddy(self.importEdit)
+        self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.importLabel.setToolTip("Pristine source package (e.g. tarballs) and patches")
+        self.importEdit.textChanged.connect(self.checkPath)
+        self.importEdit.setMinimumHeight(34)
+
+        self.importButton = QPushButton("Import")
+        self.importButton.setMinimumHeight(45)
+        self.importButton.setMinimumWidth(115)
+        self.importButton.clicked.connect(self.importPath)
+                                 
+        self.ArchLabel = QLabel("Architecture<font color=\'red\'>*</font>")
+        self.ArchEdit = QComboBox()
+        self.ArchEdit.setMinimumHeight(30)
+        arch = platform.architecture()[0]
+        if arch == "32bit":
+            self.ArchEdit.addItem("i386")
+            self.ArchEdit.addItem("x86_64")
+        else:
+            self.ArchEdit.addItem("x86_64")
+            self.ArchEdit.addItem("i386")
+        self.ArchLabel.setBuddy(self.ArchEdit)
+        self.ArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.ArchLabel.setToolTip("Choose architekture (32 bit - i386 or 64 bit - x68_64)")
+        
+        self.DistroLabel = QLabel("Distribution<font color=\'red\'>*</font>")
+        self.DistroEdit = QComboBox()
+        self.DistroEdit.setMinimumHeight(30)
+        self.DistroEdit.addItem("fedora-22")
+        self.DistroEdit.addItem("fedora-21")
+        self.DistroEdit.addItem("fedora-20")
+        self.DistroEdit.addItem("fedora-19")
+        self.DistroEdit.addItem("fedora-rawhide")
+        self.DistroEdit.addItem("epel-7")
+        self.DistroEdit.addItem("epel-6")
+        self.DistroEdit.addItem("epel-5")
+        self.DistroLabel.setBuddy(self.DistroEdit)
+        self.DistroLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.DistroLabel.setToolTip("Choose distribution")
+        
+        self.registerField("Source*", self.importEdit)
+        
+        mainLayout = QVBoxLayout()
+        grid = QGridLayout()
+        grid.addWidget(self.importLabel, 0, 0, 1, 1)
+        grid.addWidget(self.importEdit, 0, 1, 1, 6)
+        grid.addWidget(self.importButton, 0, 7, 1, 1)
+        grid.addWidget(self.DistroLabel, 1, 0, 1, 0)
+        grid.addWidget(self.DistroEdit, 1, 1, 1, 2)
+        grid.addWidget(self.ArchLabel, 2, 0, 1, 0)
+        grid.addWidget(self.ArchEdit, 2, 1, 1, 2)
+        mainLayout.addSpacing(40)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
+
+    def checkPath(self):
+        ''' Checks, if path to import is correct while typing'''
+        path = Path(self.importEdit.text())
+        if(path.exists()):
+            self.importEdit.setStyleSheet("")
+        else:
+            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
+                                          "border-width: 1px;" +
+                                          "border-color: red;" +
+                                          "border-radius: 3px;" +
+                                          "background-color:" +
+                                          "rgb(233,233,233);}")
+
+    def importPath(self):
+        ''' Returns path selected file or archive'''
+
+        self.import_dialog = DialogImport()
+        self.import_dialog.exec_()
+        if (isinstance(self.import_dialog.filesSelected(), list)):
+            path = self.import_dialog.filesSelected()
+        else:
+            path = self.import_dialog.selectedFiles()
+        try:
+            self.importEdit.setText(path[0])
+        except IndexError:
+            msq = "Source file or archive is not selected"
+
+    def validatePage(self):
+        ''' [Bool] Function that invokes just after pressing the next button
+            {True} - user moves to next page
+            {False}- user blocked on current page
+            ###### Setting up RPG class references ###### '''
+
+        # Verifying path
+        path = Path(self.importEdit.text())
+        if(path.exists()):
+            self.base.target_arch = self.ArchEdit.currentText()
+            self.base.target_distro = self.DistroEdit.currentText()
+            self.base.load_project_from_url(self.importEdit.text().strip())
+            self.importEdit.setStyleSheet("")
+            return True
+        else:
+            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
+                                          "border-width: 1px;" +
+                                          "border-color: red;" +
+                                          "border-radius: 3px;" +
+                                          "background-color:" +
+                                          "rgb(233,233,233);}")
+            return False
+
+    def nextId(self):
+        ''' [int] Function that determines the next page after the current one
+            - returns integer value and then checks, which value is page"
+            in NUM_PAGES'''
+
+        return Wizard.PageMandatory
+        
+class MandatoryPage(QtWidgets.QWizardPage):
+    def __init__(self, Wizard, parent=None):
+        super(MandatoryPage, self).__init__(parent)
+
+        self.base = Wizard.base
+
+        self.setTitle(self.tr("Mandatory fields"))
+        self.setSubTitle(self.tr("Fill in fields and import "))
+        
         ''' Creating widgets and setting them to layout'''
         self.nameLabel = QLabel("Name<font color=\'red\'>*</font>")
         self.nameEdit = QLineEdit()
@@ -104,78 +230,33 @@ class ImportPage(QtWidgets.QWizardPage):
         self.URLLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.URLLabel.setToolTip("The full URL for more information about the program (e.g. the project website)")
 
-        self.importLabel = QLabel("Source<font color=\'red\'>*</font>")
-        self.importEdit = QLineEdit()
-        self.importEdit.setMinimumHeight(30)
-        self.importLabel.setBuddy(self.importEdit)
-        self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.importLabel.setToolTip("Pristine source package (e.g. tarballs) and patches")
-        self.importEdit.textChanged.connect(self.checkPath)
-        self.importEdit.setMinimumHeight(34)
-
-        self.importButton = QPushButton("Import")
-        self.importButton.setMinimumHeight(45)
-        self.importButton.setMinimumWidth(115)
-        self.importButton.clicked.connect(self.importPath)
-
         # Making mandatory fields:
         self.registerField("Name*", self.nameEdit)
         self.registerField("Summary*", self.summaryEdit)
         self.registerField("Version*", self.versionEdit)
         self.registerField("Release*", self.releaseEdit)
         self.registerField("License*", self.licenseEdit)
-        self.registerField("Source*", self.importEdit)
         self.registerField("Description*", self.descriptionEdit)
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
-        grid.addWidget(self.importLabel, 0, 0, 1, 1)
-        grid.addWidget(self.importEdit, 0, 1, 1, 1)
-        grid.addWidget(self.importButton, 0, 2, 1, 1)
-        grid.addWidget(self.nameLabel, 1, 0, 1, 1)
-        grid.addWidget(self.nameEdit, 1, 1, 1, 3)
-        grid.addWidget(self.versionLabel, 2, 0, 1, 1)
-        grid.addWidget(self.versionEdit, 2, 1, 1, 3)
-        grid.addWidget(self.releaseLabel, 3, 0, 1, 1)
-        grid.addWidget(self.releaseEdit, 3, 1, 1, 3)
-        grid.addWidget(self.licenseLabel, 4, 0, 1, 1)
-        grid.addWidget(self.licenseEdit, 4, 1, 1, 3)
-        grid.addWidget(self.summaryLabel, 5, 0, 1, 1)
-        grid.addWidget(self.summaryEdit, 5, 1, 1, 3)
-        grid.addWidget(self.descriptionLabel, 6, 0, 1, 1)
-        grid.addWidget(self.descriptionEdit, 6, 1, 1, 3)
-        grid.addWidget(self.URLLabel, 7, 0, 1, 1)
-        grid.addWidget(self.URLEdit, 7, 1, 1, 3)
+        grid.addWidget(self.nameLabel, 0, 0)
+        grid.addWidget(self.nameEdit, 0, 1)
+        grid.addWidget(self.versionLabel, 1, 0)
+        grid.addWidget(self.versionEdit, 1, 1)
+        grid.addWidget(self.releaseLabel, 2, 0)
+        grid.addWidget(self.releaseEdit, 2, 1)
+        grid.addWidget(self.licenseLabel, 3, 0)
+        grid.addWidget(self.licenseEdit, 3, 1)
+        grid.addWidget(self.summaryLabel, 4, 0)
+        grid.addWidget(self.summaryEdit, 4, 1)
+        grid.addWidget(self.descriptionLabel, 5, 0)
+        grid.addWidget(self.descriptionEdit, 5, 1)
+        grid.addWidget(self.URLLabel, 6, 0)
+        grid.addWidget(self.URLEdit, 6, 1)
         mainLayout.addSpacing(40)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
-
-    def checkPath(self):
-        ''' Checks, if path to import is correct while typing'''
-        path = Path(self.importEdit.text())
-        if(path.exists()):
-            self.importEdit.setStyleSheet("")
-        else:
-            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
-                                          "border-width: 1px;" +
-                                          "border-color: red;" +
-                                          "border-radius: 3px;" +
-                                          "background-color:" +
-                                          "rgb(233,233,233);}")
-
-    def importPath(self):
-        ''' Returns path selected file or archive'''
-
-        self.import_dialog = DialogImport()
-        self.import_dialog.exec_()
-        if (isinstance(self.import_dialog.filesSelected(), list)):
-            path = self.import_dialog.filesSelected()
-        else:
-            path = self.import_dialog.selectedFiles()
-        try:
-            self.importEdit.setText(path[0])
-        except IndexError:
-            msq = "Source file or archive is not selected"
 
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button
@@ -183,35 +264,22 @@ class ImportPage(QtWidgets.QWizardPage):
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        # Verifying path
-        path = Path(self.importEdit.text())
-        if(path.exists()):
-            self.base.spec.Name = self.nameEdit.text()
-            self.base.spec.Version = self.versionEdit.text()
-            self.base.spec.Release = self.releaseEdit.text()
-            self.base.spec.License = self.licenseEdit.text()
-            self.base.spec.URL = self.URLEdit.text()
-            self.base.spec.Summary = self.summaryEdit.text()
-            self.base.spec.description = self.descriptionEdit.text()
-            self.base.load_project_from_url(self.importEdit.text().strip())
-            self.base.run_raw_sources_analysis()
-            self.importEdit.setStyleSheet("")
-            return True
-        else:
-            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
-                                          "border-width: 1px;" +
-                                          "border-color: red;" +
-                                          "border-radius: 3px;" +
-                                          "background-color:" +
-                                          "rgb(233,233,233);}")
-            return False
+        self.base.spec.Name = self.nameEdit.text()
+        self.base.spec.Version = self.versionEdit.text()
+        self.base.spec.Release = self.releaseEdit.text()
+        self.base.spec.License = self.licenseEdit.text()
+        self.base.spec.URL = self.URLEdit.text()
+        self.base.spec.Summary = self.summaryEdit.text()
+        self.base.spec.description = self.descriptionEdit.text()
+        self.base.run_raw_sources_analysis()
+        return True
 
     def nextId(self):
         ''' [int] Function that determines the next page after the current one
             - returns integer value and then checks, which value is page"
             in NUM_PAGES'''
+        return Wizard.PageScripts
 
-        return Wizard.PagePatches
 
 
 class ScriptsPage(QtWidgets.QWizardPage):
@@ -278,109 +346,6 @@ class ScriptsPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         return Wizard.PageRequires
-
-
-class PatchesPage(QtWidgets.QWizardPage):
-    def __init__(self, Wizard, parent=None):
-        super(PatchesPage, self).__init__(parent)
-
-        self.base = Wizard.base
-
-        self.setTitle(self.tr("Patches, documents and changelog page"))
-        self.setSubTitle(self.tr("\n"))
-
-        self.addButton = QPushButton("+")
-        self.removeButton = QPushButton("-")
-        patchesLabel = QLabel("Patches")
-        patchesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        patchesLabel.setToolTip("Patches should make only one logical change each, so it's quite possible to have multiple patch files")
-        self.listPatches = QListWidget()
-        self.addButton.setMaximumWidth(68)
-        self.addButton.setMaximumHeight(60)
-        self.addButton.clicked.connect(self.openPatchesPageFileDialog)
-        self.removeButton.setMaximumWidth(68)
-        self.removeButton.setMaximumHeight(60)
-        self.removeButton.clicked.connect(self.removeItemFromListWidget)
-
-        documentationFilesLabel = QLabel("Documentation files ")
-        documentationFilesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        documentationFilesLabel.setToolTip("Documentation files that you wish to include")
-        self.addDocumentationButton = QPushButton("+")
-        self.addDocumentationButton.clicked.connect(self.openDocsFileDialog)
-        self.addDocumentationButton.setMaximumWidth(68)
-        self.addDocumentationButton.setMaximumHeight(60)
-        self.removeDocumentationButton = QPushButton("-")
-        self.removeDocumentationButton.setMaximumWidth(68)
-        self.removeDocumentationButton.setMaximumHeight(60)
-        self.openChangelogDialogButton = QPushButton("Changelog")
-        self.openChangelogDialogButton.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.openChangelogDialogButton.setToolTip("Changes in the package. Do NOT put software's changelog at here.This changelog is for RPM itself")
-        self.openChangelogDialogButton.clicked.connect(
-            self.openChangeLogDialog)
-        self.documentationFilesList = QListWidget()
-
-        topLayout = QGridLayout()
-        topLayout.addWidget(patchesLabel, 0, 2)
-        topLayout.addWidget(self.addButton, 0, 0,)
-        topLayout.addWidget(self.removeButton, 0, 1)
-        topLayout.addWidget(self.listPatches, 1, 0, 1, 0)
-
-        mainLayout = QVBoxLayout()
-        upperLayout = QHBoxLayout()
-        midleLayout = QHBoxLayout()
-        lowerLayout = QHBoxLayout()
-        upperLayout.addWidget(self.addDocumentationButton)
-        upperLayout.addWidget(self.removeDocumentationButton)
-        upperLayout.addWidget(documentationFilesLabel)
-        midleLayout.addWidget(self.documentationFilesList)
-        lowerLayout.addWidget(self.openChangelogDialogButton)
-        mainLayout.addLayout(topLayout)
-        mainLayout.addLayout(upperLayout)
-        mainLayout.addLayout(midleLayout)
-        mainLayout.addLayout(lowerLayout)
-        self.setLayout(mainLayout)
-
-    def openChangeLogDialog(self):
-        changelogWindow = QDialog()
-        changelog = DialogChangelog(changelogWindow, self)
-        changelog.exec_()
-
-    def openDocsFileDialog(self):
-        brows = QFileDialog()
-        brows.getOpenFileName(self, "/home")
-
-    def removeItemFromListWidget(self):
-        self.item = self.listPatches.takeItem(self.listPatches.currentRow())
-        self.item = None
-
-    def openPatchesPageFileDialog(self):
-        brows = QFileDialog()
-        self.getPath = brows.getOpenFileName(self,
-                                             "Choose patches",
-                                             "/home",
-                                             "All files (*)")
-        self.newPath = self.getPath[0]
-        self.listPatches.addItem(self.newPath)
-
-    def validatePage(self):
-        self.itemsCount = self.listPatches.count()
-        self.pathes = []
-        for i in range(0, self.itemsCount):
-            self.pathes.append(self.listPatches.item(i).text())
-
-        self.base.apply_patches(self.pathes)
-        self.base.run_patched_sources_analysis()
-
-        self.base.build_project()
-        self.base.run_compiled_analysis()
-        self.base.install_project()
-        self.base.run_installed_analysis()
-
-        return True
-
-    def nextId(self):
-        return Wizard.PageScripts
-
 
 class RequiresPage(QtWidgets.QWizardPage):
     def initializePage(self):
