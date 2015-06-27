@@ -4,25 +4,16 @@ PROJECT (RPG NONE)
 # Python search:
 FIND_PACKAGE (PythonInterp 3.4 REQUIRED)
 
-# QT5 search:
-EXECUTE_PROCESS (COMMAND bash -c "find /lib64 /usr /lib /etc -name qt5 2>/dev/null | tr '\n' ' '" OUTPUT_VARIABLE QT5_SEARCH)
-IF (QT5_SEARCH)
-    MESSAGE (STATUS "QT5 exists")
-ELSE ()
-    MESSAGE (FATAL_ERROR "QT5 is missing!")
-ENDIF ()
-
-# QT5Base search:
-EXECUTE_PROCESS (COMMAND bash -c "find /lib64 /usr /lib /etc -path '*qt5*qtbase*' 2>/dev/null | tr '\n' ' '" OUTPUT_VARIABLE QT5BASE_SEARCH)
-IF (QT5BASE_SEARCH)
-    MESSAGE (STATUS "QT5Base exists")
-ELSE ()
-    MESSAGE (FATAL_ERROR "QT5Base is missing!")
-ENDIF ()
-
 # Python3QT5 search:
-EXECUTE_PROCESS (COMMAND bash -c "find /lib64 /usr /lib /etc -name python3-qt5 2>/dev/null | tr '\n' ' '" OUTPUT_VARIABLE PYTHON3QT5_SEARCH)
-IF (PYTHON3QT5_SEARCH)
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c 
+    "from PyQt5 import QtWidgets, QtCore, QtGui\n"
+    "from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit,"
+                                 "QCheckBox, QGroupBox, QPushButton,"
+                                 "QGridLayout, QTextEdit, QListWidget,"
+                                 "QHBoxLayout, QDialog, QFileDialog,"
+                                 "QTreeWidget, QTreeWidgetItem)"
+                RESULT_VARIABLE PYTHON3QT5_SEARCH)
+IF (NOT PYTHON3QT5_SEARCH)
     MESSAGE (STATUS "Python3QT5 exists")
 ELSE ()
     MESSAGE (FATAL_ERROR "Python3QT5 is missing!")
@@ -45,7 +36,7 @@ ELSE ()
 ENDIF ()
 
 # coreutils search:
-EXECUTE_PROCESS (COMMAND bash -c "find /lib64 /usr /lib /etc -name coreutils 2>/dev/null | tr '\n' ' '" OUTPUT_VARIABLE COREUTILS_SEARCH)
+FIND_PROGRAM (COREUTILS_SEARCH cat)
 IF (COREUTILS_SEARCH)
     MESSAGE (STATUS "CoreUtils exists")
 ELSE ()
@@ -53,7 +44,7 @@ ELSE ()
 ENDIF ()
 
 # rpmdevtools search:
-EXECUTE_PROCESS (COMMAND bash -c "find /lib64 /usr /lib /etc -path '*rpmdevtools' 2>/dev/null | tr '\n' ' '" OUTPUT_VARIABLE RPMDEVTOOLS_SEARCH)
+FIND_PROGRAM(RPMDEVTOOLS_SEARCH rpmbuild)
 IF (RPMDEVTOOLS_SEARCH)
     MESSAGE (STATUS "Rpm developer tools exists")
 ELSE ()
