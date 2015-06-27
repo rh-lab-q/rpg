@@ -59,6 +59,5 @@ class Command:
 
 
 def cmd_output(cmdlines, binary=False):
-    output = check_output(["/bin/sh", "-c", " 2>/dev/null && ".join(cmdlines) +
-                           " 2>/dev/null" ])
+    output = check_output(["/bin/sh", "-c", " && ".join(cmdlines)])
     return output if binary else output.decode('utf-8')
