@@ -18,8 +18,10 @@ class FilesToPkgsPlugin(Plugin):
         def _uniq(_list):
             return list(set(_list))
 
-        _query = sack.query().available()
-        logging.info("Resolving Requires")
-        spec.Requires = _uniq(_resolve(spec.required_files, _query))
-        logging.info("Resolving BuildRequires")
-        spec.BuildRequires = _uniq(_resolve(spec.build_required_files, _query))
+        if sack:
+            _query = sack.query().available()
+            logging.info("Resolving Requires")
+            spec.Requires += _uniq(_resolve(spec.required_files, _query))
+            logging.info("Resolving BuildRequires")
+            spec.BuildRequires += _uniq(_resolve(spec.build_required_files,
+                                                 _query))
