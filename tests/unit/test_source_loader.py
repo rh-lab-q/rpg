@@ -4,7 +4,7 @@ from os import remove
 from pathlib import Path
 from rpg.command import Command
 from rpg.source_loader import SourceLoader
-from support import RpgTestCase
+from tests.support import RpgTestCase
 from shutil import rmtree
 from unittest import expectedFailure
 
@@ -25,11 +25,10 @@ class SourceLoaderTest(RpgTestCase):
 
         self._download = self._tar_temp / "download.tar.gz"
 
-        if not path.isdir(str(self._tar_temp)):
-            makedirs(str(self._tar_temp))
-            makedirs(str(self._tar_extracted))
-        else:
+        if path.isdir(str(self._tar_temp)):
             rmtree(str(self._tar_temp))
+        makedirs(str(self._tar_temp))
+        makedirs(str(self._tar_extracted))
 
     def tearDown(self):
         if self._tar:
@@ -97,18 +96,6 @@ class SourceLoaderTest(RpgTestCase):
             self.md5Dir(self._tar_dir))
         self.assertExistInDir(["sample.tar.gz", "sample.tar.xz"],
                               self._tar_extracted)
-
-    def test_git_download(self):
-        SourceLoader.download_git_repo(
-            "https://github.com/rh-lab-q/rpg",
-            self._download)
-        self.assertTrue(Path(str(self._download)).exists())
-
-    def test_download(self):
-        SourceLoader.download_archive(
-            "https://github.com/rh-lab-q/rpg/archive/master.tar.gz",
-            self._download)
-        self.assertTrue(Path(str(self._download)).exists())
 
     @expectedFailure
     def test_tar_xz_method_fail(self):

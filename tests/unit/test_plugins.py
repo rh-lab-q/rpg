@@ -1,4 +1,4 @@
-from support import PluginTestCase
+from tests.support import PluginTestCase
 from rpg.plugins.lang.python import PythonPlugin
 from rpg.plugins.misc.find_patch import FindPatchPlugin, _is_patch
 from rpg.plugins.misc.find_file import FindFilePlugin

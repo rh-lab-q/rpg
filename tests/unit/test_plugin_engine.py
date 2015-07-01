@@ -1,4 +1,4 @@
-from support import PluginTestCase
+from tests.support import PluginTestCase
 from rpg import plugin_engine as engine
 from tests.project.py.plugin0 import TestPlugin
 from unittest import mock

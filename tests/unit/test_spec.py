@@ -1,4 +1,4 @@
-from support import RpgTestCase
+from tests.support import RpgTestCase
 from rpg.spec import Spec
 from rpg.command import Command
 

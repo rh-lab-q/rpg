@@ -1,5 +1,5 @@
 from pathlib import Path
-from support import RpgTestCase
+from tests.support import RpgTestCase
 from rpg.command import Command
 import subprocess
 

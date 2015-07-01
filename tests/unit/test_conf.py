@@ -1,5 +1,5 @@
 import sys
-from support import RpgTestCase
+from tests.support import RpgTestCase
 from rpg.conf import Conf
 
 
