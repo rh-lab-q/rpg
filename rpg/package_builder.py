@@ -1,6 +1,4 @@
 from os.path import expanduser
-from subprocess import call
-from rpg.utils import copy_file
 from rpg.command import Command
 
 
@@ -23,14 +21,13 @@ class PackageBuilder(object):
         """builds RPM package with build_srpm and build_rpm"""
 
         # Build srpm pakcage from given spec_file and tarball
-        call(["rpmdev-setuptree", ""])
-        home = expanduser("~")
-        Command("cp " + str(tarball) + " " + home + "/rpmbuild/SOURCES")\
-            .execute()
+        Command("rpmdev-setuptree").execute()
+        Command("cp " + str(tarball) +
+                ' $(rpm --eval "%{_topdir}")/SOURCES').execute()
         output = Command("rpmbuild -bs " + str(spec_file)).execute()
         Command("mv " + str(output.split()[-1]) +
                 " " + str(output_file)).execute()
-                
+
     def fetch_repos(self, dist, arch):
         config_file = dist + '-' + arch
         Command("mock --init --no-clean -r " + config_file).execute()
