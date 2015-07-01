@@ -29,7 +29,14 @@ echo "SRPM created: $srpm"
 echo -en "travis_fold:start:$package_basename-mock\\r"
 echo "Running mock"
 # build SRPM
-sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild $srpm
+sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild $srpm &
+proc_id=$!
+minutes=0
+while ! kill -0 ${proc_id}; do
+	sleep 60
+	minutes=$((min+1))
+	echo "Mock is working ${minutes}"
+done
 status=$?
 echo -en "travis_fold:end:$package_basename-mock\\r"
 if [ $status -eq 0 ] ; then
