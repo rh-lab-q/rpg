@@ -22,7 +22,7 @@ You need these packages in order to satisfy RPG dependencies:
 * python3-nose (for tests)
 * python3-argcomplete (optional)
 * python3-dnf  (optional)
-* copr-cli (optional)
+* python3-copr (optional)
 
 Building in Fedora 21+
 ======================

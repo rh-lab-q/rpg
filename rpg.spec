@@ -24,7 +24,7 @@ Requires:       rpmdevtools
 %if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
-Recommends:     copr-cli
+Recommends:     python3-copr
 %endif
 
 %description

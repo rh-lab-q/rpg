@@ -5,6 +5,7 @@ from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.project_builder import ProjectBuilder
 from rpg.copr_uploader import CoprUploader
+from copr.client import CoprClient
 from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
@@ -186,16 +187,14 @@ class Base(object):
                                     self.spec.build)
 
     def copr_set_config(self, username, login, token):
-        self.copr = CoprUploader()
-        self.copr.setup_config(username, login, token)
+        self.cl = CoprClient(username, login, token, copr_url="http://copr.fedoraproject.org")
 
     def copr_create_project(self, name, chroots, desc, intro):
-        self.copr = CoprUploader()
-        self.copr.create_copr(name, chroots, desc, intro)
+        self.cl.create_project(
+            name, chroots=chroots, description=desc, instructions=intro)
 
     def copr_build(self, name, url):
-        self.copr = CoprUploader()
-        self.copr.build_copr(name, url)
+        self.cl.create_new_build(name, pkgs=[url,])
 
     @staticmethod
     def compute_checksum(sources):
