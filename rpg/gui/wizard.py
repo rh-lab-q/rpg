@@ -276,6 +276,11 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.base.spec.Summary = self.summaryEdit.text()
         self.base.spec.description = self.descriptionEdit.text()
         self.base.run_raw_sources_analysis()
+        self.base.run_patched_sources_analysis()
+        self.base.build_project()
+        self.base.run_compiled_analysis()
+        self.base.install_project()
+        self.base.run_installed_analysis()
         return True
 
     def nextId(self):
@@ -283,7 +288,6 @@ class MandatoryPage(QtWidgets.QWizardPage):
             - returns integer value and then checks, which value is page"
             in NUM_PAGES'''
         return Wizard.PageScripts
-
 
 
 class ScriptsPage(QtWidgets.QWizardPage):
