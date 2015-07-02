@@ -4,7 +4,6 @@ import platform
 from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.project_builder import ProjectBuilder
-from rpg.copr_uploader import CoprUploader
 from copr.client import CoprClient
 from rpg.package_builder import PackageBuilder
 from rpg.source_loader import SourceLoader
@@ -31,7 +30,6 @@ class Base(object):
         self.sack = None
         self._package_builder = PackageBuilder()
         self._source_loader = SourceLoader()
-        self._copr_uploader = CoprUploader()
 
     def dnf_load_sack(self):
         logging.info('DNF sack is loading')
