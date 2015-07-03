@@ -7,7 +7,7 @@ from rpg.command import Command
 from shutil import rmtree
 from shutil import copytree
 from tempfile import mkdtemp
-from urllib.request import urlopen
+import urllib
 
 
 class SourceLoader(object):
@@ -135,27 +135,23 @@ class SourceLoader(object):
             callback)
 
     @classmethod
-    def download_archive(cls, url, arch_name,
-                         callback=None):
+    def download_archive(cls, url, arch_name, retreat_counter=0):
         """ Download file from 'url' and sets file name to 'arch_name'
             Every progress change will call callback function """
-        header_error = True
-        while header_error:
-            with open(str(arch_name), 'wb') as out_handle,\
-                    urlopen(url) as in_handle:
-                try:
-                    file_size = int(in_handle.info()['Content-Length'])
-                except TypeError:
-                    continue
-                progress = 0
-                buff = in_handle.read(cls._download_block_size)
-                while buff:
-                    out_handle.write(buff)
-                    progress += len(buff)
-                    if callback:
-                        callback(progress, file_size)
-                    buff = in_handle.read(cls._download_block_size)
-                header_error = False
+        if retreat_counter == 10:
+            raise RuntimeError("Can't download '{}' - 10 times retreated"
+                               .format(url))
+        else:
+            try:
+                with open(str(arch_name), 'wb') as out_handle,\
+                        urllib.request.urlopen(url) as in_handle:
+                    while True:
+                        buff = in_handle.read(cls._download_block_size)
+                        if buff:
+                            break
+                        out_handle.write(buff)
+            except:
+                cls.download_archive(url, arch_name, retreat_counter + 1)
 
     @staticmethod
     def _copy_dir(path, ex_dir):
