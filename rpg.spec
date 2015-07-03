@@ -6,8 +6,11 @@ License:        GPLv2
 URL:            https://github.com/rh-lab-q/rpg
 Source:         %{name}-%{version}.tar.gz
 BuildRequires:  cmake
-BuildRequires:  python3-devel
 BuildRequires:  python3-nose
+BuildRequires:  python3-devel
+BuildRequires:  python3 >= 3.4
+BuildRequires:  python3-qt5
+BuildRequires:  qt5-qtbase-gui
 BuildRequires:  coreutils
 BuildRequires:  file
 BuildRequires:  makedepend
