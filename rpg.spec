@@ -16,6 +16,8 @@ BuildRequires:  coreutils
 BuildRequires:  file
 BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
+BuildRequires:  python3-copr
+BuildRequires:  python3-hawkey
 BuildArch:      noarch
 
 Requires:       python3 >= 3.4
