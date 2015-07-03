@@ -10,6 +10,7 @@ BuildRequires:  python3-nose
 BuildRequires:  python3-devel
 BuildRequires:  python3 >= 3.4
 BuildRequires:  python3-qt5
+BuildRequires:  python3-copr
 BuildRequires:  qt5-qtbase-gui
 BuildRequires:  coreutils
 BuildRequires:  file

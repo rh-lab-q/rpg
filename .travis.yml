@@ -1,3 +1,4 @@
+lang: python
 branches:
   only:
   - master
