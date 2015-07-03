@@ -24,20 +24,28 @@ package_basename=$(basename $package)
 # process package
 echo -en "travis_fold:start:$package_basename-build\\r"
 echo "Building $package_basename"
-srpm=$(tito build --srpm --test | awk 'NF{p=$0}END{print p}' | sed 's/^Wrote: //g')
+srpm=$(tito build --srpm --test)
+tito_ret=$?
+srpm=$(echo "$srpm" | awk 'NF{p=$0}END{print p}' | sed 's/^Wrote: //g')
+if [ $tito_ret -ne 0 ]; then
+	echo "Tito failed to create SRPM"
+	exit $tito_ret
+fi
 echo "SRPM created: $srpm"
 echo -en "travis_fold:start:$package_basename-mock\\r"
 echo "Running mock"
 # build SRPM
-sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild $srpm &
-proc_id=$!
-minutes=0
-while ! kill -0 ${proc_id}; do
-	sleep 60
-	minutes=$((min+1))
-	echo "Mock is working ${minutes}"
+sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild $srpm >temp.mock_out 2>&1 &
+mock_pid=$!
+secs=0
+while ps -p $mock_pid > /dev/null; do
+	sleep 1
+	printf "\r>>> Mock is working -- %02d:%02d <<<" $((secs++/60)) $((secs%60))
 done
+printf "\r"
+wait $mock_pid
 status=$?
+cat temp.mock_out
 echo -en "travis_fold:end:$package_basename-mock\\r"
 if [ $status -eq 0 ] ; then
     echo "Building $package_basename succeeded"
