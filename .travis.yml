@@ -4,8 +4,6 @@ branches:
   - master
 notifications:
   email:
-    recipients:
-    - jsilhan@redhat.com
     on_success: never
     on_failure: always
 sudo: required
@@ -16,6 +14,7 @@ before_install:
 - git clone https://git.fedorahosted.org/git/copr.git /tmp/copr
 install:
 - sudo apt-get install mock pigz python-lzma
+- sudo pip install flake8 flake8-diff
 - sudo pip install /tmp/tito.tar.gz
 - cd /tmp/copr/python
 - sudo pip install -r requirements.txt
@@ -28,4 +27,3 @@ before_script:
 - git config user.email "travis@localhost" && git config user.name "Travis"
 script: rel-eng/travis/build.sh
 after_success: rel-eng/travis/upload.sh
-

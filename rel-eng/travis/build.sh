@@ -28,8 +28,8 @@ srpm=$(tito build --srpm --test)
 tito_ret=$?
 srpm=$(echo "$srpm" | awk 'NF{p=$0}END{print p}' | sed 's/^Wrote: //g')
 if [ $tito_ret -ne 0 ]; then
-	echo "Tito failed to create SRPM"
-	exit $tito_ret
+    echo "Tito failed to create SRPM"
+    exit $tito_ret
 fi
 echo "SRPM created: $srpm"
 echo -en "travis_fold:start:$package_basename-mock\\r"
@@ -39,8 +39,8 @@ sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild
 mock_pid=$!
 secs=0
 while ps -p $mock_pid > /dev/null; do
-	sleep 1
-	printf "\r>>> Mock is working -- %02d:%02d <<<" $((secs++/60)) $((secs%60))
+    sleep 1
+    printf "\r>>> Mock is working -- %02d:%02d <<<" $((secs++/60)) $((secs%60))
 done
 printf "\r"
 wait $mock_pid
@@ -70,5 +70,17 @@ echo -en "travis_fold:end:$package_basename-state-log\\r"
 
 STATUS_ALL=$((STATUS_ALL+status))
 echo -en "travis_fold:end:$package_basename-build\\r"
+
+if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
+    echo -en "travis_fold:start:flake8\\r"
+    echo "flake8"
+    flake8 .
+    echo -en "travis_fold:end:flake8\\r"
+else
+    echo -en "travis_fold:start:flake8-diff\\r"
+    echo "flake8-diff"
+    flake8-diff
+    echo -en "travis_fold:end:flake8-diff\\r"
+fi
 
 exit $STATUS_ALL
