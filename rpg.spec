@@ -10,6 +10,8 @@ BuildRequires:  python3-nose
 BuildRequires:  python3-devel
 BuildRequires:  python3 >= 3.4
 BuildRequires:  python3-qt5
+BuildRequires:  python3-copr
+BuildRequires:  python-sphinx
 BuildRequires:  qt5-qtbase-gui
 BuildRequires:  coreutils
 BuildRequires:  file
@@ -43,6 +45,7 @@ advanced users can use our tool for a quick creation of a package.
 
 %build
 %cmake .
+make doc-man
 
 %post
 activate-global-python-argcomplete
@@ -58,6 +61,7 @@ make ARGS="-V" test
 %files
 %{_bindir}/rpg
 %{python3_sitelib}/rpg/
+%{_mandir}/man8/rpg.8.gz
 
 %changelog
 * Fri Jul 03 2015 Jan Silhan <jsilhan@redhat.com> 0.0.2-1

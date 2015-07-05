@@ -74,3 +74,6 @@ MESSAGE (STATUS "Installing to dir '${PYTHON_INSTALL_DIR}'")
 # Installation:
 ADD_SUBDIRECTORY (rpg)
 INSTALL (PROGRAMS "rpg.py" DESTINATION bin RENAME rpg)
+
+# Documentation:
+ADD_SUBDIRECTORY (doc)
