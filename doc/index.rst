@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 1
 
    command_ref
-   conf_ref
 
 Indices and tables
 ==================
