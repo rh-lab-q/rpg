@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 1
 
    command_ref
+   api_base
+   api_spec
 
 Indices and tables
 ==================
@@ -19,4 +21,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

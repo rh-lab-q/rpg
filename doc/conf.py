@@ -2,16 +2,11 @@ import sys
 import os
 import re
 
-
-_dirname = os.path.dirname(__file__)
-
-sys.path.insert(0, _dirname)
+sys.path.insert(0,os.path.abspath('../rpg'))
 
 AUTHORS=[u'See AUTHORS in RPG source distribution.']
 
-extensions = []
-
-templates_path = ['_templates']
+extensions = ['sphinx.ext.autodoc']
 
 source_suffix = '.rst'
 
@@ -41,8 +36,6 @@ latex_documents = [
 ]
 
 man_pages = [
-    #('index', 'rpg', u'rpg Documentation',
-    # AUTHORS, 1),
     ('command_ref', 'rpg', u'RPG Command Reference',
      AUTHORS, 8),
 ]
@@ -52,4 +45,17 @@ texinfo_documents = [
    AUTHORS[0], 'rpg', 'Tool used for creation of RPM packages',
    'Miscellaneous'),
 ]
+
+
+# Fix of module ImportErrors
+class Mock(object):
+    def __init__(self, *args):
+        pass
+ 
+    def __getattr__(self, name):
+        return Mock
+ 
+for mod_name in ('pathlib', 'copr', 'copr.client', 'urllib', 'urllib.request'):
+    sys.modules[mod_name] = Mock()
+
 
