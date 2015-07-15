@@ -32,4 +32,4 @@ class PackageBuilder(object):
     def fetch_repos(self, dist, arch):
         logging.info("New thread for fetch repos started")
         config_file = dist + '-' + arch
-        Command("mock --init --no-clean -r " + config_file).execute()
+        Command("mock --init -r " + config_file).execute()
