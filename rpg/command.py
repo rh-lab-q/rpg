@@ -34,7 +34,7 @@ class Command:
         if isinstance(cmdline, list):
             self._command_lines.extend(cmdline)
         elif isinstance(cmdline, str):
-            self._command_lines.extend(cmdline.split("\n"))
+            self._command_lines.extend(cmdline.strip().split("\n"))
         else:
             msg = "Only list of command strings or command string is accepted"
             raise TypeError(msg)

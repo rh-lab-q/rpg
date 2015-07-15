@@ -40,3 +40,7 @@ class PluginEngineTest(RpgTestCase):
         cmd1 = Command("test")
         cmd2 = Command("test")
         self.assertEqual(cmd1, cmd2)
+
+    def test_new_line(self):
+        cmd = Command("a\nb\n")
+        self.assertEqual("a\nb", str(cmd))
