@@ -1,10 +1,6 @@
 import argparse
 import logging
 from os import path
-try:
-    import argcomplete
-except ImportError:
-    pass
 
 class Conf:
 
@@ -31,8 +27,9 @@ class Conf:
             '--disable-dnf', dest='load_dnf', action='store_false',
             default=True, help='Disable loading DNF sack')
         try:
+            import argcomplete
             argcomplete.autocomplete(self.parser)
-        except:
+        except ImportError:
             pass
         args = self.parser.parse_args()
         self.load_dnf = args.load_dnf
