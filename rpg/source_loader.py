@@ -124,15 +124,13 @@ class SourceLoader(object):
         return (arch_t.group(1), arch_t.group(2))
 
     @classmethod
-    def download_git_repo(cls, url, arch_name,
-                          callback=None, branch='master'):
+    def download_git_repo(cls, url, arch_name, branch='master'):
         """ Downloads archive from github (url) """
         compr = cls._get_compression_method(str(arch_name))
         cls.download_archive(
             str(url) + "/archive/" + branch + "." + compr[0] +
             (("." + compr[1]) if compr[1] else ""),
-            arch_name,
-            callback)
+            arch_name)
 
     @classmethod
     def download_archive(cls, url, arch_name, retreat_counter=0):
