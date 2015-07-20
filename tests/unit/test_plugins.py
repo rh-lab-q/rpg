@@ -65,6 +65,8 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/translation/CZ.mo', None, None),
                  ('/libs/libstatic.a', None, None),
                  ('/libs/libdynamic.so.1', None, None),
+                 ('/srpm/test.src.rpm', None, None),
+                 ('/srpm/fail.src.rpm', None, None),
                  ('/archives/sample.tar.gz', None, None),
                  ('/archives/sample.tar.xz', None, None),
                  ('/Makefile', None, None),
@@ -77,7 +79,8 @@ class FindPatchPluginTest(PluginTestCase):
                     ('/translation/__pycache__/', r'%exclude', None),
                     ('/libs/__pycache__/', r'%exclude', None),
                     ('/archives/__pycache__/', r'%exclude', None),
-                    ('/__pycache__/', r'%exclude', None)]
+                    ('/__pycache__/', r'%exclude', None),
+                    ('/srpm/__pycache__/', '%exclude', None)]
         sorted_files = sorted(files + excludes, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)

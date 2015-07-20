@@ -1,21 +1,10 @@
-from os.path import expanduser
-from rpg.command import Command
 import logging
+import re
+from rpg.command import Command
+import subprocess
 
 
 class PackageBuilder(object):
-
-    @staticmethod
-    def _parse_error(log_path):
-        _ret = []
-        build_log = open(log_path + "/build.log", "r")
-        write = False
-        for line in build_log:
-            if not write:
-                write = "EXCEPTION" in str(line)
-            if write:
-                _ret.append(str(line).replace('\n', ''))
-        return _ret
 
     @staticmethod
     def build_srpm(spec_file, tarball, output_file):
@@ -29,7 +18,36 @@ class PackageBuilder(object):
         Command("mv " + str(output.split()[-1]) +
                 " " + str(output_file)).execute()
 
-    def fetch_repos(self, dist, arch):
+    @staticmethod
+    def build_rpm(srpm, distro, arch):
+
+        def check_output(proc):
+            while proc.poll() is None:
+                line = proc.stdout.readline().decode("utf-8")
+                print(line)
+                if re.search(r"[eE][rR][rR][oO][rR]|" +
+                             r"[eE][xX][cC][eE][pP][tT][iI][oO][nN]",
+                             line):
+                    yield line
+
+        return list(
+            check_output(
+                subprocess.Popen(
+                    [
+                        "mock", "--no-clean",
+                        "--no-cleanup-after",
+                        "--verbose",
+                        "--root", distro + '-' + arch,
+                        "--rebuild", srpm
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT
+                )
+            )
+        )
+
+    @staticmethod
+    def fetch_repos(dist, arch):
         logging.info("New thread for fetch repos started")
         config_file = dist + '-' + arch
         Command("mock --init -r " + config_file).execute()
