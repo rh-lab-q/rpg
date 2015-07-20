@@ -196,9 +196,9 @@ class Spec(Subpackage):
         )
 
     def _write_changelog(self, out):
-        print("\n%changelog", file=out)
+        out.write("\n%changelog")
         for changelog in self.changelogs:
-            print("{}\n".format(changelog), file=out)
+            out.write("{}\n".format(changelog))
 
     def load(source_file):
         pass
