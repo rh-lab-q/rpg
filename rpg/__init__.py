@@ -11,6 +11,7 @@ from rpg.spec import Spec
 from rpg.command import cmd_output
 from rpg.command import Command
 from rpg.conf import Conf
+from re import search
 from os.path import isdir
 from os import makedirs
 from os import geteuid
@@ -120,7 +121,7 @@ class Base(object):
         """executed in background after dir/tarball/SRPM selection"""
         path = Path(path)
         temp_arch = "downloaded_archive.tar.gz"
-        if "github" in str(path):
+        if search(r"github\.com/[^/]+/[^/]+/?$", str(path)):
             self._source_loader.download_git_repo(str(path), temp_arch)
         elif str(path).startswith("http"):
             self._source_loader.download_archive(str(path), temp_arch)
