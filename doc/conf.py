@@ -1,10 +1,10 @@
 import sys
 import os
-import re
 
-sys.path.insert(0,os.path.abspath('../rpg'))
 
-AUTHORS=[u'See AUTHORS in RPG source distribution.']
+sys.path.insert(0, os.path.abspath('../rpg'))
+
+AUTHORS = [u'See AUTHORS in RPG source distribution.']
 
 extensions = ['sphinx.ext.autodoc']
 
@@ -31,8 +31,8 @@ htmlhelp_basename = 'rpgdoc'
 latex_elements = {}
 
 latex_documents = [
-  ('index', 'rpg.tex', u'rpg Documentation',
-   AUTHORS[0], 'manual'),
+    ('index', 'rpg.tex', u'rpg Documentation',
+     AUTHORS[0], 'manual'),
 ]
 
 man_pages = [
@@ -41,9 +41,9 @@ man_pages = [
 ]
 
 texinfo_documents = [
-  ('index', 'rpg', u'rpg Documentation',
-   AUTHORS[0], 'rpg', 'Tool used for creation of RPM packages',
-   'Miscellaneous'),
+    ('index', 'rpg', u'rpg Documentation',
+     AUTHORS[0], 'rpg', 'Tool used for creation of RPM packages',
+     'Miscellaneous'),
 ]
 
 
@@ -51,11 +51,9 @@ texinfo_documents = [
 class Mock(object):
     def __init__(self, *args):
         pass
- 
+
     def __getattr__(self, name):
         return Mock
- 
+
 for mod_name in ('pathlib', 'copr', 'copr.client', 'urllib', 'urllib.request'):
     sys.modules[mod_name] = Mock()
-
-
