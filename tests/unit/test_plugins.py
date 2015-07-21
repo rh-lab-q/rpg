@@ -84,6 +84,7 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/srpm/fail.src.rpm', None, None),
                  ('/archives/sample.tar.gz', None, None),
                  ('/archives/sample.tar.xz', None, None),
+                 ('/archives/rpg-0.0.2-1.tar.gz', None, None),
                  ('/Makefile', None, None),
                  ('/py/requires/sourcecode2.py', None, None),
                  ('/mock_project/mock-1.0.tar.gz', None, None),
