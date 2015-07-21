@@ -55,5 +55,7 @@ class Mock(object):
     def __getattr__(self, name):
         return Mock
 
-for mod_name in ('pathlib', 'copr', 'copr.client', 'urllib', 'urllib.request'):
+for mod_name in ('pathlib', 'copr', 'copr.client',
+                 'urllib', 'urllib.request',
+                 'urllib.parse', 'urllib.error'):
     sys.modules[mod_name] = Mock()
