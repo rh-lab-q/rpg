@@ -63,6 +63,6 @@ class SourceLoaderLongTest(RpgTestCase):
     @mock.patch('subprocess.PIPE', new=MockedSubprocess.PIPE)
     @mock.patch('subprocess.STDOUT', new=MockedSubprocess.STDOUT)
     def test_rpm_build_err_parse(self):
-        self.assertEqual(sorted(PackageBuilder.build_rpm("", "", "")),
+        self.assertEqual(sorted(PackageBuilder().build_rpm("", "", "")),
                          sorted([text.decode("utf-8")
                                  for text in MockedSubprocess.ErrorText]))

@@ -8,23 +8,22 @@ import os
 
 class FakeBase(Base):
 
-    def __init__(self):
-        pass
-
     base_dir = Path(RpgTestCase.test_project_dir / "hello_project")
-    _package_builder = PackageBuilder()
     project_name = "hello"
-    spec = Spec()
-    spec.Name = "hello"
-    spec.Version = "1.4"
-    spec.Release = "1%{?dist}"
-    spec.Summary = "Hello World test program"
-    spec.License = "GPLv2"
-    spec.Source = "hello-1.4.tar.gz"
-    spec.description = "Hello World C project for testing RPG."
-    spec.prep = r'%autosetup'
-    spec.build = "make"
-    spec.install = r"make install DESTDIR=%{RPM_BUILD_ROOT}"
+
+    def __init__(self):
+        self._package_builder = PackageBuilder()
+        self.spec = Spec()
+        self.spec.Name = "hello"
+        self.spec.Version = "1.4"
+        self.spec.Release = "1%{?dist}"
+        self.spec.Summary = "Hello World test program"
+        self.spec.License = "GPLv2"
+        self.spec.Source = "hello-1.4.tar.gz"
+        self.spec.description = "Hello World C project for testing RPG."
+        self.spec.prep = r'%autosetup'
+        self.spec.build = "make"
+        self.spec.install = r"make install DESTDIR=%{RPM_BUILD_ROOT}"
 
 
 class BuildSrpmTest(RpgTestCase):

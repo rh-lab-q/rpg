@@ -70,7 +70,8 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/archives/sample.tar.gz', None, None),
                  ('/archives/sample.tar.xz', None, None),
                  ('/Makefile', None, None),
-                 ('/py/requires/sourcecode2.py', None, None)]
+                 ('/py/requires/sourcecode2.py', None, None),
+                 ('/mock_project/mock-1.0.tar.gz', None, None)]
         excludes = [('/patch/__pycache__/', r'%exclude', None),
                     ('/c/__pycache__/', r'%exclude', None),
                     ('/hello_project/__pycache__/', r'%exclude', None),
@@ -80,7 +81,8 @@ class FindPatchPluginTest(PluginTestCase):
                     ('/libs/__pycache__/', r'%exclude', None),
                     ('/archives/__pycache__/', r'%exclude', None),
                     ('/__pycache__/', r'%exclude', None),
-                    ('/srpm/__pycache__/', '%exclude', None)]
+                    ('/srpm/__pycache__/', '%exclude', None),
+                    ('/mock_project/__pycache__/', '%exclude', None)]
         sorted_files = sorted(files + excludes, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)
