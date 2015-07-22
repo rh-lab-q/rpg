@@ -6,7 +6,8 @@ import logging
 class MakePlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
-        if (project_dir / "Makefile").is_file():
+        if (project_dir / "Makefile").is_file() or\
+                (project_dir / "makefile").is_file():
             spec.BuildRequires.add("make")
             logging.debug('Makefile found')
 
