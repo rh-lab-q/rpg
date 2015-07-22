@@ -19,6 +19,7 @@ BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
 BuildRequires:  python3-copr
 BuildRequires:  python3-hawkey
+BuildRequires:  mock
 BuildArch:      noarch
 
 Requires:       python3 >= 3.4
@@ -28,6 +29,7 @@ Requires:       coreutils
 Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
+Requires:       mock
 %if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
@@ -56,7 +58,8 @@ make install DESTDIR=%{RPM_BUILD_ROOT}
 %make_install
 
 %check
-make ARGS="-V" test
+make ARGS="-V" test-unit
+make ARGS="-V" test-long
 
 %files
 %{_bindir}/rpg
