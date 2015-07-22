@@ -14,6 +14,11 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
     COMMIT_RANGE=$TRAVIS_COMMIT_RANGE
 else
     COMMIT_RANGE=$TRAVIS_BRANCH...FETCH_HEAD
+    git rebase origin/master >/dev/null
+    if [ $? -eq 1 ]; then
+        echo "Failed to rebase!"
+        exit 1
+    fi
 fi
 
 echo "Commit range: $COMMIT_RANGE"
