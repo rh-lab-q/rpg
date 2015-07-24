@@ -25,9 +25,9 @@ class CPlugin(Plugin):
         regex2 = compile(str(project_dir) + ".*")
         unlink(file_name + ".bak")
         with open(file_name, "r") as f:
-            _ret_paths = list(set([path.dirname(s) for s in f.read().split()
-                                   if regex.match(s) and not regex2.match(s)]))
+            _ret_paths = set([path.dirname(s) for s in f.read().split()
+                            if regex.match(s) and not regex2.match(s)])
         unlink(file_name)
 
-        spec.required_files += _ret_paths
-        spec.build_required_files += _ret_paths
+        spec.required_files = spec.required_files.union(_ret_paths)
+        spec.build_required_files = spec.build_required_files.union(_ret_paths)

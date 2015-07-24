@@ -15,13 +15,10 @@ class FilesToPkgsPlugin(Plugin):
                                 "For '{}' have not been found any package"
                                 .format(_file))
 
-        def _uniq(_list):
-            return list(set(_list))
-
         if sack:
             _query = sack.query().available()
             logging.info("Resolving Requires")
-            spec.Requires += _uniq(_resolve(spec.required_files, _query))
+            spec.Requires = spec.Requires.union(set(_resolve(spec.required_files, _query)))
             logging.info("Resolving BuildRequires")
-            spec.BuildRequires += _uniq(_resolve(spec.build_required_files,
-                                                 _query))
+            spec.BuildRequires = spec.BuildRequires.union(set(_resolve(spec.build_required_files,
+                                                 _query)))

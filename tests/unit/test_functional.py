@@ -36,7 +36,7 @@ class FunctionalTest(RpgTestCase):
             "hello"
         ]
         base.run_installed_analysis()
-        self.assertEqual(["make"], base.spec.BuildRequires)
+        self.assertEqual(set(["make"]), base.spec.BuildRequires)
         self.assertEqual(expected_required_files,
                          set(base.spec.required_files))
         self.assertEqual(expected_build_required_files,

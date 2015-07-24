@@ -7,7 +7,7 @@ class CMakePlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
         if (project_dir / "CMakeLists.txt").is_file():
-            spec.BuildRequires.append("cmake")
+            spec.BuildRequires.add("cmake")
             logging.debug('CMakeLists.txt found')
             build = Command()
             build.append("cmake .")

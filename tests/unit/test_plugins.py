@@ -113,28 +113,23 @@ class FindPatchPluginTest(PluginTestCase):
         imports = [("/usr/lib{0}/python{1}.{2}/" +
                     "lib-dynload/math.cpython-{1}{2}m.so")
                    .format(arch, version.major, version.minor)]
-        self.spec.required_files.sort()
-        imports.sort()
-        self.assertEqual(self.spec.required_files, imports)
+        self.assertEqual(self.spec.required_files, set(imports))
 
     def test_files_to_pkgs(self):
         ftpp = FilesToPkgsPlugin()
-        self.spec.required_files = [
+        self.spec.required_files = set([
             "/usr/lib/python3.4/site-packages/dnf/conf/read.py",
             "/usr/lib/python3.4/site-packages/dnf/yum/sqlutils.py",
             "/usr/lib/python3.4/site-packages/dnf/query.py"
-        ]
+        ])
         ftpp.installed(None, self.spec, MockSack())
         self.assertEqual(len(self.spec.Requires), 1)
-        self.assertEqual(["python3-dnf"], self.spec.Requires)
+        self.assertEqual(set(["python3-dnf"]), self.spec.Requires)
 
     def test_c(self):
         c_plug = CPlugin()
         c_plug.patched(self.test_project_dir, self.spec, self.sack)
-        expected = ['/usr/include', '/usr/include/bits',
-                    '/usr/include/gnu', '/usr/include/sys']
-        expected.sort()
-        self.spec.required_files.sort()
-        self.spec.build_required_files.sort()
+        expected = set(['/usr/include', '/usr/include/bits',
+                        '/usr/include/gnu', '/usr/include/sys'])
         self.assertEqual(self.spec.required_files, expected)
         self.assertEqual(self.spec.build_required_files, expected)
