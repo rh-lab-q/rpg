@@ -11,7 +11,7 @@ from rpg.command import Command
 import subprocess
 import platform
 from threading import Thread
-
+import time
 
 class Wizard(QtWidgets.QWizard):
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
@@ -665,7 +665,7 @@ class BuildPage(QtWidgets.QWizardPage):
 
     def validatePage(self):
         self.base.build_srpm()
-        Command("mv " + str(self.base.srpm_path) + " " +
+        Command("cp " + str(self.base.srpm_path) + " " +
                 self.buildLocationEdit.text()).execute()
         self.base.final_path = self.buildLocationEdit.text()
         return True
@@ -963,6 +963,8 @@ class CoprFinalPage(QtWidgets.QWizardPage):
 class FinalPage(QtWidgets.QWizardPage):
     def initializePage(self):
         self.buildPath = (str(self.base.final_path))
+        self.distro = self.base.target_distro
+        self.arch = self.base.target_arch
         self.finalLabel.setText("<html><head/><body><p align=\"center\"><span" +
                             "style=\" font-size:24pt;\">Thank you for " +
                             "using RPG!</span></p><p align=\"center\">" +
@@ -986,13 +988,42 @@ class FinalPage(QtWidgets.QWizardPage):
                             "For upload your package to Copr, choose Next " +
                             "button, otherwise use Finish button." + 
                             "</p></body></html>")
+        self.rpmButton = QPushButton("Build compiled rpm package")
+        self.rpmButton.setMinimumHeight(45)
+        self.rpmButton.setMinimumWidth(200)
+        self.rpmButton.setMaximumHeight(45)
+        self.rpmButton.setMaximumWidth(250)
+        self.rpmButton.clicked.connect(self.buildRpm)
 
         mainLayout = QVBoxLayout()
-        mainLayout.addSpacing(170)
-        mainLayout.addWidget(self.finalLabel)
+        grid = QGridLayout()
+        grid.addWidget(self.rpmButton)
+        grid.setAlignment(QtCore.Qt.AlignCenter)
         mainLayout.addSpacing(100)
+        mainLayout.addWidget(self.finalLabel)
+        mainLayout.addSpacing(50)
         mainLayout.addWidget(self.coprLabel)
+        mainLayout.addSpacing(50)
+        mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
+    
+    def buildRpm(self):
+        self.rpm_dialog = QDialog(self)
+        self.rpm_dialog.resize(600,400)
+        self.rpm_dialog.setWindowTitle("Building RPM")
+        self.rpm_progress = QTextEdit()
+        self.rpm_progress.setReadOnly(True)
+        self.rpm_progress.setText("Building RPM package is in progress...")
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addSpacing(50)
+        mainLayout.addWidget(self.rpm_progress)
+        mainLayout.addSpacing(50)
+        self.rpm_dialog.setLayout(mainLayout)
+        self.rpm_dialog.show()
+        time.sleep(5)
+        self.base.build_rpm(self.distro, self.arch)
+        self.rpm_dialog.close()
 
     def validatePage(self):
         print(self.base.spec)
