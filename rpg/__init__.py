@@ -177,6 +177,10 @@ class Base(object):
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
             
+    def build_rpm(self, target_distro, target_arch):
+        self._package_builder.build_rpm(str(self.srpm_path), 
+            target_distro, target_arch)
+            
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)
 
