@@ -1,6 +1,4 @@
-import hawkey
 import logging
-import platform
 from pathlib import Path
 from rpg.plugin_engine import PluginEngine, phases
 from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
@@ -176,11 +174,11 @@ class Base(object):
         self.write_spec()
         self._package_builder.build_srpm(
             self.spec_path, self.archive_path, self.base_dir)
-            
+
     def build_rpm(self, target_distro, target_arch):
-        self._package_builder.build_rpm(str(self.srpm_path), 
-            target_distro, target_arch)
-            
+        self._package_builder.build_rpm(str(self.srpm_path),
+                                        target_distro, target_arch)
+
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)
 
@@ -191,14 +189,15 @@ class Base(object):
                                     self.spec.build)
 
     def copr_set_config(self, username, login, token):
-        self.cl = CoprClient(username, login, token, copr_url="http://copr.fedoraproject.org")
+        self.cl = CoprClient(
+            username, login, token, copr_url="http://copr.fedoraproject.org")
 
     def copr_create_project(self, name, chroots, desc, intro):
         self.cl.create_project(
             name, chroots=chroots, description=desc, instructions=intro)
 
     def copr_build(self, name, url):
-        self.cl.create_new_build(name, pkgs=[url,])
+        self.cl.create_new_build(name, pkgs=[url, ])
 
     @staticmethod
     def compute_checksum(sources):

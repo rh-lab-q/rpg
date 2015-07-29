@@ -17,7 +17,6 @@ class SourceLoaderLongTest(RpgTestCase):
             rmtree(str(self._tar_temp))
         makedirs(str(self._tar_temp))
 
-
     def test_git_download(self):
         SourceLoader.download_git_repo(
             "https://github.com/rh-lab-q/rpg",

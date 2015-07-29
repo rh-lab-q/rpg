@@ -2,7 +2,6 @@ import logging
 import re
 from rpg.command import Command
 import subprocess
-from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 import tempfile
 from pathlib import Path
 
@@ -58,6 +57,7 @@ class PackageBuilder(object):
                 )
             )
         )
+
     @staticmethod
     def fetch_repos(dist, arch):
         logging.info("New thread for fetch repos started")

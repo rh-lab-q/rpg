@@ -2,6 +2,7 @@ import argparse
 import logging
 from os import path
 
+
 class Conf:
 
     directories = []
@@ -11,9 +12,13 @@ class Conf:
     def parse_cmdline(self):
 
         self.parser = argparse.ArgumentParser(
-            description="RPG is tool, that guides people through the creation of a RPM package. "
-                        "RPG makes packaging much easier due to the automatic analysis of packaged files. "
-                        "Beginners can get familiar with packaging process or the advanced users can use our tool for a quick creation of a package.",
+            description="RPG is tool, that guides people through the " +
+                        "creation of a RPM package. "
+                        "RPG makes packaging much easier due to the " +
+                        "automatic analysis of packaged files. "
+                        "Beginners can get familiar with packaging process " +
+                        "or the advanced users can use our tool " +
+                        "for a quick creation of a package.",
             prog='rpg')
         self.parser.add_argument(
             '--plugin-dir', type=str, dest='plug_dir',

@@ -41,8 +41,6 @@ class SpecTest(RpgTestCase):
                     "a2 f2\n"  \
                     "a3 f3\n\n"
         self.assertEqual(expected, str(self.spec))
-        
 
     def test_spec_getter_fail(self):
         self.assertRaises(AttributeError, getattr, self.spec, "bla")
-

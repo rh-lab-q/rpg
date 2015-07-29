@@ -8,6 +8,7 @@ from os.path import expanduser
 
 
 class DialogChangelog(QtWidgets.QDialog):
+
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogChangelog, self).__init__(parent)
 
@@ -68,6 +69,7 @@ class DialogChangelog(QtWidgets.QDialog):
 
 
 class DialogError(QtWidgets.QDialog):
+
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogError, self).__init__(parent)
 
@@ -106,6 +108,7 @@ class DialogError(QtWidgets.QDialog):
 
 
 class DialogSRPM(QtWidgets.QDialog):
+
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSRPM, self).__init__(parent)
 
@@ -146,6 +149,7 @@ class DialogSRPM(QtWidgets.QDialog):
 
 
 class DialogSubpackage(QtWidgets.QDialog):
+
     def __init__(self, Dialog, Wizard, parent=None):
         super(DialogSubpackage, self).__init__(parent)
 
@@ -195,6 +199,7 @@ class DialogSubpackage(QtWidgets.QDialog):
 
 
 class DialogImport(QFileDialog):
+
     def __init__(self):
         QFileDialog.__init__(self)
         self.setDirectory(expanduser("~"))

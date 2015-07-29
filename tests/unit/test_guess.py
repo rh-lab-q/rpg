@@ -9,7 +9,8 @@ class GuessTest(RpgTestCase):
 
     def test_guess_name(self):
         self.base._input_name = self.test_project_dir
-        self.assertEqual(str(self.base.guess_name()), str(self.test_project_dir))
+        self.assertEqual(
+            str(self.base.guess_name()), str(self.test_project_dir))
         self.base._input_name = "vec.zip"
         self.assertEqual(str(self.base.guess_name()), "vec")
         self.base._input_name = "vec.tar.gz"

@@ -6,6 +6,7 @@ from re import compile
 
 
 class CPlugin(Plugin):
+
     def patched(self, project_dir, spec, sack):
         f = NamedTemporaryFile(delete=False, prefix="rpg_plugin_c_")
         file_name = f.name
@@ -26,7 +27,7 @@ class CPlugin(Plugin):
         unlink(file_name + ".bak")
         with open(file_name, "r") as f:
             _ret_paths = set([path.dirname(s) for s in f.read().split()
-                            if regex.match(s) and not regex2.match(s)])
+                              if regex.match(s) and not regex2.match(s)])
         unlink(file_name)
 
         spec.required_files = spec.required_files.union(_ret_paths)

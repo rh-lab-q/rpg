@@ -93,7 +93,7 @@ class FindPatchPluginTest(PluginTestCase):
                          self.spec, self.sack)
         translation_file = ("-f %{CZ.mo}.lang")
         self.assertEqual(self.spec.files[0],
-                        (translation_file, None, None))
+                         (translation_file, None, None))
 
     def test_find_library(self):
         plugin = FindLibraryPlugin()
