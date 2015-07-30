@@ -46,16 +46,23 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
-# Fix of module ImportErrors
-class Mock(object):
-    def __init__(self, *args):
-        pass
-
-    def __getattr__(self, name):
-        return Mock
-
-for mod_name in ('pathlib', 'copr', 'copr.client',
-                 'urllib', 'urllib.request',
-                 'urllib.parse', 'urllib.error'):
-    sys.modules[mod_name] = Mock()
+autodoc_mock_imports = [
+    'pathlib',
+    'copr',
+    'copr.client',
+    'urllib',
+    'urllib.request',
+    'urllib.parse',
+    'urllib.error',
+    'rpg',
+    'rpg.plugin_engine',
+    'rpg.command',
+    'rpg.plugins',
+    'rpg.plugins.misc',
+    'rpg.plugins.misc.files_to_pkgs',
+    'rpg.project_builder',
+    'rpg.package_builder',
+    'rpg.source_loader',
+    'rpg.spec',
+    'rpg.conf',
+]
