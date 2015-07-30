@@ -44,42 +44,42 @@ class Subpackage(object):
         "Provides"
     ]
 
-    # tags
-    Name = ""
-    Version = ""
-    Release = ""
-    Summary = ""
-    Group = ""
-    License = ""
-    URL = ""
-    Source = ""
-    Patch = ""
-    BuildArch = ""
-    BuildRoot = ""
-    Obsoletes = ""
-    Conflicts = ""
-    Vendor = ""
-    Packager = ""
-    package = ""
-    description = ""
-    BuildRequires = set()
-    Requires = set()
-    Provides = set()
-    files = []
-    changelog = []
-    prep = Command()
-    build = Command()
-    pre = Command()
-    install = Command()
-    check = Command()
-    post = Command()
-    preun = Command()
-    postun = Command()
-    pretrans = Command()
-    posttrans = Command()
-    clean = Command()
-
     def __init__(self):
+        # tags
+        self.Name = ""  #: initial value: ""
+        self.Version = ""  #: initial value: ""
+        self.Release = ""  #: initial value: ""
+        self.Summary = ""  #: initial value: ""
+        self.Group = ""  #: initial value: ""
+        self.License = ""  #: initial value: ""
+        self.URL = ""  #: initial value: ""
+        self.Source = ""  #: initial value: ""
+        self.Patch = ""  #: initial value: ""
+        self.BuildArch = ""  #: initial value: ""
+        self.BuildRoot = ""  #: initial value: ""
+        self.Obsoletes = ""  #: initial value: ""
+        self.Conflicts = ""  #: initial value: ""
+        self.Vendor = ""  #: initial value: ""
+        self.Packager = ""  #: initial value: ""
+        self.package = ""  #: initial value: ""
+        self.description = ""  #: initial value: ""
+        self.BuildRequires = set()  #: initial value: set()
+        self.Requires = set()  #: initial value: set()
+        self.Provides = set()  #: initial value: set()
+        self.files = []  #: initial value: []
+        self.changelog = []  #: initial value: []
+        self.prep = Command()  #: initial value: Command()
+        self.build = Command()  #: initial value: Command()
+        self.pre = Command()  #: initial value: Command()
+        self.install = Command()  #: initial value: Command()
+        self.check = Command()  #: initial value: Command()
+        self.post = Command()  #: initial value: Command()
+        self.preun = Command()  #: initial value: Command()
+        self.postun = Command()  #: initial value: Command()
+        self.pretrans = Command()  #: initial value: Command()
+        self.posttrans = Command()  #: initial value: Command()
+        self.clean = Command()  #: initial value: Command()
+
         # list of generated translation files
         self.files_translations = []
 
