@@ -9,6 +9,7 @@ from rpg.utils import get_architecture
 import sys
 from rpg.plugins.lang.c import CPlugin
 from rpg.spec import Spec
+from unittest import mock
 
 
 class MockSack:
@@ -18,13 +19,26 @@ class MockSack:
 
 
 class MockedPackage:
-    name = "python3-dnf"
+
+    def __init__(self, package):
+        self.name = package
+
+
+class MockedLogging:
+
+    called = 0
+
+    @classmethod
+    def log(cls, *args, **kwargs):
+        cls.called += 1
 
 
 class MockedDNFQuery:
 
     def filter(self, **kwd):
-        return [MockedPackage()]
+        if kwd["file"] == "/usr/lib/python3.4/site-packages/dnf/conf/read.py":
+            return [MockedPackage("python3-dnf")]
+        raise IndexError
 
     def available(self):
         return self
@@ -117,16 +131,23 @@ class FindPatchPluginTest(PluginTestCase):
                    .format(arch, version.major, version.minor)]
         self.assertEqual(self.spec.required_files, set(imports))
 
+    @mock.patch("logging.log", new=MockedLogging.log)
     def test_files_to_pkgs(self):
         ftpp = FilesToPkgsPlugin()
-        self.spec.required_files = set([
+        self.spec.required_files = {
             "/usr/lib/python3.4/site-packages/dnf/conf/read.py",
             "/usr/lib/python3.4/site-packages/dnf/yum/sqlutils.py",
             "/usr/lib/python3.4/site-packages/dnf/query.py"
-        ])
+        }
         ftpp.installed(None, self.spec, MockSack())
         self.assertEqual(len(self.spec.Requires), 1)
-        self.assertEqual(set(["python3-dnf"]), self.spec.Requires)
+        self.assertEqual({"python3-dnf"}, self.spec.Requires)
+        self.assertEqual(set(), self.spec.BuildRequires)
+        self.assertEqual(MockedLogging.called, 2)
+        self.spec.check.append("pwd")
+        ftpp.installed(None, self.spec, MockSack())
+        self.assertEqual({"python3-dnf"}, self.spec.BuildRequires)
+        self.assertEqual(MockedLogging.called, 2)
 
     def test_c(self):
         c_plug = CPlugin()

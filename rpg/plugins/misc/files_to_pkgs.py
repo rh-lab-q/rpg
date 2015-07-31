@@ -25,3 +25,5 @@ class FilesToPkgsPlugin(Plugin):
                 set(_resolve(spec.build_required_files, _query)))
             spec.required_files = set()
             spec.build_required_files = set()
+            if str(spec.check):
+                spec.BuildRequires = spec.BuildRequires.union(spec.Requires)
