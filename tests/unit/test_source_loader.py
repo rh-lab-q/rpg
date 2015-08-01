@@ -97,6 +97,27 @@ class SourceLoaderTest(RpgTestCase):
         self.assertExistInDir(["sample.tar.gz", "sample.tar.xz"],
                               self._tar_extracted)
 
+    def test_extensions(self):
+        self.assertEqual(
+            ("zip", None),
+            self._source_loader._get_compression_method("sample.zip"))
+        self.assertEqual(
+            ("zip", None),
+            self._source_loader._get_compression_method("sample.sample.zip"))
+        self.assertEqual(
+            ("zip", None),
+            self._source_loader._get_compression_method("sample.tar.zip"))
+        self.assertEqual(
+            ("tar", "xz"),
+            self._source_loader._get_compression_method("sample.tar.xz"))
+
+    @expectedFailure
+    def test_extensions_fail(self):
+        self._source_loader._get_compression_method("sample.tar.zip")
+        self._source_loader._get_compression_method("sample.xz.tar")
+        self._source_loader._get_compression_method("sample.tar.")
+        self._source_loader._get_compression_method("sample.zip.xz")
+
     @expectedFailure
     def test_tar_xz_method_fail(self):
         self._tar_xz = self._tar_gz

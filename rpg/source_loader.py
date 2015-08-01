@@ -116,12 +116,16 @@ class SourceLoader(object):
     @classmethod
     def _get_compression_method(cls, name):
         """ determine the compression method used for a tar file. """
-
-        arch_t = re.match(r".+?\.([^.]+)(?:\.([^.]+)|)$", name)
-        if not arch_t.group(1) in cls._compressions \
-                and not arch_t.group(2) in cls._compressions[arch_t.group(1)]:
-            return None
-        return (arch_t.group(1), arch_t.group(2))
+        for second in cls._compressions:
+            try:
+                for first in cls._compressions[second][3]:
+                    if name.endswith(second + "." + first):
+                        return second, first
+            except IndexError:
+                if name.endswith(second):
+                    return second, None
+        raise LookupError("Couldn't resolve compression method of '{}'!"\
+                          .format(name))
 
     @classmethod
     def download_git_repo(cls, url, arch_name, branch='master'):
