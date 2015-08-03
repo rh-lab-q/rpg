@@ -18,13 +18,13 @@ class Wizard(QtWidgets.QWizard):
 
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageGreetings) to 10 (PageFinal)
+        - counted from 0 (PageImport) to 9 (PageCoprFinal)
         - tooltips are from:
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
-    NUM_PAGES = 12
-    (PageGreetings, PageImport, PageMandatory, PageScripts,
-        PageRequires, PageScriplets, PageSubpackages, PageBuild, PageFinal,
+    NUM_PAGES = 10
+    (PageImport, PageMandatory, PageScripts,
+        PageRequires, PageScriplets, PageBuild, PageFinal,
         PageCoprLogin, PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
@@ -40,7 +40,6 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageScripts, ScriptsPage(self))
         self.setPage(self.PageRequires, RequiresPage(self))
         self.setPage(self.PageScriplets, ScripletsPage(self))
-        self.setPage(self.PageSubpackages, SubpackagesPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
         self.setPage(self.PageFinal, FinalPage(self))
         self.setPage(self.PageCoprLogin, CoprLoginPage(self))
@@ -444,7 +443,7 @@ class RequiresPage(QtWidgets.QWizardPage):
         return True
 
     def nextId(self):
-        return Wizard.PageSubpackages
+        return Wizard.PageScriplets
 
 
 class ScripletsPage(QtWidgets.QWizardPage):
@@ -521,135 +520,6 @@ class ScripletsPage(QtWidgets.QWizardPage):
 
     def nextId(self):
         return Wizard.PageBuild
-
-
-class SubpackagesPage(QtWidgets.QWizardPage):
-
-    def initializePage(self):
-        self.tree.addSubpackage(self.base.spec.Name)
-        for a, b, c in self.base.spec.files:
-            if ".lang" not in str(a):
-                self.tree.addFileToSubpackage(self.
-                                              tree.
-                                              invisibleRootItem().child(0),
-                                              a, "file")
-
-    def __init__(self, Wizard, parent=None):
-        super(SubpackagesPage, self).__init__(parent)
-
-        self.base = Wizard.base
-        self.tree = self.SubpackTreeWidget(self)
-
-        self.setTitle(self.tr("Subpackages page"))
-        self.setSubTitle(self.tr("Choose subpackages"))
-
-        filesLabel = QLabel("Do not include: ")
-        subpackagesLabel = QLabel("Packages: ")
-
-        self.addPackButton = QPushButton("+")
-        self.addPackButton.setMaximumWidth(68)
-        self.addPackButton.setMaximumHeight(60)
-        self.addPackButton.clicked.connect(self.openSubpackageDialog)
-
-        self.removePackButton = QPushButton("-")
-        self.removePackButton.setMaximumWidth(68)
-        self.removePackButton.setMaximumHeight(60)
-        self.removePackButton.clicked.connect(self.removeItem)
-
-        self.transferButton = QPushButton("->")
-        self.transferButton.setMaximumWidth(120)
-        self.transferButton.setMaximumHeight(20)
-        self.transferButton.clicked.connect(self.moveFileToTree)
-
-        self.filesListWidget = QListWidget()
-        mainLayout = QVBoxLayout()
-        upperLayout = QHBoxLayout()
-        lowerLayout = QHBoxLayout()
-        upperLayout.addSpacing(150)
-        upperLayout.addWidget(filesLabel)
-        upperLayout.addSpacing(190)
-        upperLayout.addWidget(subpackagesLabel)
-        upperLayout.addWidget(self.addPackButton)
-        upperLayout.addWidget(self.removePackButton)
-        lowerLayout.addWidget(self.filesListWidget)
-        lowerLayout.addWidget(self.transferButton)
-        lowerLayout.addWidget(self.tree)
-        mainLayout.addLayout(upperLayout)
-        mainLayout.addLayout(lowerLayout)
-        self.setLayout(mainLayout)
-
-    def moveFileToTree(self):
-        ''' Function to move items from left to right
-            (depending on which and where selected)
-            - trigered when user clicked [ -> ] button '''
-        self.subpackageItems = self.tree.selectedItems()
-        self.subpackageItem = self.subpackageItems[0]
-        self.itemLeft = self.filesListWidget.takeItem(self.filesListWidget.
-                                                      currentRow())
-        for itemRight in self.tree.selectedItems():
-            if (itemRight.parent() is None):
-                self.tree.addFileToSubpackage(itemRight,
-                                              self.itemLeft.text(), "file")
-            else:
-                self.tree.addFileToSubpackage(itemRight.parent(),
-                                              self.itemLeft.text(), "file")
-        self.itemLeft = None
-
-    def removeItem(self):
-        ''' Function to remove items (depending on which and where selected)
-            - trigered when user clicked [ - ] button '''
-        root = self.tree.invisibleRootItem()
-        for item in self.tree.selectedItems():
-            if (item.parent() is not None):
-                self.filesListWidget.addItem(item.text(0))
-            (item.parent() or root).removeChild(item)
-
-    def openSubpackageDialog(self):
-        subpackageWindow = QDialog()
-        subpackage = DialogSubpackage(subpackageWindow, self)
-        subpackage.exec_()
-
-    def nextId(self):
-        return Wizard.PageScriplets
-
-    # Class for tree view (Subpackages generation)
-    class SubpackTreeWidget(QTreeWidget):
-
-        def __init__(self, Page):
-            self.page = Page
-            QtWidgets.QWidget.__init__(self)
-
-            ''' TODO - drag and drop, someday'''
-            # self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
-            self.setColumnCount = 1  # only one column in each row
-            self.column = 1
-            self.setHeaderHidden(True)  # make invisible -1 row (with name)
-            self.header().setSectionResizeMode(3)
-
-        def addSubpackage(self, Name):
-            self.name = Name
-            ''' Add new subpackage and make root it's parent '''
-            self.addParent(self.invisibleRootItem(),
-                           self.name,
-                           self.name + " Subpackage")
-            self.resizeColumnToContents(0)
-
-        def addParent(self, parent, title, data):
-            item = QTreeWidgetItem(parent, [title])
-            item.setData(self.column, QtCore.Qt.UserRole, data)
-
-            ''' Dropdown arrows near subpackages '''
-            item.setChildIndicatorPolicy(QTreeWidgetItem.ShowIndicator)
-            item.setExpanded(True)  # To look like a tree (expanding items)
-            self.resizeColumnToContents(0)
-            return item
-
-        def addFileToSubpackage(self, parent, title, data):
-            item = QTreeWidgetItem(parent, [title])
-            item.setData(self.column, QtCore.Qt.UserRole, data)
-            self.resizeColumnToContents(0)
-            return item
-
 
 class BuildPage(QtWidgets.QWizardPage):
 
