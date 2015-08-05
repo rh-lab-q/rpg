@@ -33,7 +33,7 @@ class PackageBuilder(object):
                 if PackageBuilder.regex.search(line):
                     yield line
 
-    def build_rpm(self, srpm, distro, arch):
+    def build_rpm(self, srpm, distro, arch, output_dir):
 
         def check_output(proc):
             while proc.poll() is None:
@@ -57,6 +57,8 @@ class PackageBuilder(object):
                 )
             )
         )
+        Command("mv " + str(self.temp_dir.glob("*.rpm")[0]) +
+                " " + str(output_dir)).execute()
 
     @staticmethod
     def fetch_repos(dist, arch):
