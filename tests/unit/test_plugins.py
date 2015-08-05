@@ -10,6 +10,7 @@ import sys
 from rpg.plugins.lang.c import CPlugin
 from rpg.spec import Spec
 from unittest import mock
+from rpg.plugins.project_builder.cmake import CMakePlugin
 
 
 class MockSack:
@@ -85,7 +86,8 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/archives/sample.tar.xz', None, None),
                  ('/Makefile', None, None),
                  ('/py/requires/sourcecode2.py', None, None),
-                 ('/mock_project/mock-1.0.tar.gz', None, None)]
+                 ('/mock_project/mock-1.0.tar.gz', None, None),
+                 ('/c/CMakeCache.txt', None, None)]
         excludes = [('/patch/__pycache__/', r'%exclude', None),
                     ('/c/__pycache__/', r'%exclude', None),
                     ('/hello_project/__pycache__/', r'%exclude', None),
@@ -156,3 +158,12 @@ class FindPatchPluginTest(PluginTestCase):
                         '/usr/include/gnu', '/usr/include/sys'])
         self.assertEqual(self.spec.required_files, expected)
         self.assertEqual(self.spec.build_required_files, expected)
+
+    def test_compiled(self):
+        cmakeplug = CMakePlugin()
+        expected = set(["/usr/bin/gmake", "/usr/bin/file",
+            "/usr/bin/makedepend", "/usr/bin/nosetests-3.4",
+            "/usr/bin/python3.4"])
+        cmakeplug.compiled(self.test_project_dir / "c", self.spec, self.sack)
+        self.assertEqual(self.spec.build_required_files, expected)
+        self.assertEqual(self.spec.required_files, expected)
