@@ -22,7 +22,7 @@ class FakeBase(Base):
         self.spec.description = "Hello World C project for testing RPG."
         self.spec.prep = r'%autosetup'
         self.spec.build = "make"
-        self.sack = self.dnf_load_sack()
+        self.sack = self.load_dnf_sack()
         self._package_builder = PackageBuilder()
 
 

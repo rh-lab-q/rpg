@@ -14,7 +14,7 @@ def main():
     app = QApplication(sys.argv)
     base.conf.parse_cmdline()
     if base.conf.load_dnf:
-        base.sack = base.dnf_load_sack()
+        base.sack = base.load_dnf_sack()
     base.load_plugins()
     wiz = Wizard(base)
     wiz.setObjectName("RPG")

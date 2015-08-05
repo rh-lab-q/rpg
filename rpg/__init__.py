@@ -31,7 +31,7 @@ class Base(object):
         self._package_builder = PackageBuilder()
         self._source_loader = SourceLoader()
 
-    def dnf_load_sack(self):
+    def load_dnf_sack(self):
         logging.info('DNF sack is loading')
         import dnf
         with dnf.Base() as self._dnf_base:
