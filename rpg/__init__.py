@@ -172,6 +172,10 @@ class Base(object):
             self.spec_path, self.archive_path, self.base_dir)
 
     def build_rpm(self, target_distro, target_arch):
+        try:
+            self.srpm_path
+        except RuntimeError:
+            self.build_srpm()
         self._package_builder.build_rpm(str(self.srpm_path),
                                         target_distro, target_arch)
 
