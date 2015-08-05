@@ -110,11 +110,11 @@ class Base(object):
     @property
     def srpm_path(self):
         try:
-            return next(self.base_dir.glob(self.project_name + "*src.rpm"))
+            return next(self.base_dir.glob(self.project_name + "*.src.rpm"))
         except StopIteration:
             raise RuntimeError(
                 "Can't find '{}'! You need to call build_srpm first."
-                .format(str(self.base_dir / (self.project_name + "*src.rpm"))))
+                .format(str(self.base_dir / (self.project_name + "*.src.rpm"))))
 
     def load_project_from_url(self, path):
         """executed in background after dir/tarball/SRPM selection"""
