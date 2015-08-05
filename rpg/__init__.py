@@ -179,6 +179,44 @@ class Base(object):
         self._package_builder.build_rpm(str(self.srpm_path),
                                         target_distro, target_arch)
 
+    def build_rpm_recover(self, distro, arch):
+
+        def build():
+            self.build_srpm()
+            return self.build_rpm(
+                distro, arch) + list(self._package_builder.check_logs())
+
+        _files_to_pkgs = FilesToPkgsPlugin()
+
+        while True:
+            _file = ""
+            _files_to_pkgs.installed(self.base_dir,
+                                     self.spec,
+                                     self.sack)
+            self.write_spec()
+            for err in build():
+                match = search(
+                    r"DEBUG\:\s*[^:]+\:\s*([^:]+)\:\s*" +
+                    r"[cC][oO][mM][mM][aA][nN][dD]\s*[nN][oO][tT]\s*" +
+                    r"[fF][oO][uU][nN][dD]", err)
+                if match:
+                    if match.group(1) == _file or\
+                            "/usr/bin/" + match.group(1) == _file:
+                        logging.info("Couldn't resolve '{}'!"
+                                     .format(match.group(1)))
+                        return
+                    else:
+                        if "/" in match.group(1):
+                            _file = match.group(1)
+                        else:
+                            _file = "/usr/bin/" + match.group(1)
+                    break
+            if _file == "":
+                break
+            self.spec.required_files.add(_file)
+            self.spec.build_required_files.add(_file)
+        Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")
+
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)
 
@@ -260,42 +298,3 @@ class Base(object):
         for pkg in self.sack.query():
             licenses.update(pkg.license)
         return sorted(licenses)
-
-    def build_rpm_recover(self, distro, arch):
-
-        def build():
-            self.build_srpm()
-            return self._package_builder.build_rpm(
-                self.srpm_path,
-                distro, arch) + list(self._package_builder.check_logs())
-
-        _files_to_pkgs = FilesToPkgsPlugin()
-
-        while True:
-            _file = ""
-            _files_to_pkgs.installed(self.base_dir,
-                                     self.spec,
-                                     self.sack)
-            self.write_spec()
-            for err in build():
-                match = search(
-                    r"DEBUG\:\s*[^:]+\:\s*([^:]+)\:\s*" +
-                    r"[cC][oO][mM][mM][aA][nN][dD]\s*[nN][oO][tT]\s*" +
-                    r"[fF][oO][uU][nN][dD]", err)
-                if match:
-                    if match.group(1) == _file or\
-                            "/usr/bin/" + match.group(1) == _file:
-                        logging.info("Couldn't resolve '{}'!"
-                                     .format(match.group(1)))
-                        return
-                    else:
-                        if "/" in match.group(1):
-                            _file = match.group(1)
-                        else:
-                            _file = "/usr/bin/" + match.group(1)
-                    break
-            if _file == "":
-                break
-            self.spec.required_files.add(_file)
-            self.spec.build_required_files.add(_file)
-        Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")
