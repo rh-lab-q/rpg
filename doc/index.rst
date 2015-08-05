@@ -6,6 +6,10 @@
 Welcome to rpg's documentation!
 ===============================
 
+.. warning::
+
+	RPG is in alpha stage and the docs could change at any time without any notice
+
 Contents:
 
 .. toctree::
