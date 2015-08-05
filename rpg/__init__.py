@@ -139,10 +139,6 @@ class Base(object):
         self._plugin_engine.execute_phase(phases[0],
                                           self.extracted_dir)
 
-    def apply_patches(self, ordered_patches):
-        """executed in background after patch selection and reordering"""
-        self._project_builder.apply_patches(ordered_patches)
-
     def run_patched_sources_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[1],

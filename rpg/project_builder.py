@@ -25,13 +25,3 @@ class ProjectBuilder:
         install_command.rpm_variables.append(("RPM_BUILD_ROOT",
                                               project_target_dir))
         install_command.execute_from(project_source_dir)
-
-    def _apply_patch(self, patch):
-        return False
-
-    def apply_patches(self, ordered_patches):
-        """Applies patches to a project_source_dir
-           On failure returns the first patch, that failed"""
-        for patch in ordered_patches:
-            if not self._apply_patch(patch):
-                return patch
