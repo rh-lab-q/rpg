@@ -9,10 +9,10 @@ class BaseTest(RpgTestCase):
         self.base = Base()
 
     def test_checksum(self):
-        shasum = self.base.compute_checksum(self.test_project_dir / "patch")
+        shasum = self.base._compute_checksum(self.test_project_dir / "patch")
         self.assertTrue(re.match(r"^[0-9a-fA-F]{7}$",
                                  shasum))
-        shasum2 = self.base.compute_checksum(self.test_project_dir / "patch" /
+        shasum2 = self.base._compute_checksum(self.test_project_dir / "patch" /
                                              "0.patch")
         self.assertTrue(re.match(r"^[0-9a-fA-F]{7}$",
                                  shasum2))

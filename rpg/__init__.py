@@ -126,7 +126,7 @@ class Base(object):
             self._source_loader.download_archive(str(path), temp_arch)
         else:
             temp_arch = None
-        self._hash = self.compute_checksum(path)
+        self._hash = self._compute_checksum(path)
         self._input_name = path.name
         self._setup_workspace()
         self._source_loader.load_sources(path, self.extracted_dir)
@@ -196,7 +196,7 @@ class Base(object):
         self.cl.create_new_build(name, pkgs=[url, ])
 
     @staticmethod
-    def compute_checksum(sources):
+    def _compute_checksum(sources):
         if sources.is_dir():
             cmd = "find %s -type f -print0 | sort -z | xargs " \
                   "-0 sha1sum | sha1sum" % sources.resolve()
