@@ -46,39 +46,39 @@ class Subpackage(object):
 
     def __init__(self):
         # tags
-        self.Name = ""  #: initial value: ""
-        self.Version = ""  #: initial value: ""
-        self.Release = ""  #: initial value: ""
-        self.Summary = ""  #: initial value: ""
-        self.Group = ""  #: initial value: ""
-        self.License = ""  #: initial value: ""
-        self.URL = ""  #: initial value: ""
-        self.Source = ""  #: initial value: ""
-        self.Patch = ""  #: initial value: ""
-        self.BuildArch = ""  #: initial value: ""
-        self.BuildRoot = ""  #: initial value: ""
-        self.Obsoletes = ""  #: initial value: ""
-        self.Conflicts = ""  #: initial value: ""
-        self.Vendor = ""  #: initial value: ""
-        self.Packager = ""  #: initial value: ""
-        self.package = ""  #: initial value: ""
-        self.description = ""  #: initial value: ""
-        self.BuildRequires = set()  #: initial value: set()
-        self.Requires = set()  #: initial value: set()
-        self.Provides = set()  #: initial value: set()
-        self.files = []  #: initial value: []
-        self.changelog = []  #: initial value: []
-        self.prep = Command()  #: initial value: Command()
-        self.build = Command()  #: initial value: Command()
-        self.pre = Command()  #: initial value: Command()
-        self.install = Command()  #: initial value: Command()
-        self.check = Command()  #: initial value: Command()
-        self.post = Command()  #: initial value: Command()
-        self.preun = Command()  #: initial value: Command()
-        self.postun = Command()  #: initial value: Command()
-        self.pretrans = Command()  #: initial value: Command()
-        self.posttrans = Command()  #: initial value: Command()
-        self.clean = Command()  #: initial value: Command()
+        self.Name = ""
+        self.Version = ""
+        self.Release = ""
+        self.Summary = ""
+        self.Group = ""
+        self.License = ""
+        self.URL = ""
+        self.Source = ""
+        self.Patch = ""
+        self.BuildArch = ""
+        self.BuildRoot = ""
+        self.Obsoletes = ""
+        self.Conflicts = ""
+        self.Vendor = ""
+        self.Packager = ""
+        self.package = ""
+        self.description = ""
+        self.BuildRequires = set()
+        self.Requires = set()
+        self.Provides = set()
+        self.files = []
+        self.changelog = []
+        self.prep = Command()
+        self.build = Command()
+        self.pre = Command()
+        self.install = Command()
+        self.check = Command()
+        self.post = Command()
+        self.preun = Command()
+        self.postun = Command()
+        self.pretrans = Command()
+        self.posttrans = Command()
+        self.clean = Command()
 
         # list of generated translation files
         self.files_translations = []
@@ -134,7 +134,43 @@ class Subpackage(object):
 
 class Spec(Subpackage):
 
-    """SPEC properties holder"""
+    """
+    SPEC properties holder
+
+    :ivar Name: initial value = ""
+    :ivar Version: initial value = ""
+    :ivar Release: initial value = ""
+    :ivar Summary: initial value = ""
+    :ivar Group: initial value = ""
+    :ivar License: initial value = ""
+    :ivar URL: initial value = ""
+    :ivar Source: initial value = ""
+    :ivar Patch: initial value = ""
+    :ivar BuildArch: initial value = ""
+    :ivar BuildRoot: initial value = ""
+    :ivar Obsoletes: initial value = ""
+    :ivar Conflicts: initial value = ""
+    :ivar Vendor: initial value = ""
+    :ivar Packager: initial value = ""
+    :ivar package: initial value = ""
+    :ivar description: initial value = ""
+    :ivar BuildRequires: initial value = set()
+    :ivar Requires: initial value = set()
+    :ivar Provides: initial value = set()
+    :ivar files: initial value = []
+    :ivar changelog: initial value = []
+    :ivar prep: initial value = Command()
+    :ivar build: initial value = Command()
+    :ivar pre: initial value = Command()
+    :ivar install: initial value = Command()
+    :ivar check: initial value = Command()
+    :ivar post: initial value = Command()
+    :ivar preun: initial value = Command()
+    :ivar postun: initial value = Command()
+    :ivar pretrans: initial value = Command()
+    :ivar posttrans: initial value = Command()
+    :ivar clean: initial value = Command()
+    """
     subpackages = []
     changelogs = []
 
