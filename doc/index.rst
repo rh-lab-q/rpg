@@ -16,6 +16,7 @@ Contents:
    :maxdepth: 1
 
    command_ref
+   writing_plugins
    api_base
    api_spec
 

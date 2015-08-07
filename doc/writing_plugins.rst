@@ -1,0 +1,27 @@
+Writing plugins
+###############
+
+Plugins are the main part of RPG. Their purpose is to append :doc:`Spec class  <api_spec>` with tags and scripts. Whole process of creating spec file from source code in RPG app is following:
+
+* plugins are triggered in project directory - they set some tags/scripts in Spec instance
+* guessed values from Spec are auto filled in GUI forms and user can modify them
+* next spec command (``%prep``, ``%build``, ``%install``, ``%files``) is executed and new directory is created
+* repeat steps for new directory
+
+Plugin is a class that is derived from ``rpg.plugin.Plugin`` and overrides at least one of following methods: ``extracted``, `patched`, ``compiled``, ``installed``, ``package_built``. Each of them takes ``(spec, current_dir, sack)`` parameters. ``spec`` is instance of :doc:`Spec class  <api_spec>`, ``sack`` is initialized sack from DNF and ``current_dir`` is pathlib.Path instance where are project files of future RPM package located. ``current_dir`` is different in each phase.
+
+.. csv-table:: Phases
+   :header: "Phase", "Description", "Base call"
+   :widths: 10 60 30
+
+
+   "extracted", "raw files are extracted from chosen archive or copied files from project working directory", :meth:`raw sources analysis <__init__.Base.run_raw_sources_analysis>`
+   "patched", "after application of patches on source files", :meth:`patched sources analysis <__init__.Base.run_patched_sources_analysis>`
+   "compiled", "after execution of ``%build`` script (e.g. calling ``make``)", :meth:`compiled analysis <__init__.Base.run_compiled_analysis>`
+   "installed", "directory containing files after ``make install``", :meth:`installed analysis <__init__.Base.run_installed_analysis>`
+   "package_built", "path to final rpm package", --
+
+
+Inside plugin can be helper methods that should not be named as any of the phase. It should follow conventions as any private Python method (e.g. ``_helper_method``).
+
+For plugin examples take a look at `core plugins folder <https://github.com/rh-lab-q/rpg/tree/master/rpg/plugins>`_.
