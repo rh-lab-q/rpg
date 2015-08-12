@@ -2,29 +2,27 @@ from os.path import expanduser
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
-                             QTextEdit, QListWidget, QHBoxLayout,
-                             QDialog, QFileDialog, QTreeWidget,
-                             QTreeWidgetItem, QComboBox)
-from rpg.gui.dialogs import DialogChangelog, DialogSubpackage, DialogImport
+                             QTextEdit, QHBoxLayout, QFileDialog,
+                             QComboBox)
+from rpg.gui.dialogs import DialogImport
 from pathlib import Path
 from rpg.command import Command
 import subprocess
 import platform
 from threading import Thread
-import time
 
 
 class Wizard(QtWidgets.QWizard):
 
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageImport) to 9 (PageCoprFinal)
+        - counted from 0 (PageImport) to 8 (PageCoprFinal)
         - tooltips are from:
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
-    NUM_PAGES = 10
+    NUM_PAGES = 9
     (PageImport, PageMandatory, PageScripts,
-        PageRequires, PageScriplets, PageBuild, PageFinal,
+        PageRequires, PageScriplets, PageBuild,
         PageCoprLogin, PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
@@ -41,7 +39,6 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageRequires, RequiresPage(self))
         self.setPage(self.PageScriplets, ScripletsPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
-        self.setPage(self.PageFinal, FinalPage(self))
         self.setPage(self.PageCoprLogin, CoprLoginPage(self))
         self.setPage(self.PageCoprBuild, CoprBuildPage(self))
         self.setPage(self.PageCoprFinal, CoprFinalPage(self))
@@ -521,69 +518,155 @@ class ScripletsPage(QtWidgets.QWizardPage):
     def nextId(self):
         return Wizard.PageBuild
 
+
 class BuildPage(QtWidgets.QWizardPage):
 
     def initializePage(self):
         self.buildLocationEdit.setText(expanduser("~"))
+        self.distro = self.base.target_distro
+        self.arch = self.base.target_arch
+        index = self.BuildDistroEdit.findText(
+            self.distro, QtCore.Qt.MatchFixedString)
+        if index >= 0:
+            self.BuildDistroEdit.setCurrentIndex(index)
+        index = self.BuildArchEdit.findText(
+            self.arch, QtCore.Qt.MatchFixedString)
+        if index >= 0:
+            self.BuildArchEdit.setCurrentIndex(index)
 
     def __init__(self, Wizard, parent=None):
         super(BuildPage, self).__init__(parent)
 
         self.base = Wizard.base
-
         self.Wizard = Wizard  # Main wizard of program
         self.setTitle(self.tr("Build page"))
         self.setSubTitle(self.tr("Options to build"))
 
         specEditBox = QGroupBox()
-        buildPathBox = QGroupBox()
+        buildSRPMBox = QGroupBox()
+        buildRPMBox = QGroupBox()
         layoutspecEditBox = QGridLayout()
-        layoutbuildPathBox = QGridLayout()
+        layoutbuildSRPMBox = QGridLayout()
+        layoutbuildRPMBox = QGridLayout()
 
-        specEditBox.setTitle("Edit SPEC file")
-        specWarningLabel = QLabel("* Edit SPEC file on your own risk")
-        self.editSpecButton = QPushButton("Edit SPEC file")
-        self.editSpecButton.clicked.connect(self.editSpecFile)
-        layoutspecEditBox.setColumnStretch(0, 1)
-        layoutspecEditBox.setColumnStretch(1, 1)
-        layoutspecEditBox.setColumnStretch(2, 1)
-        layoutspecEditBox.setColumnStretch(3, 1)
-        layoutspecEditBox.setColumnStretch(4, 1)
-        layoutspecEditBox.setColumnStretch(5, 1)
-        layoutspecEditBox.addWidget(specWarningLabel, 0, 0)
-        layoutspecEditBox.addWidget(self.editSpecButton, 2, 2)
+        specEditBox.setTitle("SPEC file")
+        specWarningLabel = QLabel(
+            "* The metada for RPM package (for advanced users)")
+        layoutspecEditBox.addWidget(specWarningLabel, 1, 0)
         specEditBox.setLayout(layoutspecEditBox)
 
-        buildPathBox.setTitle("Build SRPM to")
+        self.editSpecButton = QPushButton("Edit SPEC file")
+        self.editSpecButton.clicked.connect(self.editSpecFile)
+        self.editSpecButton.setMinimumHeight(45)
+        self.editSpecButton.setMinimumWidth(180)
+        self.editSpecButton.setMaximumHeight(45)
+        self.editSpecButton.setMaximumWidth(180)
+
+        buildSRPMBox.setTitle("Target build directory")
         self.buildLocationEdit = QLineEdit()
         self.buildToButton = QPushButton("Change path")
+        self.buildToButton.setMinimumHeight(45)
         self.buildToButton.clicked.connect(self.openBuildPathFileDialog)
-        layoutbuildPathBox.addWidget(self.buildLocationEdit, 0, 0)
-        layoutbuildPathBox.addWidget(self.buildToButton, 0, 1)
-        buildPathBox.setLayout(layoutbuildPathBox)
+        self.textBuildSRPMLabel = QLabel()
+        layoutbuildSRPMBox.addWidget(self.buildLocationEdit, 0, 0)
+        layoutbuildSRPMBox.addWidget(self.buildToButton, 0, 1)
+        layoutbuildSRPMBox.addWidget(self.textBuildSRPMLabel)
+        buildSRPMBox.setLayout(layoutbuildSRPMBox)
+
+        self.buildSRPMButton = QPushButton("Build source package")
+        self.buildSRPMButton.setMinimumHeight(45)
+        self.buildSRPMButton.setMinimumWidth(180)
+        self.buildSRPMButton.setMaximumHeight(45)
+        self.buildSRPMButton.setMaximumWidth(180)
+        self.buildSRPMButton.clicked.connect(self.buildSrpm)
+
+        buildRPMBox.setTitle("Build RPM")
+        self.textBuildRPMLabel = QLabel()
+        self.BuildArchLabel = QLabel("Architecture")
+        self.BuildArchEdit = QComboBox()
+        self.BuildArchEdit.setMaximumWidth(200)
+        self.BuildArchEdit.setMinimumHeight(30)
+        self.BuildArchEdit.addItem("i386")
+        self.BuildArchEdit.addItem("x86_64")
+        self.BuildArchLabel.setBuddy(self.BuildArchEdit)
+        self.BuildArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.BuildArchLabel.setToolTip(
+            "Choose architekture (32 bit - i386 or 64 bit - x68_64)")
+
+        self.BuildDistroLabel = QLabel("Distribution")
+        self.BuildDistroEdit = QComboBox()
+        self.BuildDistroEdit.setMaximumWidth(200)
+        self.BuildDistroEdit.setMinimumHeight(30)
+        self.BuildDistroEdit.addItem("fedora-22")
+        self.BuildDistroEdit.addItem("fedora-21")
+        self.BuildDistroEdit.addItem("fedora-20")
+        self.BuildDistroEdit.addItem("fedora-19")
+        self.BuildDistroEdit.addItem("fedora-rawhide")
+        self.BuildDistroEdit.addItem("epel-7")
+        self.BuildDistroEdit.addItem("epel-6")
+        self.BuildDistroEdit.addItem("epel-5")
+        self.BuildDistroLabel.setBuddy(self.BuildDistroEdit)
+        self.BuildDistroLabel.setCursor(
+            QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.BuildDistroLabel.setToolTip("Choose distribution")
+        layoutbuildRPMBox.addWidget(self.BuildArchLabel, 0, 0)
+        layoutbuildRPMBox.addWidget(self.BuildArchEdit, 1, 0)
+        layoutbuildRPMBox.addWidget(self.BuildDistroLabel, 0, 2)
+        layoutbuildRPMBox.addWidget(self.BuildDistroEdit, 1, 2)
+        layoutbuildRPMBox.addWidget(self.textBuildRPMLabel, 2, 0)
+        buildRPMBox.setLayout(layoutbuildRPMBox)
+
+        self.buildRPMButton = QPushButton("Build package")
+        self.buildRPMButton.setMinimumHeight(45)
+        self.buildRPMButton.setMinimumWidth(180)
+        self.buildRPMButton.setMaximumHeight(45)
+        self.buildRPMButton.setMaximumWidth(180)
+        self.buildRPMButton.clicked.connect(self.buildRpm)
 
         mainLayout = QVBoxLayout()
-        midleLayout = QHBoxLayout()
-        lowerLayout = QHBoxLayout()
-
-        midleLayout.addWidget(specEditBox)
-        lowerLayout.addWidget(buildPathBox)
-
-        mainLayout.addSpacing(40)
-        mainLayout.addLayout(midleLayout)
+        grid_spec = QGridLayout()
+        grid_spec.setAlignment(QtCore.Qt.AlignCenter)
+        grid_spec.addWidget(self.editSpecButton)
+        grid = QGridLayout()
+        grid.setAlignment(QtCore.Qt.AlignCenter)
+        grid.addWidget(self.buildSRPMButton)
+        grid_rpm = QGridLayout()
+        grid_rpm.setAlignment(QtCore.Qt.AlignCenter)
+        grid_rpm.addWidget(self.buildRPMButton)
+        mainLayout.addWidget(specEditBox)
+        mainLayout.addLayout(grid_spec)
         mainLayout.addSpacing(20)
-        mainLayout.addLayout(lowerLayout)
+        mainLayout.addWidget(buildSRPMBox)
+        mainLayout.addLayout(grid)
+        mainLayout.addWidget(buildRPMBox)
+        mainLayout.addLayout(grid_rpm)
         self.setLayout(mainLayout)
 
-    def validatePage(self):
+    def buildSrpm(self):
+        self.textBuildSRPMLabel.setText('Building SRPM...')
+        self.textBuildSRPMLabel.repaint()
         self.base.build_srpm()
         Command("cp " + str(self.base.srpm_path) + " " +
                 self.buildLocationEdit.text()).execute()
         self.base.final_path = self.buildLocationEdit.text()
+        self.textBuildSRPMLabel.setText('Your source package was build in '
+                                        + self.base.final_path)
+
+    def buildRpm(self):
+        self.textBuildRPMLabel.setText('Building RPM...')
+        self.textBuildSRPMLabel.repaint()
+        self.base.final_path = self.buildLocationEdit.text()
+        arch = self.BuildArchEdit.currentText()
+        distro = self.BuildDistroEdit.currentText()
+        self.base.build_rpm_recover(distro, arch)
+        self.textBuildRPMLabel.setText(
+            'Your package was build in ' + self.base.final_path)
+
+    def validatePage(self):
         return True
 
     def editSpecFile(self):
-        '''If user clicked Edit SPACE file,
+        '''If user clicked Edit SPEC file,
            default text editor with the file is open'''
         subprocess.call(('xdg-open', str(self.base.spec_path)))
 
@@ -596,7 +679,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.buildLocationEdit.setText(self.getPath)
 
     def nextId(self):
-        return Wizard.PageFinal
+        return Wizard.PageCoprLogin
 
 
 class CoprLoginPage(QtWidgets.QWizardPage):
@@ -885,7 +968,7 @@ class CoprFinalPage(QtWidgets.QWizardPage):
         super(CoprFinalPage, self).__init__(parent)
 
         self.base = Wizard.base
-        FinalPage.setFinalPage(self, True)
+        CoprFinalPage.setFinalPage(self, True)
         self.setTitle(self.tr("Copr final page"))
         self.setSubTitle(self.tr("Copr additional information"))
 
@@ -901,80 +984,3 @@ class CoprFinalPage(QtWidgets.QWizardPage):
 
     def validatePage(self):
         return True
-
-
-class FinalPage(QtWidgets.QWizardPage):
-
-    def initializePage(self):
-        self.buildPath = (str(self.base.final_path))
-        self.distro = self.base.target_distro
-        self.arch = self.base.target_arch
-        self.finalLabel.setText(
-            "<html><head/><body><p align=\"center\"><span" +
-            "style=\" font-size:24pt;\">Thank you for " +
-            "using RPG!</span></p><p align=\"center\">" +
-            "<span style=\" font-size:24pt;\">Your" +
-            " package was built in:</span></p>" +
-            "<p align=\"center\">" + self.buildPath +
-            "<p></body></html>")
-
-    def __init__(self, Wizard, parent=None):
-        super(FinalPage, self).__init__(parent)
-
-        self.base = Wizard.base
-        self.Wizard = Wizard
-        ''' On this page will be "Finish button" instead of "Next" '''
-        FinalPage.setFinalPage(self, True)
-        self.setTitle(self.tr("Final page"))
-        self.setSubTitle(self.tr("Your package was successfully created"))
-        self.finalLabel = QLabel()
-        self.coprLabel = QLabel()
-        self.coprLabel.setText(
-            "<html><head/><body><p align=\"center\"><span" +
-            "style=\" font-size:14pt;\">" +
-            "For upload your package to Copr, choose Next " +
-            "button, otherwise use Finish button." +
-            "</p></body></html>")
-        self.rpmButton = QPushButton("Build compiled rpm package")
-        self.rpmButton.setMinimumHeight(45)
-        self.rpmButton.setMinimumWidth(200)
-        self.rpmButton.setMaximumHeight(45)
-        self.rpmButton.setMaximumWidth(250)
-        self.rpmButton.clicked.connect(self.buildRpm)
-
-        mainLayout = QVBoxLayout()
-        grid = QGridLayout()
-        grid.addWidget(self.rpmButton)
-        grid.setAlignment(QtCore.Qt.AlignCenter)
-        mainLayout.addSpacing(100)
-        mainLayout.addWidget(self.finalLabel)
-        mainLayout.addSpacing(50)
-        mainLayout.addWidget(self.coprLabel)
-        mainLayout.addSpacing(50)
-        mainLayout.addLayout(grid)
-        self.setLayout(mainLayout)
-
-    def buildRpm(self):
-        self.rpm_dialog = QDialog(self)
-        self.rpm_dialog.resize(600, 400)
-        self.rpm_dialog.setWindowTitle("Building RPM")
-        self.rpm_progress = QTextEdit()
-        self.rpm_progress.setReadOnly(True)
-        self.rpm_progress.setText("Building RPM package is in progress...")
-
-        mainLayout = QVBoxLayout()
-        mainLayout.addSpacing(50)
-        mainLayout.addWidget(self.rpm_progress)
-        mainLayout.addSpacing(50)
-        self.rpm_dialog.setLayout(mainLayout)
-        self.rpm_dialog.show()
-        time.sleep(5)
-        self.base.build_rpm(self.distro, self.arch)
-        self.rpm_dialog.close()
-
-    def validatePage(self):
-        print(self.base.spec)
-        return True
-
-    def nextId(self):
-        return Wizard.PageCoprLogin
