@@ -7,7 +7,7 @@ class BuildTest(RpgTestCase):
 
     def test_rpg_project(self):
         self.base = Base()
-        self.base.sack = self.base.dnf_load_sack()
+        self.base.sack = self.base.load_dnf_sack()
         self.base.load_plugins()
         self.base.load_project_from_url(
             self.test_project_dir / "archives/rpg-0.0.2-1.tar.gz")
@@ -39,7 +39,5 @@ class BuildTest(RpgTestCase):
         self.assertTrue(self.base.srpm_path.exists())
         self.base.build_rpm_recover(
             self.base.target_distro, self.base.target_arch)
-
-    def tearDown(self):
         os.remove(str(self.base.srpm_path))
         os.remove(str(self.base.spec_path))

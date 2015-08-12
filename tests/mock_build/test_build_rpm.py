@@ -16,21 +16,25 @@ class PackageBuilderTest(RpgTestCase):
         self.srpm = RpgTestCase.test_project_dir / "srpm"
         self.fail_srpm = self.srpm / "fail.src.rpm"
         self.test_srpm = self.srpm / "test.src.rpm"
+        self.test_rpm = self.srpm / "test.rpm"
 
     def test_build_rpm(self):
         self.assertEqual(
             self.package_builder.build_rpm(self.test_srpm,
                                            PackageBuilderTest.distro,
-                                           PackageBuilderTest.arch),
+                                           PackageBuilderTest.arch,
+                                           self.srpm),
             [])
 
     def test_build_rpm_fail(self):
         self.assertNotEqual(
             self.package_builder.build_rpm(self.fail_srpm,
                                            PackageBuilderTest.distro,
-                                           PackageBuilderTest.arch),
+                                           PackageBuilderTest.arch,
+                                           self.srpm),
             [])
 
     def tearDown(self):
         Command("rm -rf " + str(self.srpm) + "/*.log").execute()
         Command("rm -rf " + str(self.srpm) + "/a-a-a.src.rpm").execute()
+        Command("rm -rf " + str(self.test_rpm)).execute()

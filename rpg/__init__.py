@@ -176,9 +176,9 @@ class Base(object):
             self.srpm_path
         except RuntimeError:
             self.build_srpm()
-        self._package_builder.build_rpm(str(self.srpm_path),
-                                        target_distro, target_arch,
-                                        self.base_dir)
+        return self._package_builder.build_rpm(str(self.srpm_path),
+                                               target_distro, target_arch,
+                                               self.base_dir)
 
     def build_rpm_recover(self, distro, arch):
 
