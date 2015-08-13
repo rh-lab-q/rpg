@@ -10,7 +10,8 @@ ADD_CUSTOM_TARGET (doc-man
 ADD_CUSTOM_TARGET (doc)
 ADD_DEPENDENCIES (doc doc-html doc-man)
 
-if (NOT WITH_MAN EQUAL 0)
+IF (NOT WITH_MAN EQUAL 0)
 	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/rpg.8
-		      DESTINATION share/man/man8)
-endif()
+			DESTINATION share/man/man8
+			OPTIONAL)
+ENDIF()
