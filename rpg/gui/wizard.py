@@ -295,8 +295,8 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.base.spec.URL = self.URLEdit.text()
         self.base.spec.Summary = self.summaryEdit.text()
         self.base.spec.description = self.descriptionEdit.text()
-        self.base.run_raw_sources_analysis()
-        self.base.run_patched_sources_analysis()
+        self.base.run_extracted_source_analysis()
+        self.base.run_patched_source_analysis()
         return True
 
     def nextId(self):
@@ -377,9 +377,9 @@ class ScriptsPage(QtWidgets.QWizardPage):
         if self.buildArchCheckbox.isChecked():
             self.base.spec.BuildArch = "noarch"
         self.base.build_project()
-        self.base.run_compiled_analysis()
+        self.base.run_compiled_source_analysis()
         self.base.install_project()
-        self.base.run_installed_analysis()
+        self.base.run_installed_source_analysis()
         return True
 
     def nextId(self):

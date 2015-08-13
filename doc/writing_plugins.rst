@@ -15,10 +15,10 @@ Plugin is a class that is derived from ``rpg.plugin.Plugin`` and overrides at le
    :widths: 10 60 30
 
 
-   "extracted", "raw files are extracted from chosen archive or copied files from project working directory", :meth:`raw sources analysis <__init__.Base.run_raw_sources_analysis>`
-   "patched", "after application of patches on source files", :meth:`patched sources analysis <__init__.Base.run_patched_sources_analysis>`
-   "compiled", "after execution of ``%build`` script (e.g. calling ``make``)", :meth:`compiled analysis <__init__.Base.run_compiled_analysis>`
-   "installed", "directory containing files after ``make install``", :meth:`installed analysis <__init__.Base.run_installed_analysis>`
+   "extracted", "raw files are extracted from chosen archive or copied files from project working directory", :meth:`extracted source analysis <__init__.Base.run_extracted_source_analysis>`
+   "patched", "after application of patches on source files", :meth:`patched source analysis <__init__.Base.run_patched_source_analysis>`
+   "compiled", "after execution of ``%build`` script (e.g. calling ``make``)", :meth:`compiled source analysis <__init__.Base.run_compiled_source_analysis>`
+   "installed", "directory containing files after ``make install``", :meth:`installed source analysis <__init__.Base.run_installed_source_analysis>`
    "package_built", "path to final rpm package", --
 
 

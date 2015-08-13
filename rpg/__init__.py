@@ -134,17 +134,17 @@ class Base(object):
         if temp_arch:
             remove(temp_arch)
 
-    def run_raw_sources_analysis(self):
+    def run_extracted_source_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
         self._plugin_engine.execute_phase(phases[0],
                                           self.extracted_dir)
 
-    def run_patched_sources_analysis(self):
+    def run_patched_source_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[1],
                                           self.extracted_dir)
 
-    def run_compiled_analysis(self):
+    def run_compiled_source_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[2],
                                           self.extracted_dir)
@@ -155,7 +155,7 @@ class Base(object):
                                       self.installed_dir,
                                       self.spec.install)
 
-    def run_installed_analysis(self):
+    def run_installed_source_analysis(self):
         """executed in background after successful project build"""
         self._plugin_engine.execute_phase(phases[3],
                                           self.installed_dir)
