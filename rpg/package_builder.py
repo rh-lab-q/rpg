@@ -40,10 +40,10 @@ class PackageBuilder(object):
                 line = proc.stdout.readline().decode("utf-8")
                 if PackageBuilder.regex.search(line):
                     yield line
-            Command("mv " + str(next(self.temp_dir.glob("*.rpm"))) +
-                    " " + str(output_dir)).execute()
+            self._ret_code = proc.returncode
 
-        return list(
+        self._ret_code = 0
+        _ret = list(
             check_output(
                 subprocess.Popen(
                     [
@@ -59,6 +59,11 @@ class PackageBuilder(object):
                 )
             )
         )
+        if self._ret_code == 0:
+            for _rpm in self.temp_dir.glob("*.rpm"):
+                Command("mv " + str(_rpm) +
+                        " " + str(output_dir))
+        return _ret
 
     @staticmethod
     def fetch_repos(dist, arch):

@@ -114,7 +114,24 @@ class Base(object):
         except StopIteration:
             raise RuntimeError(
                 "Can't find '{}'! You need to call build_srpm first."
-                .format(str(self.base_dir / (self.project_name + "*.src.rpm"))))
+                .format(str(self.base_dir /
+                        (self.project_name + "*.src.rpm"))))
+
+    @property
+    def rpm_path(self):
+        try:
+            _ret = [
+                _path
+                for _path in self.base_dir.glob(self.project_name + "*.rpm")
+                if not str(_path).endswith(".src.rpm")
+            ]
+            if not _ret:
+                raise StopIteration
+            return _ret
+        except StopIteration:
+            raise RuntimeError(
+                "Can't find '{}'! You need to call build_rpm first."
+                .format(str(self.base_dir / (self.project_name + "*.rpm"))))
 
     def load_project_from_url(self, path):
         """executed in background after dir/tarball/SRPM selection"""
@@ -218,7 +235,8 @@ class Base(object):
                 break
             self.spec.required_files.add(_file)
             self.spec.build_required_files.add(_file)
-        Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")
+        Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")\
+            .execute()
 
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)

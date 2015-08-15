@@ -56,6 +56,10 @@ class MockedSubprocess(object):
         self.stdout = MockedSTDOUT(MockedSubprocess.MockedText[self.poll_ite])
         return None if self.poll_ite != -1 else True
 
+    @staticmethod
+    def returncode(self):
+        return 1
+
 
 class SourceLoaderLongTest(RpgTestCase):
 

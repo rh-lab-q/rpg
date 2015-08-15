@@ -27,7 +27,7 @@ class BuildTest(RpgTestCase):
         self.base.target_distro = "fedora-22"
         self.base.spec.check.append(["make test"])
         self.base.spec.Requires.update(['makedepend', 'mock'])
-        self.base.spec.BuildRequires.update(['makedepend', 'mock'])
+        self.base.spec.BuildRequires.update(['makedepend', 'mock', 'python3-nose'])
         self.base.fetch_repos(self.base.target_distro, self.base.target_arch)
         self.base.run_extracted_source_analysis()
         self.base.run_patched_source_analysis()
@@ -39,5 +39,8 @@ class BuildTest(RpgTestCase):
         self.assertTrue(self.base.srpm_path.exists())
         self.base.build_rpm_recover(
             self.base.target_distro, self.base.target_arch)
+        self.assertTrue(self.base.rpm_path)
+        for _rpm in self.base.rpm_path:
+            os.remove(str(_rpm))
         os.remove(str(self.base.srpm_path))
         os.remove(str(self.base.spec_path))

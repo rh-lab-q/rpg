@@ -43,8 +43,7 @@ class MockAnalyseTest(RpgTestCase):
         self.assertEqual(self.base.spec.Requires,
                          self.base.spec.BuildRequires)
         self.assertEqual(self.base.spec.BuildRequires,
-                         set(['python3-nose', 'python-nose', 'bam']))
-
-    def tearDown(self):
+                         set(['python3-nose', 'python-nose', 'doxygen']))
+        self.assertTrue(self.base.rpm_path)
         Command("rm -rf " + str(FakeBase.base_dir) + "/*rpm " +
                 str(FakeBase.base_dir) + "/*spec").execute()
