@@ -2,12 +2,10 @@ import logging
 from os.path import isfile
 from os.path import isdir
 from pathlib import Path
-import re
 from rpg.command import Command
 from shutil import rmtree
 from shutil import copytree
 from tempfile import mkdtemp
-import urllib
 
 
 class SourceLoader(object):
@@ -124,7 +122,7 @@ class SourceLoader(object):
             except IndexError:
                 if name.endswith(second):
                     return second, None
-        raise LookupError("Couldn't resolve compression method of '{}'!"\
+        raise LookupError("Couldn't resolve compression method of '{}'!"
                           .format(name))
 
     @classmethod
@@ -137,23 +135,11 @@ class SourceLoader(object):
             arch_name)
 
     @classmethod
-    def download_archive(cls, url, arch_name, retreat_counter=0):
+    def download_archive(cls, url, arch_name):
         """ Download file from 'url' and sets file name to 'arch_name'
             Every progress change will call callback function """
-        if retreat_counter == 10:
-            raise RuntimeError("Can't download '{}' - 10 times retreated"
-                               .format(url))
-        else:
-            try:
-                with open(str(arch_name), 'wb') as out_handle,\
-                        urllib.request.urlopen(url) as in_handle:
-                    while True:
-                        buff = in_handle.read(cls._download_block_size)
-                        if buff:
-                            break
-                        out_handle.write(buff)
-            except:
-                cls.download_archive(url, arch_name, retreat_counter + 1)
+        import urllib.request
+        urllib.request.urlretrieve(url, str(arch_name))
 
     @staticmethod
     def _copy_dir(path, ex_dir):

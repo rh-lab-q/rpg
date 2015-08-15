@@ -118,14 +118,16 @@ class Base(object):
 
     def load_project_from_url(self, path):
         """executed in background after dir/tarball/SRPM selection"""
-        path = Path(path)
         temp_arch = "downloaded_archive.tar.gz"
         if search(r"github\.com/[^/]+/[^/]+/?$", str(path)):
-            self._source_loader.download_git_repo(str(path), temp_arch)
+            self._source_loader.download_git_repo(path, temp_arch)
+            path = Path(temp_arch)
         elif str(path).startswith("http"):
-            self._source_loader.download_archive(str(path), temp_arch)
+            self._source_loader.download_archive(path, temp_arch)
+            path = Path(temp_arch)
         else:
             temp_arch = None
+            path = Path(path)
         self._hash = self._compute_checksum(path)
         self._input_name = path.name
         self._setup_workspace()
