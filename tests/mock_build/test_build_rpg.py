@@ -26,8 +26,8 @@ class BuildTest(RpgTestCase):
         self.base.target_arch = "i386"
         self.base.target_distro = "fedora-22"
         self.base.spec.check.append(["make test"])
-        self.base.spec.Requires.union(['makedepend', 'mock'])
-        self.base.spec.BuildRequires.union(['makedepend', 'mock'])
+        self.base.spec.Requires.update(['makedepend', 'mock'])
+        self.base.spec.BuildRequires.update(['makedepend', 'mock'])
         self.base.fetch_repos(self.base.target_distro, self.base.target_arch)
         self.base.run_extracted_source_analysis()
         self.base.run_patched_source_analysis()
