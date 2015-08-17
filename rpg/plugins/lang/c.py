@@ -30,5 +30,5 @@ class CPlugin(Plugin):
                               if regex.match(s) and not regex2.match(s)])
         unlink(file_name)
 
-        spec.required_files = spec.required_files.union(_ret_paths)
-        spec.build_required_files = spec.build_required_files.union(_ret_paths)
+        spec.required_files.update(_ret_paths)
+        spec.build_required_files.update(_ret_paths)

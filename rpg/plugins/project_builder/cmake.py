@@ -25,5 +25,5 @@ class CMakePlugin(Plugin):
             with p.open() as f:
                 matches += regex.findall(f.read())
         matches = set(matches)
-        spec.build_required_files = spec.build_required_files.union(matches)
-        spec.required_files = spec.required_files.union(matches)
+        spec.build_required_files.update(matches)
+        spec.required_files.update(matches)

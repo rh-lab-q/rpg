@@ -18,12 +18,12 @@ class FilesToPkgsPlugin(Plugin):
         if sack:
             _query = sack.query().available()
             logging.info("Resolving Requires")
-            spec.Requires = spec.Requires.union(
+            spec.Requires.update(
                 set(_resolve(spec.required_files, _query)))
             logging.info("Resolving BuildRequires")
-            spec.BuildRequires = spec.BuildRequires.union(
+            spec.BuildRequires.update(
                 set(_resolve(spec.build_required_files, _query)))
             spec.required_files = set()
             spec.build_required_files = set()
             if str(spec.check):
-                spec.BuildRequires = spec.BuildRequires.union(spec.Requires)
+                spec.BuildRequires.update(spec.Requires)
