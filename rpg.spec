@@ -1,5 +1,5 @@
 Name:           rpg
-Version:        0.0.2
+Version:        0.0.3
 Release:        1%{?snapshot}%{?dist}
 Summary:        RPM Package Generator
 License:        GPLv2
@@ -67,6 +67,65 @@ make ARGS="-V" test-long
 %{_mandir}/man8/rpg.8.gz
 
 %changelog
+* Tue Aug 18 2015 Jan Silhan <jsilhan@redhat.com> 0.0.3-1
+- SourceLoader + load_project_from_url refactored (Miroslav Cibulka)
+- Gui building page redesign (fix #226) (regeciovad)
+- test: really update spec set attr (Jan Silhan)
+- cosmetic: union -> update (Jan Silhan)
+- make install fix (fix #247) (LukasSlouka)
+- Base method plugin calls refactor (fix #248) (LukasSlouka)
+- failing tests fix (Miroslav Cibulka)
+- Build RPG test (fix #206) (regeciovad)
+- Subpackages page removed (fix #190) (regeciovad)
+- Writing plugins doc (fix #123) (LukasSlouka)
+- Docs warning (fix #237) (LukasSlouka)
+- cmake.py extended: get dependencies from CMakeCache (fix #191) (FLuptak)
+- Base.build_rpm: move result rpm to base_dir (Jan Silhan)
+- Base.srpm_path search for more proper srpm file name (Jan Silhan)
+- call build_rpm in build_rpm_recover (Jan Silhan)
+- builds srpm if does not exists during Base.build_rpm (Jan Silhan)
+- Base: renamed dnf_load_sack to load_dnf_sack (Jan Silhan)
+- Base.compute_checksum madew private (Jan Silhan)
+- removed: apply patches (Jan Silhan)
+- Spec tags documentation (fix #188) (LukasSlouka)
+- Subpackage documentation (#fix 219) (LukasSlouka)
+- merging Requires and BuildRequires if spec.check is not empty (fix #228)
+  (Miroslav Cibulka)
+- loading archives bug fixed (fix #229) (Miroslav Cibulka)
+- ReadTheDocs (fix #231) (LukasSlouka)
+- Spec tags as instance attributes (fix #219) (LukasSlouka)
+- Flake8 errors fixed (mostly) with Pep8 (fix #222) (Miroslav Cibulka)
+- Build rpm in GUI(fix #218) (regeciovad)
+- Base build_rpm (#218) (regeciovad)
+- Speeding up files_to_pkgs with dictionary + flake8 errors (Miroslav Cibulka)
+- make plugin now search for Makefile and makefile (Miroslav Cibulka)
+- Mock project analyse + mock-test + unit-test (without mock) (fix #184)
+  (Miroslav Cibulka)
+- mock_build test suite added (fix #211) (Miroslav Cibulka)
+- Spec attributes refactoring (fix #219) (LukasSlouka)
+- git rebase CI PR (fix #215) (Pavol Vican)
+- Documentation fix for python3-sphinx (fix #121) (LukasSlouka)
+- Conf.py fix (LukasSlouka)
+- Print replacement (LukasSlouka)
+- Documentation for Base and Spec (fix #188) (LukasSlouka)
+- Comments removal (fix #121) (LukasSlouka)
+- CLI options documentation (fix #198) (LukasSlouka)
+- Doc setup (fix #121) (LukasSlouka)
+- load_project_from_url regex checking of github url (Miroslav Cibulka)
+- rpg.package_builder.build_rpm implemented + long tests (fix #175) (fix #176)
+  (Miroslav Cibulka)
+- spec file: redundant python3-copr removed (regeciovad)
+- Extra parameter removed from download_git_repo - callback (fix #207)
+  (Miroslav Cibulka)
+- Mock init cleans cache (regeciovad)
+- command: ignore new line at the end (Jan Silhan)
+- Gui - moved build_project (regeciovad)
+- consmetic: conf: move import statement (Jan Silhan)
+- README to install rpg (fix #200) (Pavol Vican)
+- fix the COPR builds (Pavol Vican)
+- add log flake8 (fix #171) (Pavol Vican)
+- Upload srpm + run copr (fix #159) (Pavol Vican)
+
 * Fri Jul 03 2015 Jan Silhan <jsilhan@redhat.com> 0.0.2-1
 - yum install added to travis (Miroslav Cibulka)
 - python3-corp added to mock rpg.cfg (Miroslav Cibulka)
