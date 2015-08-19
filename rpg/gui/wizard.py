@@ -21,9 +21,9 @@ class Wizard(QtWidgets.QWizard):
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
     NUM_PAGES = 9
-    (PageImport, PageMandatory, PageScripts,
-        PageRequires, PageScriplets, PageBuild,
-        PageCoprLogin, PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
+    (PageImport, PageMandatory, PageScripts, PageRequires, PageScriplets,
+        PageBuild, PageCoprLogin, PageCoprBuild,
+        PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
         super(Wizard, self).__init__(parent)
@@ -105,6 +105,7 @@ class ImportPage(QtWidgets.QWizardPage):
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(self.importLabel, 0, 0, 1, 1)
         grid.addWidget(self.importEdit, 0, 1, 1, 6)
         grid.addWidget(self.importButton, 0, 7, 1, 1)
@@ -112,7 +113,7 @@ class ImportPage(QtWidgets.QWizardPage):
         grid.addWidget(self.DistroEdit, 1, 1, 1, 2)
         grid.addWidget(self.ArchLabel, 2, 0, 1, 0)
         grid.addWidget(self.ArchEdit, 2, 1, 1, 2)
-        mainLayout.addSpacing(40)
+        mainLayout.addSpacing(25)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
 
@@ -186,7 +187,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.base = Wizard.base
 
         self.setTitle(self.tr("Mandatory fields"))
-        self.setSubTitle(self.tr("Fill in fields and import "))
+        self.setSubTitle(self.tr("Basic required information"))
 
         ''' Creating widgets and setting them to layout'''
         self.nameLabel = QLabel("Name<font color=\'red\'>*</font>")
@@ -261,6 +262,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(self.nameLabel, 0, 0)
         grid.addWidget(self.nameEdit, 0, 1)
         grid.addWidget(self.versionLabel, 1, 0)
@@ -275,7 +277,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         grid.addWidget(self.descriptionEdit, 5, 1)
         grid.addWidget(self.URLLabel, 6, 0)
         grid.addWidget(self.URLEdit, 6, 1)
-        mainLayout.addSpacing(40)
+        mainLayout.addSpacing(25)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
 
@@ -324,7 +326,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
         prepareLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         prepareLabel.setToolTip(
             "Script commands to prepare the program (e.g. to uncompress it) " +
-            "so that it will be ready for building. Typically this is " +
+            "so that it will be ready for building.<br> Typically this is " +
             "just %autosetup; a common variation is %autosetup -n NAME if " +
             "the source file unpacks into NAME")
 
@@ -353,7 +355,9 @@ class ScriptsPage(QtWidgets.QWizardPage):
             "(e.g. shell scripts, data files), then add BuildArch: noarch. " +
             "The architecture for the binary RPM will then be noarch")
 
+        mainLayout = QVBoxLayout()
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(prepareLabel, 0, 0)
         grid.addWidget(self.prepareEdit, 0, 1)
         grid.addWidget(buildLabel, 1, 0)
@@ -364,7 +368,9 @@ class ScriptsPage(QtWidgets.QWizardPage):
         grid.addWidget(self.checkEdit, 3, 1)
         grid.addWidget(buildArchLabel, 4, 0)
         grid.addWidget(self.buildArchCheckbox, 4, 1)
-        self.setLayout(grid)
+        mainLayout.addSpacing(25)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
 
     def validatePage(self):
         self.base.spec.prep = Command(self.prepareEdit.toPlainText())
@@ -420,14 +426,18 @@ class RequiresPage(QtWidgets.QWizardPage):
         providesLabel.setToolTip(
             "List virtual package names that this package provides")
 
+        mainLayout = QVBoxLayout()
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(buildRequiresLabel, 0, 0)
-        grid.addWidget(self.bRequiresEdit, 1, 0)
-        grid.addWidget(requiresLabel, 2, 0)
-        grid.addWidget(self.requiresEdit, 3, 0,)
-        grid.addWidget(providesLabel, 4, 0)
-        grid.addWidget(self.providesEdit, 5, 0)
-        self.setLayout(grid)
+        grid.addWidget(self.bRequiresEdit, 0, 1)
+        grid.addWidget(requiresLabel, 1, 0)
+        grid.addWidget(self.requiresEdit, 1, 1)
+        grid.addWidget(providesLabel, 2, 0)
+        grid.addWidget(self.providesEdit, 2, 1)
+        mainLayout.addSpacing(25)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
 
     def validatePage(self):
         self.base.spec.BuildRequires = self.bRequiresEdit.toPlainText()
@@ -468,42 +478,46 @@ class ScripletsPage(QtWidgets.QWizardPage):
         preLabel = QLabel("%pre: ")
         self.preEdit = QTextEdit()
         preLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        preLabel.setToolTip("Before a packages is installed")
+        preLabel.setToolTip("Before a package is installed")
 
         postLabel = QLabel("%post: ")
         self.postEdit = QTextEdit()
         postLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        postLabel.setToolTip("After a packages is installed")
-
-        postunLabel = QLabel("%postun: ")
-        self.postunEdit = QTextEdit()
-        postunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        postunLabel.setToolTip("After a packages is uninstalled")
+        postLabel.setToolTip("After a package is installed")
 
         preunLabel = QLabel("%preun: ")
         self.preunEdit = QTextEdit()
         preunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        preunLabel.setToolTip("Before a packages is uninstalled")
+        preunLabel.setToolTip("Before a package is uninstalled")
+
+        postunLabel = QLabel("%postun: ")
+        self.postunEdit = QTextEdit()
+        postunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        postunLabel.setToolTip("After a package is uninstalled")
 
         posttransLabel = QLabel("%posttrans: ")
         self.posttransEdit = QTextEdit()
         posttransLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         posttransLabel.setToolTip("At the end of transaction")
 
+        mainLayout = QVBoxLayout()
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(pretransLabel, 0, 0)
         grid.addWidget(self.pretransEdit, 0, 1)
         grid.addWidget(preLabel, 1, 0)
         grid.addWidget(self.preEdit, 1, 1,)
         grid.addWidget(postLabel, 2, 0)
         grid.addWidget(self.postEdit, 2, 1)
-        grid.addWidget(postunLabel, 3, 0)
-        grid.addWidget(self.postunEdit, 3, 1)
-        grid.addWidget(preunLabel, 4, 0)
-        grid.addWidget(self.preunEdit, 4, 1,)
+        grid.addWidget(preunLabel, 3, 0)
+        grid.addWidget(self.preunEdit, 3, 1,)
+        grid.addWidget(postunLabel, 4, 0)
+        grid.addWidget(self.postunEdit, 4, 1)
         grid.addWidget(posttransLabel, 5, 0)
         grid.addWidget(self.posttransEdit, 5, 1)
-        self.setLayout(grid)
+        mainLayout.addSpacing(25)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
 
     def validatePage(self):
         self.base.spec.pretrans = Command(self.pretransEdit.toPlainText())
@@ -792,6 +806,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         gridLoginText.addWidget(self.textLoginLabel, 0, 1, 1, 1)
 
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(self.usernameLabel, 2, 0, 1, 1)
         grid.addWidget(self.usernameEdit, 2, 1, 1, 1)
         grid.addWidget(self.loginLabel, 3, 0, 1, 1)
@@ -806,7 +821,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         lowerLayout = QHBoxLayout()
         lowerLayout.addWidget(releaseBox)
 
-        mainLayout.addSpacing(40)
+        mainLayout.addSpacing(25)
         mainLayout.addLayout(gridLoginText)
         mainLayout.addSpacing(5)
         mainLayout.addLayout(grid)
@@ -889,12 +904,13 @@ class CoprBuildPage(QtWidgets.QWizardPage):
         gridBuildText.addWidget(self.textBuildLabel, 0, 1, 1, 1)
 
         grid = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(self.packageDescLabel, 2, 0, 1, 1)
         grid.addWidget(self.packageDescEdit, 2, 1, 1, 1)
         grid.addWidget(self.packageInstuctionLabel, 3, 0, 1, 1)
         grid.addWidget(self.packageInstuctionEdit, 3, 1, 1, 1)
 
-        mainLayout.addSpacing(40)
+        mainLayout.addSpacing(25)
         mainLayout.addLayout(gridBuildText)
         mainLayout.addSpacing(10)
         mainLayout.addLayout(grid)
