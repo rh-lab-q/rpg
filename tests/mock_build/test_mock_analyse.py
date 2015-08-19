@@ -6,6 +6,12 @@ from tests.support import RpgTestCase
 from pathlib import Path
 
 
+class FakeConf(object):
+
+    exclude = ""
+    directories = []
+
+
 class FakeBase(Base):
 
     base_dir = Path(RpgTestCase.test_project_dir / "mock_project")
@@ -24,6 +30,8 @@ class FakeBase(Base):
         self.spec.build = "make"
         self.sack = self.load_dnf_sack()
         self._package_builder = PackageBuilder()
+        self.conf = FakeConf()
+        self.load_plugins()
 
 
 class MockAnalyseTest(RpgTestCase):
@@ -44,6 +52,6 @@ class MockAnalyseTest(RpgTestCase):
                          self.base.spec.BuildRequires)
         self.assertEqual(self.base.spec.BuildRequires,
                          set(['python3-nose', 'python-nose', 'doxygen']))
-        self.assertTrue(self.base.rpm_path)
         Command("rm -rf " + str(FakeBase.base_dir) + "/*rpm " +
-                str(FakeBase.base_dir) + "/*spec").execute()
+                str(FakeBase.base_dir) + "/*spec " +
+                str(FakeBase.base_dir / "mock_logs")).execute()

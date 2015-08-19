@@ -14,6 +14,7 @@ class PackageBuilder(object):
 
     def __init__(self):
         self.temp_dir = Path(tempfile.gettempdir())
+        self.mock_logs = Path()
 
     @staticmethod
     def build_srpm(spec_file, tarball, output_dir):
@@ -28,12 +29,19 @@ class PackageBuilder(object):
                 " " + str(output_dir)).execute()
 
     def check_logs(self):
-        with open(str(self.temp_dir) + "/build.log") as build_log:
+        with open(str(self.mock_logs) + "/build.log") as build_log:
             for line in build_log.readlines():
                 if PackageBuilder.regex.search(line):
                     yield line
 
     def build_rpm(self, srpm, distro, arch, output_dir):
+
+        def move_files(output, files):
+            if not output.is_dir():
+                Command("mkdir " + str(output)).execute()
+            for _out in files:
+                Command("cp " + str(_out) +
+                        " " + str(output)).execute()
 
         def check_output(proc):
             while proc.poll() is None:
@@ -59,10 +67,9 @@ class PackageBuilder(object):
                 )
             )
         )
-        if self._ret_code == 0:
-            for _rpm in self.temp_dir.glob("*.rpm"):
-                Command("mv " + str(_rpm) +
-                        " " + str(output_dir))
+        move_files(output_dir, self.temp_dir.glob("*.rpm"))
+        self.mock_logs = output_dir / "mock_logs"
+        move_files(self.mock_logs, self.temp_dir.glob("*.log"))
         return _ret
 
     @staticmethod

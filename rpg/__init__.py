@@ -206,35 +206,16 @@ class Base(object):
             return self.build_rpm(
                 distro, arch) + list(self._package_builder.check_logs())
 
-        _files_to_pkgs = FilesToPkgsPlugin()
-
-        while True:
-            _file = ""
+        def analyse():
             _files_to_pkgs.installed(self.base_dir,
                                      self.spec,
                                      self.sack)
             self.write_spec()
-            for err in build():
-                match = search(
-                    r"DEBUG\:\s*[^:]+\:\s*([^:]+)\:\s*" +
-                    r"[cC][oO][mM][mM][aA][nN][dD]\s*[nN][oO][tT]\s*" +
-                    r"[fF][oO][uU][nN][dD]", err)
-                if match:
-                    if match.group(1) == _file or\
-                            "/usr/bin/" + match.group(1) == _file:
-                        logging.info("Couldn't resolve '{}'!"
-                                     .format(match.group(1)))
-                        return
-                    else:
-                        if "/" in match.group(1):
-                            _file = match.group(1)
-                        else:
-                            _file = "/usr/bin/" + match.group(1)
-                    break
-            if _file == "":
-                break
-            self.spec.required_files.add(_file)
-            self.spec.build_required_files.add(_file)
+
+        _files_to_pkgs = FilesToPkgsPlugin()
+        analyse()
+        while self._plugin_engine.execute_mock_recover(build()):
+            analyse()
         Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")\
             .execute()
 

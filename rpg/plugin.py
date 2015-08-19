@@ -21,3 +21,7 @@ class Plugin:
     # def package_build(self, package_path, spec, sack):
     #     # :api
     #     pass
+
+    # def mock_recover(self, log, spec):
+    #     # :api
+    #     pass

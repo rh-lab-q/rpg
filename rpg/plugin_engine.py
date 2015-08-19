@@ -37,10 +37,30 @@ class PluginEngine:
                 try:
                     method(project_dir, self.spec, self.sack)
                 except Exception as err:
-                    msg = ''.join(traceback.format_tb(err.__traceback__)[1:])
+                    msg = ''.join(traceback.format_tb(err.__traceback__))
                     logging.warn(
                         "error during executing plugin %s:\n%s"
                         % (plugin_name, msg))
+
+    def execute_mock_recover(self, log):
+        _ret_code = False
+        for plugin in self.plugins:
+            try:
+                method = getattr(plugin, "mock_recover")
+            except AttributeError:
+                continue
+            if callable(method):
+                logging.info("executing {}.mock_recover()"
+                             .format(plugin.__class__.__name__))
+                try:
+                    _ret_code |= method(log, self.spec)
+                except Exception as ex:
+                    msg = str(ex) + "\n" +\
+                        ''.join(traceback.format_tb(ex.__traceback__))
+                    logging.warn(
+                        "error during execution \n{}"
+                        .format(msg))
+        return _ret_code
 
     def load_plugins(self, path, excludes=[]):
         """finds all plugins in dir and it's subdirectories"""

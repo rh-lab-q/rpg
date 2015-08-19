@@ -35,6 +35,6 @@ class PackageBuilderTest(RpgTestCase):
             [])
 
     def tearDown(self):
-        Command("rm -rf " + str(self.srpm) + "/*.log").execute()
-        Command("rm -rf " + str(self.srpm) + "/a-a-a.src.rpm").execute()
-        Command("rm -rf " + str(self.test_rpm)).execute()
+        Command("rm -rf " + str(self.srpm) + "/mock_logs " +
+                str(self.srpm) + "/a-a-a*rpm " +
+                str(self.test_rpm)).execute()
