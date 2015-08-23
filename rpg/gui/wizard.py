@@ -752,6 +752,10 @@ class BuildPage(QtWidgets.QWizardPage):
         arch = self.BuildArchEdit.currentText()
         distro = self.BuildDistroEdit.currentText()
         self.base.build_rpm_recover(distro, arch)
+        packages = self.base.rpm_path
+        for package in packages:
+            Command("cp " + str(package) + " " +
+                    self.base.final_path).execute()
         self.textBuildRPMLabel.setText(
             'Your package was build in ' + self.base.final_path)
 
