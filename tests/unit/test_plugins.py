@@ -11,6 +11,7 @@ from rpg.plugins.lang.c import CPlugin
 from rpg.spec import Spec
 from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
+from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 
 
 class MockSack:
@@ -88,7 +89,9 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/Makefile', None, None),
                  ('/py/requires/sourcecode2.py', None, None),
                  ('/mock_project/mock-1.0.tar.gz', None, None),
-                 ('/c/CMakeCache.txt', None, None)]
+                 ('/c/CMakeCache.txt', None, None),
+                 ('/setuptools/setup.py', None, None),
+                 ('/setuptools/testscript.py', None, None)]
         excludes = [('/patch/__pycache__/', r'%exclude', None),
                     ('/c/__pycache__/', r'%exclude', None),
                     ('/hello_project/__pycache__/', r'%exclude', None),
@@ -99,7 +102,8 @@ class FindPatchPluginTest(PluginTestCase):
                     ('/archives/__pycache__/', r'%exclude', None),
                     ('/__pycache__/', r'%exclude', None),
                     ('/srpm/__pycache__/', '%exclude', None),
-                    ('/mock_project/__pycache__/', '%exclude', None)]
+                    ('/mock_project/__pycache__/', '%exclude', None),
+                    ('/setuptools/__pycache__/', '%exclude', None)]
         sorted_files = sorted(files + excludes, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)
@@ -168,3 +172,13 @@ class FindPatchPluginTest(PluginTestCase):
         cmakeplug.compiled(self.test_project_dir / "c", self.spec, self.sack)
         self.assertEqual(self.spec.build_required_files, expected)
         self.assertEqual(self.spec.required_files, expected)
+
+    def test_setuptools(self):
+        setuptplug = SetuptoolsPlugin()
+        setuptplug.patched(
+            self.test_project_dir / "setuptools", self.spec, self.sack)
+        self.assertEqual(self.spec.BuildRequires, {"python3-setuptools"})
+        self.assertEqual(str(self.spec.build), "python3 setup.py build")
+        self.assertEqual(
+            str(self.spec.install),
+            "python3 setup.py install --skip-build --root $RPM_BUILD_ROOT")
