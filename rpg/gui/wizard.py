@@ -53,7 +53,7 @@ class ImportPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Beginning"))
+        self.setTitle(self.tr("    Beginning"))
         self.setSubTitle(self.tr("Choose distribution and import " +
                                  "tarball or folder with source code"))
         self.textLabel = QLabel()
@@ -197,7 +197,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Mandatory fields"))
+        self.setTitle(self.tr("    Mandatory fields"))
         self.setSubTitle(self.tr("Basic required information"))
 
         ''' Creating widgets and setting them to layout'''
@@ -328,7 +328,7 @@ class ScriptsPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Package building information"))
+        self.setTitle(self.tr("    Package building information"))
         self.setSubTitle(self.tr(
             "Properties for building and testing of package"))
 
@@ -413,7 +413,7 @@ class InstallPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Package installation information"))
+        self.setTitle(self.tr("    Package installation information"))
         self.setSubTitle(self.tr(
             "Properties for installation of package"))
 
@@ -488,7 +488,7 @@ class RequiresPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Requires page"))
+        self.setTitle(self.tr("    Requires page"))
         self.setSubTitle(self.tr("Write requires and provides"))
 
         buildRequiresLabel = QLabel("BuildRequires: ")
@@ -560,7 +560,7 @@ class UninstallPage(QtWidgets.QWizardPage):
         super(UninstallPage, self).__init__(parent)
 
         self.base = Wizard.base
-        self.setTitle(self.tr("Package uninstallation information"))
+        self.setTitle(self.tr("    Package uninstallation information"))
         self.setSubTitle(self.tr(
             "Properties for uninstallation of package"))
 
@@ -632,7 +632,7 @@ class BuildPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
         self.Wizard = Wizard  # Main wizard of program
-        self.setTitle(self.tr("Build page"))
+        self.setTitle(self.tr("    Build page"))
         self.setSubTitle(self.tr("Options to build"))
 
         specEditBox = QGroupBox()
@@ -786,7 +786,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Copr page"))
+        self.setTitle(self.tr("    Copr page"))
         self.setSubTitle(self.tr("Copr mandatory information"))
 
         self.textLoginLabel = QLabel()
@@ -961,7 +961,7 @@ class CoprBuildPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
 
-        self.setTitle(self.tr("Copr build page"))
+        self.setTitle(self.tr("    Copr build page"))
         self.setSubTitle(self.tr("Copr additional information"))
 
         self.textBuildLabel = QLabel()
@@ -1067,7 +1067,7 @@ class CoprFinalPage(QtWidgets.QWizardPage):
 
         self.base = Wizard.base
         CoprFinalPage.setFinalPage(self, True)
-        self.setTitle(self.tr("Copr final page"))
+        self.setTitle(self.tr("    Copr final page"))
         self.setSubTitle(self.tr("Copr additional information"))
 
         self.textFinalLabel = QLabel()
