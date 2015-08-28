@@ -16,13 +16,13 @@ class Wizard(QtWidgets.QWizard):
 
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageImport) to 9 (PageCoprFinal)
+        - counted from 0 (PageIntro) to 9 (PageCoprFinal)
         - tooltips are from:
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
-    NUM_PAGES = 10
-    (PageImport, PageMandatory, PageScripts, PageInstall, PageRequires,
-        PageUninstall, PageBuild, PageCoprLogin, PageCoprBuild,
+    NUM_PAGES = 11
+    (PageIntro, PageImport, PageMandatory, PageScripts, PageInstall,
+        PageRequires, PageUninstall, PageBuild, PageCoprLogin, PageCoprBuild,
         PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
@@ -37,6 +37,7 @@ class Wizard(QtWidgets.QWizard):
         self.setButtonLayout(btnList)
 
         # Setting pages to wizard
+        self.setPage(self.PageIntro, IntroPage(self))
         self.setPage(self.PageImport, ImportPage(self))
         self.setPage(self.PageMandatory, MandatoryPage(self))
         self.setPage(self.PageScripts, ScriptsPage(self))
@@ -47,7 +48,42 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageCoprLogin, CoprLoginPage(self))
         self.setPage(self.PageCoprBuild, CoprBuildPage(self))
         self.setPage(self.PageCoprFinal, CoprFinalPage(self))
-        self.setStartId(self.PageImport)
+        self.setStartId(self.PageIntro)
+
+
+class IntroPage(QtWidgets.QWizardPage):
+
+    def __init__(self, Wizard, parent=None):
+        super(IntroPage, self).__init__(parent)
+
+        self.base = Wizard.base
+
+        self.textLabel = QLabel()
+        self.textLabel.setText(
+            "<html><head/><body><p><span style=\"font-size:14pt;\">" +
+            "<h1>Welcome!</h1>" +
+            "RPG - RPM Package Generator is tool, that guides you through" +
+            " the creation of a RPM package.<br>" +
+            "Please fill following details about your package.<br>For " +
+            "more information use tool tips (move the cursor on the label)." +
+            "</p></body></html>")
+
+        mainLayout = QVBoxLayout()
+        grid = QGridLayout()
+        grid.addWidget(self.textLabel, 0, 0, 1, 6)
+        mainLayout.addSpacing(180)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
+
+    def validatePage(self):
+        return True
+
+    def nextId(self):
+        ''' [int] Function that determines the next page after the current one
+            - returns integer value and then checks, which value is page"
+            in NUM_PAGES'''
+
+        return Wizard.PageImport
 
 
 class ImportPage(QtWidgets.QWizardPage):
@@ -60,16 +96,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.setTitle(self.tr("    Beginning"))
         self.setSubTitle(self.tr("Choose distribution and import " +
                                  "tarball or folder with source code"))
-        self.textLabel = QLabel()
-        self.textLabel.setText(
-            "<html><head/><body><p><span style=\"font-size:12pt;\">" +
-            "RPG - RPM Package Generator is tool, that guides you through" +
-            " the creation of a RPM package.<br>" +
-            "Please fill following details about your package.<br>For " +
-            "more information use tool tips (move the cursor on the label)." +
-            "<br><strong>Note:</strong> You can change target distribution" +
-            " and architecture later or you can build more packages." +
-            "</p></body></html>")
+
         self.importLabel = QLabel("Source<font color=\'#FF3333\'>*</font>")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
@@ -120,7 +147,6 @@ class ImportPage(QtWidgets.QWizardPage):
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
-        grid.addWidget(self.textLabel, 0, 0, 1, 6)
         grid.setVerticalSpacing(15)
         grid.addWidget(self.importLabel, 1, 0, 1, 1)
         grid.addWidget(self.importEdit, 1, 1, 1, 6)
