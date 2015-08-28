@@ -667,46 +667,61 @@ class BuildPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Options to build"))
 
         specEditBox = QGroupBox()
-        buildSRPMBox = QGroupBox()
-        buildRPMBox = QGroupBox()
         layoutspecEditBox = QGridLayout()
+        buildPathBox = QGroupBox()
+        layoutbuildPathBox = QGridLayout()
+        buildSRPMBox = QGroupBox()
         layoutbuildSRPMBox = QGridLayout()
+        buildRPMBox = QGroupBox()
         layoutbuildRPMBox = QGridLayout()
 
         specEditBox.setTitle("SPEC file")
         specWarningLabel = QLabel(
-            "* The metada for RPM package (for advanced users)")
-        layoutspecEditBox.addWidget(specWarningLabel, 1, 0)
-        specEditBox.setLayout(layoutspecEditBox)
-
+            "Edit manually the SPEC file that generates RPM package " +
+            "(advanced users)")
         self.editSpecButton = QPushButton("Edit SPEC file")
         self.editSpecButton.clicked.connect(self.editSpecFile)
         self.editSpecButton.setMinimumHeight(45)
         self.editSpecButton.setMinimumWidth(180)
         self.editSpecButton.setMaximumHeight(45)
         self.editSpecButton.setMaximumWidth(180)
+        layoutspecEditBox.addWidget(specWarningLabel, 1, 0)
+        layoutspecEditBox.addWidget(self.editSpecButton, 1, 1)
+        specEditBox.setLayout(layoutspecEditBox)
 
-        buildSRPMBox.setTitle("Target build directory")
+        buildPathBox.setTitle("Target build directory")
+        buildPathLabel = QLabel(
+            "Build packages into selected directory")
         self.buildLocationEdit = QLineEdit()
+        self.buildLocationEdit.setMinimumHeight(35)
         self.buildToButton = QPushButton("Change path")
-        self.buildToButton.setMinimumHeight(45)
+        self.buildToButton.setMinimumHeight(35)
         self.buildToButton.clicked.connect(self.openBuildPathFileDialog)
-        self.textBuildSRPMLabel = QLabel()
-        layoutbuildSRPMBox.addWidget(self.buildLocationEdit, 0, 0)
-        layoutbuildSRPMBox.addWidget(self.buildToButton, 0, 1)
-        layoutbuildSRPMBox.addWidget(self.textBuildSRPMLabel)
-        buildSRPMBox.setLayout(layoutbuildSRPMBox)
+        layoutbuildPathBox.addWidget(buildPathLabel, 0, 0)
+        layoutbuildPathBox.addWidget(self.buildLocationEdit, 1, 0)
+        layoutbuildPathBox.addWidget(self.buildToButton, 1, 1)
+        buildPathBox.setLayout(layoutbuildPathBox)
 
+        buildSRPMLabel = QLabel(
+            "Build packages containing source codes and spec files " +
+            "(not compiled to any specific architecture)")
+        self.textBuildSRPMLabel = QLabel()
         self.buildSRPMButton = QPushButton("Build source package")
         self.buildSRPMButton.setMinimumHeight(45)
         self.buildSRPMButton.setMinimumWidth(180)
         self.buildSRPMButton.setMaximumHeight(45)
         self.buildSRPMButton.setMaximumWidth(180)
         self.buildSRPMButton.clicked.connect(self.buildSrpm)
+        layoutbuildSRPMBox.addWidget(buildSRPMLabel, 0, 0, 1, 2)
+        layoutbuildSRPMBox.addWidget(self.textBuildSRPMLabel, 1, 0)
+        layoutbuildSRPMBox.addWidget(self.buildSRPMButton, 1, 1)
+        buildSRPMBox.setLayout(layoutbuildSRPMBox)
 
-        buildRPMBox.setTitle("Build RPM")
+        buildRPMLabel = QLabel(
+            "Build packages compiled for specific " +
+            "distribution and architecture")
         self.textBuildRPMLabel = QLabel()
-        self.BuildArchLabel = QLabel("Architecture")
+        self.BuildArchLabel = QLabel("    Architecture")
         self.BuildArchEdit = QComboBox()
         self.BuildArchEdit.setMaximumWidth(200)
         self.BuildArchEdit.setMinimumHeight(30)
@@ -716,8 +731,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.BuildArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.BuildArchLabel.setToolTip(
             "Choose architekture (32 bit - i386 or 64 bit - x68_64)")
-
-        self.BuildDistroLabel = QLabel("Distribution")
+        self.BuildDistroLabel = QLabel("    Distribution")
         self.BuildDistroEdit = QComboBox()
         self.BuildDistroEdit.setMaximumWidth(200)
         self.BuildDistroEdit.setMinimumHeight(30)
@@ -733,38 +747,43 @@ class BuildPage(QtWidgets.QWizardPage):
         self.BuildDistroLabel.setCursor(
             QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.BuildDistroLabel.setToolTip("Choose distribution")
-        layoutbuildRPMBox.addWidget(self.BuildArchLabel, 0, 0)
-        layoutbuildRPMBox.addWidget(self.BuildArchEdit, 1, 0)
-        layoutbuildRPMBox.addWidget(self.BuildDistroLabel, 0, 2)
-        layoutbuildRPMBox.addWidget(self.BuildDistroEdit, 1, 2)
-        layoutbuildRPMBox.addWidget(self.textBuildRPMLabel, 2, 0)
-        buildRPMBox.setLayout(layoutbuildRPMBox)
-
         self.buildRPMButton = QPushButton("Build package")
         self.buildRPMButton.setMinimumHeight(45)
         self.buildRPMButton.setMinimumWidth(180)
         self.buildRPMButton.setMaximumHeight(45)
         self.buildRPMButton.setMaximumWidth(180)
         self.buildRPMButton.clicked.connect(self.buildRpm)
+        layoutbuildRPMBox.addWidget(buildRPMLabel, 0, 0, 1, 6)
+        layoutbuildRPMBox.addWidget(self.BuildArchLabel, 1, 0, 1, 1)
+        layoutbuildRPMBox.addWidget(self.BuildArchEdit, 1, 1, 1, 2)
+        layoutbuildRPMBox.addWidget(self.BuildDistroLabel, 2, 0, 1, 1)
+        layoutbuildRPMBox.addWidget(self.BuildDistroEdit, 2, 1, 1, 2)
+        layoutbuildRPMBox.addWidget(self.textBuildRPMLabel, 3, 0)
+        layoutbuildRPMBox.addWidget(self.buildRPMButton, 3, 7)
+        buildRPMBox.setLayout(layoutbuildRPMBox)
 
         mainLayout = QVBoxLayout()
-        grid_spec = QGridLayout()
-        grid_spec.setAlignment(QtCore.Qt.AlignCenter)
-        grid_spec.addWidget(self.editSpecButton)
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignCenter)
-        grid.addWidget(self.buildSRPMButton)
-        grid_rpm = QGridLayout()
-        grid_rpm.setAlignment(QtCore.Qt.AlignCenter)
-        grid_rpm.addWidget(self.buildRPMButton)
         mainLayout.addWidget(specEditBox)
-        mainLayout.addLayout(grid_spec)
-        mainLayout.addSpacing(20)
+        mainLayout.addWidget(buildPathBox)
         mainLayout.addWidget(buildSRPMBox)
-        mainLayout.addLayout(grid)
         mainLayout.addWidget(buildRPMBox)
-        mainLayout.addLayout(grid_rpm)
         self.setLayout(mainLayout)
+
+    def validatePage(self):
+        return True
+
+    def editSpecFile(self):
+        '''If user clicked Edit SPEC file,
+           default text editor with the file is open'''
+        subprocess.call(('xdg-open', str(self.base.spec_path)))
+
+    def openBuildPathFileDialog(self):
+        brows = QFileDialog()
+        self.getPath = brows.getExistingDirectory(self,
+                                                  "Select Directory",
+                                                  expanduser("~"),
+                                                  QFileDialog.ShowDirsOnly)
+        self.buildLocationEdit.setText(self.getPath)
 
     def buildSrpm(self):
         self.textBuildSRPMLabel.setText('Building SRPM...')
@@ -789,22 +808,6 @@ class BuildPage(QtWidgets.QWizardPage):
                     self.base.final_path).execute()
         self.textBuildRPMLabel.setText(
             'Your package was build in ' + self.base.final_path)
-
-    def validatePage(self):
-        return True
-
-    def editSpecFile(self):
-        '''If user clicked Edit SPEC file,
-           default text editor with the file is open'''
-        subprocess.call(('xdg-open', str(self.base.spec_path)))
-
-    def openBuildPathFileDialog(self):
-        brows = QFileDialog()
-        self.getPath = brows.getExistingDirectory(self,
-                                                  "Select Directory",
-                                                  expanduser("~"),
-                                                  QFileDialog.ShowDirsOnly)
-        self.buildLocationEdit.setText(self.getPath)
 
     def nextId(self):
         return Wizard.PageCoprLogin
