@@ -70,7 +70,7 @@ class ImportPage(QtWidgets.QWizardPage):
             "<br><strong>Note:</strong> You can change target distribution" +
             " and architecture later or you can build more packages." +
             "</p></body></html>")
-        self.importLabel = QLabel("Source<font color=\'red\'>*</font>")
+        self.importLabel = QLabel("Source<font color=\'#FF3333\'>*</font>")
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
         self.importLabel.setBuddy(self.importEdit)
@@ -85,7 +85,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importButton.setMinimumWidth(115)
         self.importButton.clicked.connect(self.importPath)
 
-        self.ArchLabel = QLabel("Architecture<font color=\'red\'>*</font>")
+        self.ArchLabel = QLabel("Architecture<font color=\'#FF3333\'>*</font>")
         self.ArchEdit = QComboBox()
         self.ArchEdit.setMinimumHeight(30)
         arch = platform.architecture()[0]
@@ -100,7 +100,8 @@ class ImportPage(QtWidgets.QWizardPage):
         self.ArchLabel.setToolTip(
             "Choose target architecture (32 bit - i386 or 64 bit - x68_64)")
 
-        self.DistroLabel = QLabel("Distribution<font color=\'red\'>*</font>")
+        self.DistroLabel = QLabel(
+            "Distribution<font color=\'#FF3333\'>*</font>")
         self.DistroEdit = QComboBox()
         self.DistroEdit.setMinimumHeight(30)
         self.DistroEdit.addItem("fedora-22")
@@ -140,7 +141,7 @@ class ImportPage(QtWidgets.QWizardPage):
         else:
             self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
                                           "border-width: 1px;" +
-                                          "border-color: red;" +
+                                          "border-color: #FF3333;" +
                                           "border-radius: 3px;" +
                                           "background-color:" +
                                           "rgb(233,233,233);}")
@@ -180,7 +181,7 @@ class ImportPage(QtWidgets.QWizardPage):
         else:
             self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
                                           "border-width: 1px;" +
-                                          "border-color: red;" +
+                                          "border-color: #FF3333;" +
                                           "border-radius: 3px;" +
                                           "background-color:" +
                                           "rgb(233,233,233);}")
@@ -205,7 +206,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.setSubTitle(self.tr("Basic required information"))
 
         ''' Creating widgets and setting them to layout'''
-        self.nameLabel = QLabel("Name<font color=\'red\'>*</font>")
+        self.nameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.nameEdit = QLineEdit()
         self.nameEdit.setMinimumHeight(30)
         self.nameLabel.setBuddy(self.nameEdit)
@@ -214,7 +215,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
             "The (base) name of the package, " +
             "which should match the SPEC file name")
 
-        self.versionLabel = QLabel("Version<font color=\'red\'>*</font>")
+        self.versionLabel = QLabel("Version<font color=\'#FF3333\'>*</font>")
         self.versionEdit = QLineEdit()
         self.versionEdit.setMinimumHeight(30)
         self.versionLabel.setBuddy(self.versionEdit)
@@ -223,7 +224,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
             "The upstream version number, " +
             "usually numbers separated by dots (e.g. 1.7.4)")
 
-        self.releaseLabel = QLabel("Release<font color=\'red\'>*</font>")
+        self.releaseLabel = QLabel("Release<font color=\'#FF3333\'>*</font>")
         self.releaseEdit = QLineEdit()
         self.releaseEdit.setMinimumHeight(30)
         self.releaseLabel.setBuddy(self.releaseEdit)
@@ -232,7 +233,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
             "The initial value should normally be 1%{?dist}. " +
             "Increment the number every time you release a new package")
 
-        self.licenseLabel = QLabel("License<font color=\'red\'>*</font>")
+        self.licenseLabel = QLabel("License<font color=\'#FF3333\'>*</font>")
         self.licenseEdit = QLineEdit()
         self.licenseEdit.setMinimumHeight(30)
         self.licenseLabel.setBuddy(self.licenseEdit)
@@ -240,7 +241,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.licenseLabel.setToolTip(
             "The license, which must be an open source software license")
 
-        self.summaryLabel = QLabel("Summary<font color=\'red\'>*</font>")
+        self.summaryLabel = QLabel("Summary<font color=\'#FF3333\'>*</font>")
         self.summaryEdit = QLineEdit()
         self.summaryEdit.setMinimumHeight(30)
         self.summaryLabel.setBuddy(self.summaryEdit)
@@ -249,7 +250,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
             "A brief, one-line summary of the package. Use American English")
 
         self.descriptionLabel = QLabel(
-            "Description<font color=\'red\'>*</font> ")
+            "Description<font color=\'#FF3333\'>*</font> ")
         self.descriptionEdit = QLineEdit()
         self.descriptionEdit.setMinimumHeight(30)
         self.descriptionLabel.setBuddy(self.descriptionEdit)
@@ -805,28 +806,28 @@ class CoprLoginPage(QtWidgets.QWizardPage):
             "on some public web site." +
             "</span></p></body></html>")
 
-        self.usernameLabel = QLabel("Username<font color=\'red\'>*</font>")
+        self.usernameLabel = QLabel("Username<font color=\'#FF3333\'>*</font>")
         self.usernameEdit = QLineEdit()
         self.usernameEdit.setMinimumHeight(30)
         self.usernameLabel.setBuddy(self.usernameEdit)
         self.usernameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.usernameLabel.setToolTip("Your username from Copr API")
 
-        self.loginLabel = QLabel("Login<font color=\'red\'>*</font>")
+        self.loginLabel = QLabel("Login<font color=\'#FF3333\'>*</font>")
         self.loginEdit = QLineEdit()
         self.loginEdit.setMinimumHeight(30)
         self.loginLabel.setBuddy(self.loginEdit)
         self.loginLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.loginLabel.setToolTip("Your login (not username!) from Copr API")
 
-        self.tokenLabel = QLabel("Token<font color=\'red\'>*</font>")
+        self.tokenLabel = QLabel("Token<font color=\'#FF3333\'>*</font>")
         self.tokenEdit = QLineEdit()
         self.tokenEdit.setMinimumHeight(30)
         self.tokenLabel.setBuddy(self.tokenEdit)
         self.tokenLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.tokenLabel.setToolTip("Your token from Copr API")
 
-        self.packageNameLabel = QLabel("Name<font color=\'red\'>*</font>")
+        self.packageNameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.packageNameEdit = QLineEdit()
         self.packageNameEdit.setMinimumHeight(30)
         self.packageNameLabel.setBuddy(self.packageNameEdit)
@@ -835,7 +836,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageNameLabel.setToolTip(
             "Name of your package. It MUST be unique!")
 
-        self.packageUrlLabel = QLabel("Url<font color=\'red\'>*</font>")
+        self.packageUrlLabel = QLabel("Url<font color=\'#FF3333\'>*</font>")
         self.packageUrlEdit = QLineEdit()
         self.packageUrlEdit.setMinimumHeight(30)
         self.packageUrlLabel.setBuddy(self.packageUrlEdit)
@@ -868,7 +869,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         releaseBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
 
-        releaseBox.setTitle("Choose distribution*")
+        releaseBoxLabel = QLabel("Choose distribution<font color=\'#FF3333\'>*</font>")
         layoutReleaseBox.setColumnStretch(0, 1)
         layoutReleaseBox.setColumnStretch(1, 1)
         layoutReleaseBox.setColumnStretch(2, 1)
@@ -893,6 +894,8 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         gridLoginText.addWidget(self.textLoginLabel, 0, 1, 1, 1)
 
         grid = QGridLayout()
+        grid2 = QGridLayout()
+        grid.setVerticalSpacing(15)
         grid.addWidget(self.usernameLabel, 2, 0, 1, 1)
         grid.addWidget(self.usernameEdit, 2, 1, 1, 1)
         grid.addWidget(self.loginLabel, 3, 0, 1, 1)
@@ -903,6 +906,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         grid.addWidget(self.packageNameEdit, 5, 1, 1, 1)
         grid.addWidget(self.packageUrlLabel, 6, 0, 1, 1)
         grid.addWidget(self.packageUrlEdit, 6, 1, 1, 1)
+        grid2.addWidget(releaseBoxLabel, 0, 0, 1, 1)
 
         lowerLayout = QHBoxLayout()
         lowerLayout.addWidget(releaseBox)
@@ -911,7 +915,8 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(gridLoginText)
         mainLayout.addSpacing(15)
         mainLayout.addLayout(grid)
-        mainLayout.addSpacing(5)
+        mainLayout.addSpacing(15)
+        mainLayout.addLayout(grid2)
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
 
@@ -1019,7 +1024,7 @@ class CoprBuildPage(QtWidgets.QWizardPage):
         except subprocess.CalledProcessError:
             self.textBuildLabel.setText(
                 "<html><head/><body><p align=\"left\"><span" +
-                "style=\" font-size:24pt;\" font color=\'red\'>" +
+                "style=\" font-size:24pt;\" font color=\'#FF3333\'>" +
                 "Error in creating project!" +
                 "<br> Please check your log in information" +
                 "</span></p></body></html>")
@@ -1038,7 +1043,7 @@ class CoprBuildPage(QtWidgets.QWizardPage):
         except subprocess.CalledProcessError:
             self.textBuildLabel.setText(
                 "<html><head/><body><p align=\"left\"><span" +
-                "style=\" font-size:24pt;\" font color=\'red\'>" +
+                "style=\" font-size:24pt;\" font color=\'#FF3333\'>" +
                 "Error in building project!" +
                 "<br> Please check your url information" +
                 "</span></p></body></html>")
