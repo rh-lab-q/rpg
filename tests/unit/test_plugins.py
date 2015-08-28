@@ -12,6 +12,7 @@ from rpg.spec import Spec
 from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
+from rpg.plugins.project_builder.autotools import AutotoolsPlugin
 
 
 class MockSack:
@@ -91,7 +92,9 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/mock_project/mock-1.0.tar.gz', None, None),
                  ('/c/CMakeCache.txt', None, None),
                  ('/setuptools/setup.py', None, None),
-                 ('/setuptools/testscript.py', None, None)]
+                 ('/setuptools/testscript.py', None, None),
+                 ('/autotools/configure.ac', None, None),
+                 ('/autotools/Makefile.am', None, None)]
         excludes = [('/patch/__pycache__/', r'%exclude', None),
                     ('/c/__pycache__/', r'%exclude', None),
                     ('/hello_project/__pycache__/', r'%exclude', None),
@@ -103,7 +106,8 @@ class FindPatchPluginTest(PluginTestCase):
                     ('/__pycache__/', r'%exclude', None),
                     ('/srpm/__pycache__/', '%exclude', None),
                     ('/mock_project/__pycache__/', '%exclude', None),
-                    ('/setuptools/__pycache__/', '%exclude', None)]
+                    ('/setuptools/__pycache__/', '%exclude', None),
+                    ('/autotools/__pycache__/', '%exclude', None)]
         sorted_files = sorted(files + excludes, key=lambda e: e[0])
         self.assertEqual(self.spec.files,
                          sorted_files)
@@ -182,3 +186,23 @@ class FindPatchPluginTest(PluginTestCase):
         self.assertEqual(
             str(self.spec.install),
             "python3 setup.py install --skip-build --root $RPM_BUILD_ROOT")
+
+    def test_autotools(self):
+        autotplug = AutotoolsPlugin()
+        expected = set(["autoconf", "automake", "libtool",
+                        "test1 >= 2.36.0", "test2.1 >= test1.0",
+                        "test2.2", "test3.1 >= 0.4.6", "test3.2 >= 1.7.11",
+                        "test3.3 >= 4.11.0", "test4 <= test5", "test5.1",
+                        "test5.2", "test6 > test5", "test7.1", "test7.2",
+                        "test7.3", "test8.1 = doNotKnowIfViableButItWorks",
+                        "test8.2", "test9.1", "test9.2"])
+        autotplug.patched(
+            self.test_project_dir / "autotools", self.spec, self.sack)
+        self.assertEqual(self.spec.BuildRequires, expected)
+        self.assertEqual(
+            str(self.spec.build),
+            "autoreconf --install --force\n"
+            "./configure\nmake")
+        self.assertEqual(
+            str(self.spec.install),
+            "make install DESTDIR=$RPM_BUILD_ROOT")
