@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QTextEdit, QHBoxLayout, QFileDialog,
-                             QComboBox)
+                             QComboBox, QWizard)
 from rpg.gui.dialogs import DialogImport
 from pathlib import Path
 from rpg.command import Command
@@ -31,6 +31,10 @@ class Wizard(QtWidgets.QWizard):
         self.base = base
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
+        btnList = ([QWizard.CancelButton, QWizard.Stretch,
+                    QWizard.BackButton, QWizard.NextButton,
+                    QWizard.FinishButton])
+        self.setButtonLayout(btnList)
 
         # Setting pages to wizard
         self.setPage(self.PageImport, ImportPage(self))
