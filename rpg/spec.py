@@ -66,7 +66,7 @@ class Subpackage(object):
         self.BuildRequires = set()
         self.Requires = set()
         self.Provides = set()
-        self.files = []
+        self.files = set()
         self.changelog = []
         self.prep = Command()
         self.build = Command()
@@ -111,7 +111,7 @@ class Subpackage(object):
             if str(value):
                 if isinstance(value, Command):
                     block += '%' + ordered_key + '\n' + str(value) + '\n\n'
-                elif isinstance(value, list):
+                elif (isinstance(value, list) or (isinstance(value, set))):
                     block += '%' + ordered_key + '\n' + '\n'.join(
                         [(val[1] + " " if val[1] else "") + str(val[0])
                             for val in value]) + '\n\n' if value else ""
@@ -129,7 +129,7 @@ class Subpackage(object):
                 f[1].append("%doc")
                 break
         else:
-            self.files.append((file, ["%doc"], None))
+            self.files.add((file, ["%doc"], None))
 
 
 class Spec(Subpackage):

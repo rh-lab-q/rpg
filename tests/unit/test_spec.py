@@ -33,9 +33,11 @@ class SpecTest(RpgTestCase):
             "%check\nmake test\n\n"
         self.assertEqual(expected, str(self.spec))
 
-        self.spec.files = [("f1", "a1", ""),
-                           ("f2", "a2", ""),
-                           ("f3", "a3", "")]
+        self.spec.files = set([("f1", "a1", ""),
+                               ("f2", "a2", ""),
+                               ("f3", "a3", "")])
+        self.spec.files = sorted(list(self.spec.files))
+
         expected += "%files\n" \
                     "a1 f1\n"  \
                     "a2 f2\n"  \

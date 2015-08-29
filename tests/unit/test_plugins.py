@@ -109,7 +109,7 @@ class FindPatchPluginTest(PluginTestCase):
                     ('/setuptools/__pycache__/', '%exclude', None),
                     ('/autotools/__pycache__/', '%exclude', None)]
         sorted_files = sorted(files + excludes, key=lambda e: e[0])
-        self.assertEqual(self.spec.files,
+        self.assertEqual(sorted(list(self.spec.files)),
                          sorted_files)
 
     def test_find_translation_file(self):
@@ -117,8 +117,7 @@ class FindPatchPluginTest(PluginTestCase):
         plugin.installed(self.test_project_dir,
                          self.spec, self.sack)
         translation_file = ("-f %{CZ.mo}.lang")
-        self.assertEqual(self.spec.files[0],
-                         (translation_file, None, None))
+        self.assertTrue((translation_file, None, None) in self.spec.files)
 
     def test_find_library(self):
         plugin = FindLibraryPlugin()

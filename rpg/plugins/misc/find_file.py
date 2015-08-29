@@ -19,4 +19,4 @@ class FindFilePlugin(Plugin):
                                for key in self.exclude],
                               key=lambda e: e[0])
         for one_file in sorted_files:
-            spec.files.append(one_file)
+            spec.files.add(one_file)

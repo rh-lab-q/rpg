@@ -47,9 +47,9 @@ class FunctionalTest(RpgTestCase):
         base.run_compiled_source_analysis()
         base.install_project()
         base.run_installed_source_analysis()
-        self.assertEqual([
+        self.assertEqual(set([
             ("/hello", None, None),
             ("/__pycache__/", r"%exclude", None)
-        ].sort(), base.spec.files.sort())
+        ]), base.spec.files)
         base.build_srpm()
         self.assertTrue(base.srpm_path.exists())
