@@ -539,10 +539,10 @@ class RequiresPage(QtWidgets.QWizardPage):
         self.base.spec.BuildRequires = self.bRequiresEdit.toPlainText()
         self.base.spec.Requires = self.requiresEdit.toPlainText()
         self.base.spec.Provides = self.providesEdit.toPlainText()
-        self.base.spec.BuildRequires = self.base.spec.\
-            BuildRequires.splitlines()
-        self.base.spec.Requires = self.base.spec.Requires.splitlines()
-        self.base.spec.Provides = self.base.spec.Provides.splitlines()
+        self.base.spec.BuildRequires = set(
+            self.base.spec.BuildRequires.splitlines())
+        self.base.spec.Requires = set(self.base.spec.Requires.splitlines())
+        self.base.spec.Provides = set(self.base.spec.Provides.splitlines())
         return True
 
     def nextId(self):
