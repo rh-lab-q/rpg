@@ -14,6 +14,7 @@ class CMakePlugin(Plugin):
             build.append("cmake .")
             build.append("make")
             install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
+            _parse(project_dir, spec)
             spec.build = build
             spec.install = install
 
@@ -27,3 +28,17 @@ class CMakePlugin(Plugin):
         matches = set(matches)
         spec.build_required_files.update(matches)
         spec.required_files.update(matches)
+
+
+def _parse(project_dir, spec):
+    regex = re.compile(r"\#(?!\[\[)[^\n]*ENABLE_TESTING.*?(?:\n|$)|"
+                       r"\#\[\[.*?ENABLE_TESTING.*?\]\]|"
+                       r"ENABLE_TESTING", re.DOTALL)
+    cmake_files = list(project_dir.glob("**/CMakeLists.txt"))
+    matches = []
+    for element in cmake_files:
+        with element.open() as f:
+            matches += regex.findall(f.read())
+            if "ENABLE_TESTING" in matches:
+                spec.check.append("make test")
+                return

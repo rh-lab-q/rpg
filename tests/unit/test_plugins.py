@@ -91,6 +91,7 @@ class FindPatchPluginTest(PluginTestCase):
                  ('/py/requires/sourcecode2.py', None, None),
                  ('/mock_project/mock-1.0.tar.gz', None, None),
                  ('/c/CMakeCache.txt', None, None),
+                 ('/c/CMakeLists.txt', None, None),
                  ('/setuptools/setup.py', None, None),
                  ('/setuptools/testscript.py', None, None),
                  ('/autotools/configure.ac', None, None),
@@ -167,8 +168,10 @@ class FindPatchPluginTest(PluginTestCase):
         self.assertEqual(self.spec.required_files, expected)
         self.assertEqual(self.spec.build_required_files, expected)
 
-    def test_compiled(self):
+    def test_cmake(self):
         cmakeplug = CMakePlugin()
+        cmakeplug.patched(self.test_project_dir / "c", self.spec, self.sack)
+        self.assertEqual(str(self.spec.check), "make test")
         expected = set(["/usr/bin/gmake", "/usr/bin/file",
             "/usr/bin/makedepend", "/usr/bin/nosetests-3.4",
             "/usr/bin/python3.4"])
