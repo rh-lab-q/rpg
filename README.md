@@ -61,7 +61,7 @@ From project root directory execute::
 Documentation
 =============
 
-For documentation, tutorials and examples check [github wiki pages](https://github.com/rh-lab-q/rpg/wiki/)
+For API docs, tutorials and examples check out [official RPG project documentation page](http://rpg.readthedocs.org/)
 
 
 Contribution
