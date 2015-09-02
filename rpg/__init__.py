@@ -216,8 +216,9 @@ class Base(object):
         analyse()
         while self._plugin_engine.execute_mock_recover(build()):
             analyse()
-        Command("rm -rf " + str(self._package_builder.temp_dir) + "/*.log")\
-            .execute()
+        if self._package_builder.mock_return_code != 0:
+            raise RuntimeError("Failed to build rpm package. See logs in {}/."
+                               .format(str(self._package_builder.mock_logs)))
 
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)

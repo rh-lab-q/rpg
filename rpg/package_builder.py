@@ -15,6 +15,7 @@ class PackageBuilder(object):
     def __init__(self):
         self.temp_dir = Path(tempfile.gettempdir())
         self.mock_logs = Path()
+        self.mock_return_code = 0
 
     @staticmethod
     def build_srpm(spec_file, tarball, output_dir):
@@ -48,9 +49,8 @@ class PackageBuilder(object):
                 line = proc.stdout.readline().decode("utf-8")
                 if PackageBuilder.regex.search(line):
                     yield line
-            self._ret_code = proc.returncode
+            self.mock_return_code = proc.returncode
 
-        self._ret_code = 0
         _ret = list(
             check_output(
                 subprocess.Popen(
