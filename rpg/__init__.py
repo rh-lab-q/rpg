@@ -166,7 +166,7 @@ class Base(object):
     def run_compiled_source_analysis(self):
         """executed in background after patches are applied"""
         self._plugin_engine.execute_phase(phases[2],
-                                          self.extracted_dir)
+                                          self.compiled_dir)
 
     def install_project(self):
         """executed in background after filled requires screen"""
