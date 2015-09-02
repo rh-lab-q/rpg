@@ -33,8 +33,8 @@ To get project and satisfy all dependencies, run::
     cd rpg
     sudo dnf builddep rpg.spec
 
-Install RPG package
-===================
+Install RPG rpm package
+=======================
 
 To add COPR nightly/rpg repo and install RPG::
 
