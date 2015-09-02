@@ -24,8 +24,8 @@ You need these packages in order to satisfy RPG dependencies:
 * python3-dnf  (optional)
 * python3-copr (optional)
 
-Building in Fedora 21+
-======================
+Building RPG project in Fedora 21+
+==================================
 
 To get project and satisfy all dependencies, run::
 
