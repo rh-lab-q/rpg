@@ -37,7 +37,8 @@ class PluginEngine:
                 try:
                     method(project_dir, self.spec, self.sack)
                 except Exception as err:
-                    msg = ''.join(traceback.format_tb(err.__traceback__))
+                    msg = str(err) + "\n" +\
+                        ''.join(traceback.format_tb(err.__traceback__))
                     logging.warn(
                         "error during executing plugin %s:\n%s"
                         % (plugin_name, msg))

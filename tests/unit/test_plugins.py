@@ -26,6 +26,8 @@ class MockedPackage:
     def __init__(self, package):
         self.name = package
 
+    files = []
+
 
 class MockedLogging:
 
@@ -163,8 +165,26 @@ class FindPatchPluginTest(PluginTestCase):
     def test_c(self):
         c_plug = CPlugin()
         c_plug.patched(self.test_project_dir, self.spec, self.sack)
-        expected = set(['/usr/include', '/usr/include/bits',
-                        '/usr/include/gnu', '/usr/include/sys'])
+        expected = set([
+            "/usr/include/stdc-predef.h",
+            "/usr/include/stdlib.h",
+            "/usr/include/features.h",
+            "/usr/include/sys/cdefs.h",
+            "/usr/include/bits/wordsize.h",
+            "/usr/include/gnu/stubs.h",
+            "/usr/include/gnu/stubs-64.h",
+            "/usr/lib/gcc/x86_64-redhat-linux/5.1.1/include/stddef.h",
+            "/usr/include/bits/stdlib-float.h",
+            "/usr/include/stdio.h",
+            "/usr/include/bits/types.h",
+            "/usr/include/bits/typesizes.h",
+            "/usr/include/libio.h",
+            "/usr/include/_G_config.h",
+            "/usr/include/wchar.h",
+            "/usr/lib/gcc/x86_64-redhat-linux/5.1.1/include/stdarg.h",
+            "/usr/include/bits/stdio_lim.h",
+            "/usr/include/bits/sys_errlist.h"
+        ])
         self.assertEqual(self.spec.required_files, expected)
         self.assertEqual(self.spec.build_required_files, expected)
 
@@ -173,8 +193,8 @@ class FindPatchPluginTest(PluginTestCase):
         cmakeplug.patched(self.test_project_dir / "c", self.spec, self.sack)
         self.assertEqual(str(self.spec.check), "make test")
         expected = set(["/usr/bin/gmake", "/usr/bin/file",
-            "/usr/bin/makedepend", "/usr/bin/nosetests-3.4",
-            "/usr/bin/python3.4"])
+                        "/usr/bin/makedepend", "/usr/bin/nosetests-3.4",
+                        "/usr/bin/python3.4"])
         cmakeplug.compiled(self.test_project_dir / "c", self.spec, self.sack)
         self.assertEqual(self.spec.build_required_files, expected)
         self.assertEqual(self.spec.required_files, expected)
