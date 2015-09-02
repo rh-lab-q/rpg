@@ -28,7 +28,6 @@ class BuildHawkeyTest(RpgTestCase):
         self.base.run_extracted_source_analysis()
         self.base.run_patched_source_analysis()
         self.base.spec.build.append(["make doc-man"])
-        self.base.spec.check.append(["make test"])
         self.base.build_project()
         self.base.run_compiled_source_analysis()
         self.base.install_project()

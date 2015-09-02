@@ -25,7 +25,6 @@ class BuildTest(RpgTestCase):
         self.base.spec.URL = "https://github.com/rh-lab-q/rpg"
         self.base.target_arch = "i386"
         self.base.target_distro = "fedora-22"
-        self.base.spec.check.append(["make test"])
         self.base.spec.Requires.update(['makedepend', 'mock'])
         self.base.spec.BuildRequires.update(['makedepend', 'mock', 'python3-nose'])
         self.base.fetch_repos(self.base.target_distro, self.base.target_arch)
