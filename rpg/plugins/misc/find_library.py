@@ -10,5 +10,5 @@ class FindLibraryPlugin(Plugin):
                 static_libs and static_libs[0].is_file()):
 
             # FIXME when Command is integrated with Spec
-            spec.post = "-p /sbin/ldconfig"
-            spec.postun = "-p /sbin/ldconfig"
+            spec.post.append("/sbin/ldconfig")
+            spec.postun.append("/sbin/ldconfig")

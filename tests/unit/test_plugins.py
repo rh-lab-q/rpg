@@ -126,7 +126,7 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = FindLibraryPlugin()
         plugin.installed(self.test_project_dir,
                          self.spec, self.sack)
-        lib = "-p /sbin/ldconfig"
+        lib = "/sbin/ldconfig"
         self.assertEqual(str(self.spec.post), lib)
         self.assertEqual(str(self.spec.postun), lib)
 
