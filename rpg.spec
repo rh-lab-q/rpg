@@ -19,6 +19,7 @@ BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
 BuildRequires:  python3-hawkey
 BuildRequires:  mock
+BuildRequires:  python3-javapackages
 BuildArch:      noarch
 
 Requires:       python3 >= 3.4
@@ -29,6 +30,7 @@ Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
 Requires:       mock
+Requires:       python3-javapackages
 %if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
