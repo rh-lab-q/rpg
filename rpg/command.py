@@ -1,4 +1,5 @@
 from subprocess import check_output
+import rpm
 
 
 class Command:
@@ -51,7 +52,7 @@ class Command:
 
         cd_workdir = ["cd %s" % str(work_dir.resolve()).replace(" ", "\\ ")]
         command_lines = self._assign_rpm_variables() + cd_workdir + \
-            self._command_lines
+            [rpm.expandMacro(x) for x in self._command_lines]
         return cmd_output(command_lines)
 
     def _assign_rpm_variables(self):
