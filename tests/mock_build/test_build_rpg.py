@@ -1,5 +1,6 @@
 from tests.support import RpgTestCase
 from rpg import Base
+from rpg.command import Command
 import os
 
 
@@ -10,7 +11,7 @@ class BuildTest(RpgTestCase):
         self.base.sack = self.base.load_dnf_sack()
         self.base.load_plugins()
         self.base.load_project_from_url(
-            self.test_project_dir / "archives/rpg-0.0.2-1.tar.gz")
+            "https://github.com/rh-lab-q/rpg/archive/master.zip")
         self.base.spec.Name = "rpg"
         self.base.spec.Version = "0.0.2"
         self.base.spec.Release = "1%{?snapshot}%{?dist}"
@@ -23,13 +24,16 @@ class BuildTest(RpgTestCase):
             "get familiar with packaging process or the advanced users can"
             "use our tool for a quick creation of a package.")
         self.base.spec.URL = "https://github.com/rh-lab-q/rpg"
-        self.base.target_arch = "i386"
+        self.base.target_arch = "x86_64"
         self.base.target_distro = "fedora-22"
         self.base.spec.Requires.update(['makedepend', 'mock'])
-        self.base.spec.BuildRequires.update(['makedepend', 'mock', 'python3-nose'])
+        self.base.spec.BuildRequires.update(['makedepend',
+                                             'mock',
+                                             'python3-nose'])
         self.base.fetch_repos(self.base.target_distro, self.base.target_arch)
         self.base.run_extracted_source_analysis()
         self.base.run_patched_source_analysis()
+        self.base.spec.check = Command(["make test-unit"])
         self.base.build_project()
         self.base.run_compiled_source_analysis()
         self.base.install_project()
@@ -39,6 +43,8 @@ class BuildTest(RpgTestCase):
         self.base.build_rpm_recover(
             self.base.target_distro, self.base.target_arch)
         self.assertTrue(self.base.rpm_path)
+
+    def tearDown(self):
         for _rpm in self.base.rpm_path:
             os.remove(str(_rpm))
         os.remove(str(self.base.srpm_path))
