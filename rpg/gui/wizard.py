@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QTextEdit, QHBoxLayout, QFileDialog,
                              QComboBox, QWizard)
 from rpg.gui.dialogs import DialogImport
+from rpg.utils import path_to_str
 from pathlib import Path
 from rpg.command import Command
 import subprocess
@@ -789,7 +790,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.textBuildSRPMLabel.setText('Building SRPM...')
         self.textBuildSRPMLabel.repaint()
         self.base.build_srpm()
-        Command("cp " + str(self.base.srpm_path) + " " +
+        Command("cp " + path_to_str(self.base.srpm_path) + " " +
                 self.buildLocationEdit.text()).execute()
         self.base.final_path = self.buildLocationEdit.text()
         self.textBuildSRPMLabel.setText('Your source package was build in '

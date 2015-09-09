@@ -1,10 +1,9 @@
 import logging
-from os.path import isfile
-from os.path import isdir
+from os.path import isfile, isdir
+from rpg.utils import path_to_str
 from pathlib import Path
 from rpg.command import Command
-from shutil import rmtree
-from shutil import copytree
+from shutil import rmtree, copytree
 from tempfile import mkdtemp
 
 
@@ -82,17 +81,17 @@ class SourceLoader(object):
 
         logging.debug('load_sources({}, {}) called'
                       .format(str(source_path), str(extraction_dir)))
-        path = str(source_path)
-        extraction_dir = str(extraction_dir)
+        path = path_to_str(source_path)
+        esc_extr_dir = path_to_str(extraction_dir)
         if isfile(path):
             compression = self._get_compression_method(path)
             if not compression:
                 raise IOError("Input source archive '{}' is incompatible!"
                               .format(path))
-            self._extract(path, extraction_dir, compression)
-            self._process_dir(extraction_dir)
-        elif isdir(path):
-            self._copy_dir(path, extraction_dir)
+            self._extract(path, esc_extr_dir, compression)
+            self._process_dir(esc_extr_dir)
+        elif isdir(str(source_path)):
+            self._copy_dir(str(source_path), str(extraction_dir))
         else:
             raise IOError("Input source archive/directory '{}' doesn't exists!"
                           .format(path))
@@ -104,10 +103,12 @@ class SourceLoader(object):
 
         extr_cmd = cls._compressions[compr[0]]
         _cmd = ""
-        if extr_cmd[3]:
+        try:
             ext_cmd = extr_cmd[3][compr[1]]
             _cmd += ext_cmd[0] + " " + ext_cmd[1] + " " + arch + " | "
             arch = "-"
+        except IndexError:
+            pass
         Command(_cmd + extr_cmd[0] + " " + extr_cmd[1] + " " +
                 arch + " " + extr_cmd[2] + " " + extraction_dir).execute()
 

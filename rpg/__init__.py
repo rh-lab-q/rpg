@@ -10,6 +10,7 @@ from rpg.spec import Spec
 from rpg.command import cmd_output
 from rpg.command import Command
 from rpg.conf import Conf
+from rpg.utils import path_to_str
 from re import search
 from os.path import isdir
 from os import makedirs
@@ -68,8 +69,8 @@ class Base(object):
     def create_archive(self):
         """ Creates archive (archvie_path) from Source folder """
         self.spec.Source = self.spec.Name + "-" + self.spec.Version + ".tar.gz"
-        _tar = Command("tar zcf " + str(self.archive_path) +
-                       " -C " + str(self.extracted_dir) +
+        _tar = Command("tar zcf " + path_to_str(self.archive_path) +
+                       " -C " + path_to_str(self.extracted_dir) +
                        " . --transform='s/^\./" +
                        self.spec.Name + "-" + self.spec.Version + "/g'")
         _tar.execute()
@@ -140,6 +141,8 @@ class Base(object):
             self._source_loader.download_git_repo(path, temp_arch)
             path = Path(temp_arch)
         elif str(path).startswith("http"):
+            temp_arch = search(r"([^/]+\.[^/]+(?:\.[^/]+)?)$", str(path))\
+                .group(0)
             self._source_loader.download_archive(path, temp_arch)
             path = Path(temp_arch)
         else:
@@ -244,9 +247,9 @@ class Base(object):
     def _compute_checksum(sources):
         if sources.is_dir():
             cmd = "find %s -type f -print0 | sort -z | xargs " \
-                  "-0 sha1sum | sha1sum" % sources.resolve()
+                  "-0 sha1sum | sha1sum" % path_to_str(sources.resolve())
         else:
-            cmd = "sha1sum %s" % sources.resolve()
+            cmd = "sha1sum %s" % path_to_str(sources.resolve())
         return cmd_output([cmd])[:7]
 
     @property

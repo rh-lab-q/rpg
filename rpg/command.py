@@ -1,5 +1,6 @@
 from subprocess import check_output
 import rpm
+from rpg.utils import path_to_str
 
 
 class Command:
@@ -50,7 +51,7 @@ class Command:
         """executes command in work_dir (instance of pathlib.Path),
            can raise CalledProcessError"""
 
-        cd_workdir = ["cd %s" % str(work_dir.resolve()).replace(" ", "\\ ")]
+        cd_workdir = ["cd %s" % path_to_str(work_dir.resolve())]
         command_lines = self._assign_rpm_variables() + cd_workdir + \
             [rpm.expandMacro(x) for x in self._command_lines]
         return cmd_output(command_lines)

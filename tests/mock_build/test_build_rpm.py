@@ -1,6 +1,7 @@
 from rpg.package_builder import PackageBuilder
 from tests.support import RpgTestCase
 from rpg.command import Command
+from rpg.utils import path_to_str
 
 
 class PackageBuilderTest(RpgTestCase):
@@ -16,25 +17,23 @@ class PackageBuilderTest(RpgTestCase):
         self.srpm = RpgTestCase.test_project_dir / "srpm"
         self.fail_srpm = self.srpm / "fail.src.rpm"
         self.test_srpm = self.srpm / "test.src.rpm"
-        self.test_rpm = self.srpm / "test.rpm"
 
     def test_build_rpm(self):
-        self.assertEqual(
-            self.package_builder.build_rpm(self.test_srpm,
-                                           PackageBuilderTest.distro,
-                                           PackageBuilderTest.arch,
-                                           self.srpm),
-            [])
+        self.package_builder.build_rpm(self.test_srpm,
+                                       PackageBuilderTest.distro,
+                                       PackageBuilderTest.arch,
+                                       self.package_builder.temp_dir)
+        self.assertFalse(self.package_builder.mock_return_code)
 
     def test_build_rpm_fail(self):
         self.assertNotEqual(
             self.package_builder.build_rpm(self.fail_srpm,
                                            PackageBuilderTest.distro,
                                            PackageBuilderTest.arch,
-                                           self.srpm),
+                                           self.package_builder.temp_dir),
             [])
+        self.assertTrue(self.package_builder.mock_return_code)
 
     def tearDown(self):
-        Command("rm -rf " + str(self.srpm) + "/mock_logs " +
-                str(self.srpm) + "/a-a-a*rpm " +
-                str(self.test_rpm)).execute()
+        Command("rm -rf " + path_to_str(self.srpm) + "/mock_logs " +
+                path_to_str(self.package_builder.temp_dir / "*.rpm")).execute()

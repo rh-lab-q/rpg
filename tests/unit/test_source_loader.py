@@ -4,6 +4,7 @@ from os import remove
 from pathlib import Path
 from rpg.command import Command
 from rpg.source_loader import SourceLoader
+from rpg.utils import path_to_str
 from tests.support import RpgTestCase
 from shutil import rmtree
 from unittest import expectedFailure
@@ -25,20 +26,20 @@ class SourceLoaderTest(RpgTestCase):
 
         self._download = self._tar_temp / "download.tar.gz"
 
-        if path.isdir(str(self._tar_temp)):
-            rmtree(str(self._tar_temp))
-        makedirs(str(self._tar_temp))
-        makedirs(str(self._tar_extracted))
+        if path.isdir(path_to_str(self._tar_temp)):
+            rmtree(path_to_str(self._tar_temp))
+        makedirs(path_to_str(self._tar_temp))
+        makedirs(path_to_str(self._tar_extracted))
 
     def tearDown(self):
         if self._tar:
-            remove(str(self._tar))
-        if path.isdir(str(self._tar_temp)):
-            rmtree(str(self._tar_temp))
+            remove(path_to_str(self._tar))
+        if path.isdir(path_to_str(self._tar_temp)):
+            rmtree(path_to_str(self._tar_temp))
 
     def md5Tar(self, t):
         mdsum = Command(
-            "tar --list -f " + str(t) + " 2>/dev/null | "
+            "tar --list -f " + path_to_str(t) + " 2>/dev/null | "
             "awk -F/ '{ if($NF != \"\") print $NF }' | "
             r'sed -e "s/.*\///gm" | sort | md5sum'
         ).execute()
@@ -47,7 +48,7 @@ class SourceLoaderTest(RpgTestCase):
 
     def md5Dir(self, d):
         md5sum = Command(
-            "find " + str(d) +
+            "find " + path_to_str(d) +
             r' -type f | sed -e "s/.*\///gm" | sort | md5sum'
         ).execute()
         self.assertNotEqual(self.FNF_MD5, md5sum)
@@ -56,13 +57,13 @@ class SourceLoaderTest(RpgTestCase):
     def test_tar_gz_method(self):
         self.assertEqual(
             self._source_loader._get_compression_method(
-                str(self._tar_gz)),
+                path_to_str(self._tar_gz)),
             ("tar", "gz"))
 
     def test_tar_xz_method(self):
         self.assertEqual(
             self._source_loader._get_compression_method(
-                str(self._tar_xz)),
+                path_to_str(self._tar_xz)),
             ("tar", "xz"))
 
     def test_tar_gz_extract(self):
@@ -70,10 +71,10 @@ class SourceLoaderTest(RpgTestCase):
             self._tar_gz,
             self._tar_extracted)
         self.assertTrue(
-            path.isdir(str(self._tar_extracted)))
+            path.isdir(path_to_str(self._tar_extracted)))
         self.assertEqual(
-            self.md5Tar(str(self._tar_gz)),
-            self.md5Dir(str(self._tar_extracted)))
+            self.md5Tar(path_to_str(self._tar_gz)),
+            self.md5Dir(path_to_str(self._tar_extracted)))
         self.assertExistInDir(["file"], self._tar_extracted)
 
     def test_tar_xz_extract(self):
@@ -81,10 +82,10 @@ class SourceLoaderTest(RpgTestCase):
             self._tar_xz,
             self._tar_extracted)
         self.assertTrue(
-            path.isdir(str(self._tar_extracted)))
+            path.isdir(path_to_str(self._tar_extracted)))
         self.assertEqual(
-            self.md5Tar(str(self._tar_xz)),
-            self.md5Dir(str(self._tar_extracted)))
+            self.md5Tar(path_to_str(self._tar_xz)),
+            self.md5Dir(path_to_str(self._tar_extracted)))
         self.assertExistInDir(["file1", "file2"], self._tar_extracted)
 
     def test_dir_source_loader(self):

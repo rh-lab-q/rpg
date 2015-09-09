@@ -1,9 +1,12 @@
 import logging
 import re
 from rpg.command import Command
+from rpg.utils import path_to_str
+from shutil import copytree
 import subprocess
 import tempfile
 from pathlib import Path
+import sys
 
 
 class PackageBuilder(object):
@@ -23,11 +26,11 @@ class PackageBuilder(object):
 
         # Build srpm pakcage from given spec_file and tarball
         Command("rpmdev-setuptree").execute()
-        Command("cp " + str(tarball) +
+        Command("cp " + path_to_str(tarball) +
                 ' $(rpm --eval "%{_topdir}")/SOURCES').execute()
-        output = Command("rpmbuild -bs " + str(spec_file)).execute()
-        Command("mv " + str(output.split()[-1]) +
-                " " + str(output_dir)).execute()
+        output = Command("rpmbuild -bs " + path_to_str(spec_file)).execute()
+        Command("mv " + path_to_str(output.split()[-1]) +
+                " " + path_to_str(output_dir)).execute()
 
     def check_logs(self):
         with open(str(self.mock_logs) + "/build.log") as build_log:
@@ -38,11 +41,14 @@ class PackageBuilder(object):
     def build_rpm(self, srpm, distro, arch, output_dir):
 
         def move_files(output, files):
-            if not output.is_dir():
-                Command("mkdir " + str(output)).execute()
+            if not output.exists() and not output.is_dir():
+                Command("mkdir " + path_to_str(output)).execute()
             for _out in files:
-                Command("cp " + str(_out) +
-                        " " + str(output)).execute()
+                try:
+                    Command("cp -rf " + path_to_str(_out) + " " +
+                            path_to_str(output)).execute()
+                except:
+                    pass
 
         def check_output(proc):
             while proc.poll() is None:
@@ -50,17 +56,15 @@ class PackageBuilder(object):
                 if PackageBuilder.regex.search(line):
                     yield line
             self.mock_return_code = proc.returncode
-
         _ret = list(
             check_output(
                 subprocess.Popen(
                     [
                         "mock", "--no-clean",
-                        "--no-cleanup-after",
                         "--verbose",
                         "--root", distro + '-' + arch,
-                        "--rebuild", str(srpm),
-                        "--resultdir=" + str(self.temp_dir)
+                        "--rebuild", path_to_str(srpm),
+                        "--resultdir=" + path_to_str(self.temp_dir)
                     ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT

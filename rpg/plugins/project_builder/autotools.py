@@ -13,7 +13,7 @@ class AutotoolsPlugin(Plugin):
             build.append("./configure")
             build.append("make")
             spec.build = build
-            spec.install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
+            spec.install = Command('make install DESTDIR="$RPM_BUILD_ROOT"')
         elif ((project_dir / "configure.ac").is_file() and
               (project_dir / "Makefile.am").is_file()):
             logging.debug('configure.ac and Makefile.am found')
@@ -35,7 +35,7 @@ class AutotoolsPlugin(Plugin):
             build.append("./configure")
             build.append("make")
             spec.build = build
-            spec.install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
+            spec.install = Command("make install DESTDIR=\"$RPM_BUILD_ROOT\"")
         elif (project_dir / "configure.ac").is_file():
             logging.warning('configure.ac found, Makefile.am missing')
         elif (project_dir / "Makefile.am").is_file():

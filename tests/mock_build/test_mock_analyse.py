@@ -1,6 +1,7 @@
 from rpg.package_builder import PackageBuilder
 from rpg.command import Command
 from rpg.spec import Spec
+from rpg.utils import path_to_str
 from rpg import Base
 from tests.support import RpgTestCase
 from pathlib import Path
@@ -52,6 +53,6 @@ class MockAnalyseTest(RpgTestCase):
                          self.base.spec.BuildRequires)
         self.assertEqual(self.base.spec.BuildRequires,
                          set(['python3-nose', 'python-nose', 'doxygen']))
-        Command("rm -rf " + str(FakeBase.base_dir) + "/*rpm " +
-                str(FakeBase.base_dir) + "/*spec " +
-                str(FakeBase.base_dir / "mock_logs")).execute()
+        Command("rm -rf " + path_to_str(FakeBase.base_dir) + "/*rpm " +
+                path_to_str(FakeBase.base_dir) + "/*spec " +
+                path_to_str(FakeBase.base_dir / "mock_logs")).execute()

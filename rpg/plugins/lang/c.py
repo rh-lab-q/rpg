@@ -1,7 +1,8 @@
 from rpg.plugin import Plugin
 from rpg.command import Command
 from tempfile import NamedTemporaryFile
-from os import unlink, path
+from os import unlink
+from rpg.utils import path_to_str
 from re import compile
 from subprocess import CalledProcessError
 import logging
@@ -35,7 +36,7 @@ class CPlugin(Plugin):
         f.close()
 
         out = Command([
-            "find " + str(project_dir) + " -name " +
+            "find " + path_to_str(project_dir) + " -name " +
             " -o -name ".join(
                 ["'*." + ex + "'" for ex in self.EXTENSIONS]
             )
@@ -46,7 +47,8 @@ class CPlugin(Plugin):
                 gcc_cmd = self.get_gcc_cmd_switch(_f)
                 if not gcc_cmd:
                     continue
-                Command(gcc_cmd + str(_f) + " -o " + file_name).execute()
+                Command(gcc_cmd + path_to_str(_f) + " -o " + file_name)\
+                    .execute()
             except CalledProcessError as e:
                 logging.warn(str(e.cmd) + "\n" + str(e.output))
                 continue

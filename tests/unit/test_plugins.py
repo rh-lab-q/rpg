@@ -228,4 +228,4 @@ class FindPatchPluginTest(PluginTestCase):
             "./configure\nmake")
         self.assertEqual(
             str(self.spec.install),
-            "make install DESTDIR=$RPM_BUILD_ROOT")
+            "make install DESTDIR=\"$RPM_BUILD_ROOT\"")
