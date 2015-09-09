@@ -54,7 +54,6 @@ activate-global-python-argcomplete
 exec bash
 
 %install
-make install DESTDIR=%{RPM_BUILD_ROOT}
 %make_install
 
 %check
