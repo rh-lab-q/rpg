@@ -13,6 +13,8 @@ from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 from rpg.plugins.project_builder.autotools import AutotoolsPlugin
+from rpg.command import Command
+from os.path import isfile, isdir
 
 
 class MockSack:
@@ -53,6 +55,7 @@ class MockedDNFQuery:
 class FindPatchPluginTest(PluginTestCase):
 
     def setUp(self):
+        self.maxDiff = None
         self.spec = Spec()
         self.sack = None
 
@@ -73,48 +76,15 @@ class FindPatchPluginTest(PluginTestCase):
 
     def test_find_files(self):
         plugin = FindFilePlugin()
-        plugin.installed(self.test_project_dir,
+        plugin.installed(self.test_project_dir / "setuptools",
                          self.spec, self.sack)
-        files = [('/patch/0.patch', None, None),
-                 ('/patch/1.patch', None, None),
-                 ('/patch/2.patch', None, None),
-                 ('/c/sourcecode.c', None, None),
-                 ('/hello_project/hello-1.4.tar.gz', None, None),
-                 ('/py/plugin0.py', None, None),
-                 ('/py/sourcecode.py', None, None),
-                 ('/translation/CZ.mo', None, None),
-                 ('/libs/libstatic.a', None, None),
-                 ('/libs/libdynamic.so.1', None, None),
-                 ('/srpm/test.src.rpm', None, None),
-                 ('/srpm/fail.src.rpm', None, None),
-                 ('/archives/sample.tar.gz', None, None),
-                 ('/archives/sample.tar.xz', None, None),
-                 ('/archives/rpg-0.0.2-1.tar.gz', None, None),
-                 ('/Makefile', None, None),
-                 ('/py/requires/sourcecode2.py', None, None),
-                 ('/mock_project/mock-1.0.tar.gz', None, None),
-                 ('/c/CMakeCache.txt', None, None),
-                 ('/c/CMakeLists.txt', None, None),
-                 ('/setuptools/setup.py', None, None),
-                 ('/setuptools/testscript.py', None, None),
-                 ('/autotools/configure.ac', None, None),
-                 ('/autotools/Makefile.am', None, None)]
-        excludes = [('/patch/__pycache__/', r'%exclude', None),
-                    ('/c/__pycache__/', r'%exclude', None),
-                    ('/hello_project/__pycache__/', r'%exclude', None),
-                    ('/py/__pycache__/', r'%exclude', None),
-                    ('/py/requires/__pycache__/', r'%exclude', None),
-                    ('/translation/__pycache__/', r'%exclude', None),
-                    ('/libs/__pycache__/', r'%exclude', None),
-                    ('/archives/__pycache__/', r'%exclude', None),
-                    ('/__pycache__/', r'%exclude', None),
-                    ('/srpm/__pycache__/', '%exclude', None),
-                    ('/mock_project/__pycache__/', '%exclude', None),
-                    ('/setuptools/__pycache__/', '%exclude', None),
-                    ('/autotools/__pycache__/', '%exclude', None)]
-        sorted_files = sorted(files + excludes, key=lambda e: e[0])
+        files = sorted([
+            ("/setup.py", None, None),
+            ("/testscript.py", None, None),
+            ("/__pycache__/", "%exclude", None)
+        ])
         self.assertEqual(sorted(list(self.spec.files)),
-                         sorted_files)
+                         files)
 
     def test_find_translation_file(self):
         plugin = FindTranslationPlugin()
