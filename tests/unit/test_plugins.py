@@ -41,7 +41,8 @@ class MockedLogging:
 class MockedDNFQuery:
 
     def filter(self, **kwd):
-        if kwd["file"] == "/usr/lib/python3.4/site-packages/dnf/conf/read.py":
+        if kwd["file__glob"] ==\
+                "/usr/lib/python3.4/site-packages/dnf/conf/read.py":
             return [MockedPackage("python3-dnf")]
         raise IndexError
 
