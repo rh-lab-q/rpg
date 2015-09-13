@@ -9,6 +9,16 @@ from pathlib import Path
 import sys
 
 
+class BuildException(Exception):
+
+    def __init__(self, errors, return_code):
+        self.return_code = return_code
+        self.errors = errors
+
+    def __str__(self):
+        return "\n".join(self.errors)
+
+
 class PackageBuilder(object):
     regex = re.compile(r"[eE][rR][rR][oO][rR]|" +
                        r"[eE][xX][cC][eE][pP][tT][iI][oO][nN]|" +
@@ -18,7 +28,6 @@ class PackageBuilder(object):
     def __init__(self):
         self.temp_dir = Path(tempfile.gettempdir())
         self.mock_logs = Path()
-        self.mock_return_code = 0
 
     @staticmethod
     def build_srpm(spec_file, tarball, output_dir):
@@ -32,13 +41,15 @@ class PackageBuilder(object):
         Command("mv " + path_to_str(output.split()[-1]) +
                 " " + path_to_str(output_dir)).execute()
 
-    def check_logs(self):
-        with open(str(self.mock_logs) + "/build.log") as build_log:
+    @staticmethod
+    def check_logs(path):
+        with open(str(path / "build.log")) as build_log:
             for line in build_log.readlines():
                 if PackageBuilder.regex.search(line):
                     yield line
 
     def build_rpm(self, srpm, distro, arch, output_dir):
+        self.build_ret_code = 0
 
         def move_files(output, files):
             if not output.exists() and not output.is_dir():
@@ -55,7 +66,8 @@ class PackageBuilder(object):
                 line = proc.stdout.readline().decode("utf-8")
                 if PackageBuilder.regex.search(line):
                     yield line
-            self.mock_return_code = proc.returncode
+            self.build_ret_code = proc.returncode
+
         _ret = list(
             check_output(
                 subprocess.Popen(
@@ -70,11 +82,11 @@ class PackageBuilder(object):
                     stderr=subprocess.STDOUT
                 )
             )
-        )
+        ) + list(self.check_logs(self.temp_dir))
         move_files(output_dir, self.temp_dir.glob("*.rpm"))
         self.mock_logs = output_dir / "mock_logs"
         move_files(self.mock_logs, self.temp_dir.glob("*.log"))
-        return _ret
+        raise BuildException(_ret, self.build_ret_code)
 
     @staticmethod
     def fetch_repos(dist, arch):

@@ -4,7 +4,7 @@ from rpg.plugin_engine import PluginEngine, phases
 from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 from rpg.project_builder import ProjectBuilder
 from copr.client import CoprClient
-from rpg.package_builder import PackageBuilder
+from rpg.package_builder import PackageBuilder, BuildException
 from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from rpg.command import cmd_output
@@ -206,22 +206,25 @@ class Base(object):
 
         def build():
             self.build_srpm()
-            return self.build_rpm(
-                distro, arch) + list(self._package_builder.check_logs())
+            self.build_rpm(distro, arch)
 
         def analyse():
-            _files_to_pkgs.installed(self.base_dir,
-                                     self.spec,
-                                     self.sack)
+            _files_to_pkgs.installed(self.base_dir, self.spec, self.sack)
             self.write_spec()
 
         _files_to_pkgs = FilesToPkgsPlugin()
         analyse()
-        while self._plugin_engine.execute_mock_recover(build()):
+        while True:
+            try:
+                build()
+            except BuildException as be:
+                if not self._plugin_engine.execute_mock_recover(be.errors):
+                    if be.return_code:
+                        raise RuntimeError(
+                            "Build failed! See logs in '{}'"
+                            .format(self._package_builder.mock_logs))
+                    break
             analyse()
-        if self._package_builder.mock_return_code != 0:
-            raise RuntimeError("Failed to build rpm package. See logs in {}/."
-                               .format(str(self._package_builder.mock_logs)))
 
     def fetch_repos(self, dist, arch):
         self._package_builder.fetch_repos(dist, arch)

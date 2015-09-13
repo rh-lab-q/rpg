@@ -1,4 +1,4 @@
-from rpg.package_builder import PackageBuilder
+from rpg.package_builder import PackageBuilder, BuildException
 from tests.support import RpgTestCase
 from unittest import mock
 from pathlib import Path
@@ -68,10 +68,13 @@ class SourceLoaderLongTest(RpgTestCase):
     @mock.patch('subprocess.PIPE', new=MockedSubprocess.PIPE)
     @mock.patch('subprocess.STDOUT', new=MockedSubprocess.STDOUT)
     @mock.patch('rpg.command.Command.execute', new=lambda *args: args)
+    @mock.patch('rpg.package_builder.PackageBuilder.check_logs',
+                new=lambda *args: args)
     def test_rpm_build_err_parse(self):
-        self.assertEqual(
-            sorted(
-                PackageBuilder().build_rpm(
-                    "", "", "", Path(""))),
-            sorted([text.decode("utf-8")
-                    for text in MockedSubprocess.ErrorText]))
+        with self.assertRaises(BuildException) as be:
+            PackageBuilder().build_rpm(
+                "", "", "", Path(""))
+            self.assertEqual(
+                sorted(be.errors),
+                sorted([text.decode("utf-8")
+                        for text in MockedSubprocess.ErrorText]))
