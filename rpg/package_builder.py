@@ -45,8 +45,8 @@ class PackageBuilder(object):
                 Command("mkdir " + path_to_str(output)).execute()
             for _out in files:
                 try:
-                    Command("cp -rf " + path_to_str(_out) + " " +
-                            path_to_str(output)).execute()
+                    Command("mv " + path_to_str(_out) +
+                            " " + path_to_str(output)).execute()
                 except:
                     pass
 

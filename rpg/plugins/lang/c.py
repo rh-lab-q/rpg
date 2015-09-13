@@ -59,3 +59,17 @@ class CPlugin(Plugin):
             unlink(file_name)
         spec.required_files.update(_ret_paths)
         spec.build_required_files.update(_ret_paths)
+
+    MOCK_C_ERR = compile(r"fatal error\: ([^:]*\.[^:]*)\: "
+                         r"No such file or directory")
+
+    def mock_recover(self, log, spec):
+        for err in log:
+            _missing = self.MOCK_C_ERR.search(err)
+            if _missing:
+                _missing = _missing.group(1)
+                logging.debug("Adding missing file " + _missing)
+                spec.required_files.update(["*" + _missing])
+                spec.build_required_files.update(["*" + _missing])
+                return True
+        return False
