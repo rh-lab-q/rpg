@@ -1,6 +1,11 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.4)
 PROJECT (RPG NONE)
 
+OPTION(DISABLE_MOCK_TEST "Enables tests in tests/mock_build directory" OFF)
+OPTION(DISABLE_UNIT_TEST "Enables tests in tests/unit directory" OFF)
+OPTION(DISABLE_LONG_TEST "Enables tests in tests/long directory" OFF)
+OPTION(WITH_MAN  "Enables installation of manual pages" OFF)
+
 # Python search:
 FIND_PACKAGE (PythonInterp 3.4 REQUIRED)
 
@@ -58,9 +63,9 @@ IF (EXISTS ${PROJECT_SOURCE_DIR}/tests)
         MESSAGE (STATUS "Nosestests exists")
         ENABLE_TESTING ()
         ADD_SUBDIRECTORY (tests)
-        ADD_CUSTOM_TARGET (test-unit COMMAND ${CMAKE_CTEST_COMMAND} WORKING_DIRECTORY tests/unit)
-        ADD_CUSTOM_TARGET (test-long COMMAND ${CMAKE_CTEST_COMMAND} WORKING_DIRECTORY tests/long)
-        ADD_CUSTOM_TARGET (test-mock COMMAND ${CMAKE_CTEST_COMMAND} WORKING_DIRECTORY tests/mock_build)
+        ADD_CUSTOM_TARGET (test-unit COMMAND ${NoseProg} tests/unit WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-long COMMAND ${NoseProg} tests/long WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-mock COMMAND ${NoseProg} tests/mock_build WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     ELSE ()
         MESSAGE (WARNING "Nosetests is missing! - no tests available")
     ENDIF ()
