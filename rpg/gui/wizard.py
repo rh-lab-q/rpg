@@ -364,8 +364,7 @@ class SummaryPage(QtWidgets.QWizardPage):
         self.summaryLabel.setToolTip(
             "A brief, one-line summary of the package. Use American English")
 
-        self.descriptionLabel = QLabel(
-            "Description<font color=\'#FF3333\'>*</font> ")
+        self.descriptionLabel = QLabel("Description")
         self.descriptionEdit = QTextEdit()
         self.descriptionEdit.setMinimumHeight(30)
         self.descriptionEdit.setMaximumHeight(120)
@@ -391,8 +390,11 @@ class SummaryPage(QtWidgets.QWizardPage):
         self.setLayout(mainLayout)
 
     def validatePage(self):
+        if self.descriptionEdit.toPlainText() == '':
+            self.base.spec.description = '%{summary}'
+        else:
+            self.base.spec.description = self.descriptionEdit.toPlainText()
         self.base.spec.Summary = self.summaryEdit.text()
-        self.base.spec.description = self.descriptionEdit.toPlainText()
         self.base.run_patched_source_analysis()
         return True
 
