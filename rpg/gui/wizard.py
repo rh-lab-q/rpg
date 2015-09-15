@@ -93,6 +93,12 @@ class ImportPage(QtWidgets.QWizardPage):
         super(ImportPage, self).__init__(parent)
 
         self.base = Wizard.base
+        self.redQLineEdit = ("QLineEdit { border-style: solid;" +
+                             "border-width: 1px;" +
+                             "border-color: #FF3333;" +
+                             "border-radius: 3px;" +
+                             "background-color:" +
+                             "rgb(233,233,233);}")
 
         self.setTitle(self.tr("    Beginning"))
         self.setSubTitle(self.tr("Choose distribution and import " +
@@ -166,12 +172,7 @@ class ImportPage(QtWidgets.QWizardPage):
         if(path.exists()):
             self.importEdit.setStyleSheet("")
         else:
-            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
-                                          "border-width: 1px;" +
-                                          "border-color: #FF3333;" +
-                                          "border-radius: 3px;" +
-                                          "background-color:" +
-                                          "rgb(233,233,233);}")
+            self.importEdit.setStyleSheet(self.redQLineEdit)
 
     def importPath(self):
         ''' Returns path selected file or archive'''
@@ -207,12 +208,7 @@ class ImportPage(QtWidgets.QWizardPage):
             self.importEdit.setStyleSheet("")
             return True
         else:
-            self.importEdit.setStyleSheet("QLineEdit { border-style: solid;" +
-                                          "border-width: 1px;" +
-                                          "border-color: #FF3333;" +
-                                          "border-radius: 3px;" +
-                                          "background-color:" +
-                                          "rgb(233,233,233);}")
+            self.importEdit.setStyleSheet(self.redQLineEdit)
             return False
 
     def nextId(self):
@@ -236,6 +232,12 @@ class MandatoryPage(QtWidgets.QWizardPage):
         super(MandatoryPage, self).__init__(parent)
 
         self.base = Wizard.base
+        self.redQLineEdit = ("QLineEdit { border-style: solid;" +
+                             "border-width: 1px;" +
+                             "border-color: #FF3333;" +
+                             "border-radius: 3px;" +
+                             "background-color:" +
+                             "rgb(233,233,233);}")
 
         self.setTitle(self.tr("    Mandatory fields"))
         self.setSubTitle(self.tr("Basic required information"))
@@ -254,10 +256,12 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.versionEdit = QLineEdit()
         self.versionEdit.setMinimumHeight(30)
         self.versionLabel.setBuddy(self.versionEdit)
+        self.versionEdit.textChanged.connect(self.checkVersion)
         self.versionLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.versionLabel.setToolTip(
             "The upstream version number, " +
-            "usually numbers separated by dots (e.g. 1.7.4)")
+            "usually numbers separated by dots (e.g. 1.7.4). " +
+            "It cannot contain a dash '-'.")
 
         self.releaseLabel = QLabel("Release<font color=\'#FF3333\'>*</font>")
         self.releaseEdit = QLineEdit()
@@ -332,21 +336,33 @@ class MandatoryPage(QtWidgets.QWizardPage):
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
 
+    def checkVersion(self):
+        version = self.versionEdit.text()
+        if '-' in version:
+            self.versionEdit.setStyleSheet(self.redQLineEdit)
+        else:
+            self.versionEdit.setStyleSheet("")
+
     def validatePage(self):
         ''' [Bool] Function that invokes just after pressing the next button
             {True} - user moves to next page
             {False}- user blocked on current page
             ###### Setting up RPG class references ###### '''
 
-        self.base.spec.Name = self.nameEdit.text()
-        self.base.spec.Version = self.versionEdit.text()
-        self.base.spec.Release = self.releaseEdit.text()
-        self.base.spec.License = self.licenseEdit.text()
-        self.base.spec.URL = self.URLEdit.text()
-        self.base.spec.Summary = self.summaryEdit.text()
-        self.base.spec.description = self.descriptionEdit.text()
-        self.base.run_patched_source_analysis()
-        return True
+        if '-' in self.versionEdit.text():
+            self.versionEdit.setStyleSheet(self.redQLineEdit)
+            return False
+        else:
+            self.versionEdit.setStyleSheet("")
+            self.base.spec.Name = self.nameEdit.text()
+            self.base.spec.Version = self.versionEdit.text()
+            self.base.spec.Release = self.releaseEdit.text()
+            self.base.spec.License = self.licenseEdit.text()
+            self.base.spec.URL = self.URLEdit.text()
+            self.base.spec.Summary = self.summaryEdit.text()
+            self.base.spec.description = self.descriptionEdit.text()
+            self.base.run_patched_source_analysis()
+            return True
 
     def nextId(self):
         ''' [int] Function that determines the next page after the current one
