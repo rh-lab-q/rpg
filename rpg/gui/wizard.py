@@ -17,14 +17,14 @@ class Wizard(QtWidgets.QWizard):
 
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageIntro) to 9 (PageCoprFinal)
+        - counted from 0 (PageIntro) to 11 (PageCoprFinal)
         - tooltips are from:
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
-    NUM_PAGES = 11
-    (PageIntro, PageImport, PageMandatory, PageScripts, PageInstall,
-        PageRequires, PageUninstall, PageBuild, PageCoprLogin, PageCoprBuild,
-        PageCoprFinal) = range(NUM_PAGES)
+    NUM_PAGES = 12
+    (PageIntro, PageImport, PageMandatory, PageSummary, PageScripts,
+        PageInstall, PageRequires, PageUninstall, PageBuild, PageCoprLogin,
+        PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
         super(Wizard, self).__init__(parent)
@@ -36,11 +36,18 @@ class Wizard(QtWidgets.QWizard):
                     QWizard.BackButton, QWizard.NextButton,
                     QWizard.FinishButton])
         self.setButtonLayout(btnList)
+        self.setStyleSheet("QTextEdit { border-style: solid;" +
+                           "border-width: 1px;" +
+                           "border-color: rgb(178, 182, 178);" +
+                           "border-radius: 3px;" +
+                           "background-color:" +
+                           "rgb(237, 237, 237);}")
 
         # Setting pages to wizard
         self.setPage(self.PageIntro, IntroPage(self))
         self.setPage(self.PageImport, ImportPage(self))
         self.setPage(self.PageMandatory, MandatoryPage(self))
+        self.setPage(self.PageSummary, SummaryPage(self))
         self.setPage(self.PageScripts, ScriptsPage(self))
         self.setPage(self.PageInstall, InstallPage(self))
         self.setPage(self.PageRequires, RequiresPage(self))
@@ -224,7 +231,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
     def initializePage(self):
         self.nameEdit.setText(str(self.base.spec.Name))
         self.versionEdit.setText(str(self.base.spec.Version))
-        self.releaseEdit.setText(str(self.base.spec.Release))
+        self.releaseEdit.setText("1")
         self.licenseEdit.setText(str(self.base.spec.License))
         self.URLEdit.setText(str(self.base.spec.URL))
 
@@ -280,24 +287,6 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.licenseLabel.setToolTip(
             "The license, which must be an open source software license")
 
-        self.summaryLabel = QLabel("Summary<font color=\'#FF3333\'>*</font>")
-        self.summaryEdit = QLineEdit()
-        self.summaryEdit.setMinimumHeight(30)
-        self.summaryLabel.setBuddy(self.summaryEdit)
-        self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.summaryLabel.setToolTip(
-            "A brief, one-line summary of the package. Use American English")
-
-        self.descriptionLabel = QLabel(
-            "Description<font color=\'#FF3333\'>*</font> ")
-        self.descriptionEdit = QLineEdit()
-        self.descriptionEdit.setMinimumHeight(30)
-        self.descriptionLabel.setBuddy(self.descriptionEdit)
-        self.descriptionLabel.setCursor(QtGui.
-                                        QCursor(QtCore.Qt.WhatsThisCursor))
-        self.descriptionLabel.setToolTip(
-            "A longer, multi-line description of the program")
-
         self.URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
         self.URLEdit.setMinimumHeight(30)
@@ -309,11 +298,9 @@ class MandatoryPage(QtWidgets.QWizardPage):
 
         # Making mandatory fields:
         self.registerField("Name*", self.nameEdit)
-        self.registerField("Summary*", self.summaryEdit)
         self.registerField("Version*", self.versionEdit)
         self.registerField("Release*", self.releaseEdit)
         self.registerField("License*", self.licenseEdit)
-        self.registerField("Description*", self.descriptionEdit)
 
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
@@ -326,12 +313,8 @@ class MandatoryPage(QtWidgets.QWizardPage):
         grid.addWidget(self.releaseEdit, 2, 1)
         grid.addWidget(self.licenseLabel, 3, 0)
         grid.addWidget(self.licenseEdit, 3, 1)
-        grid.addWidget(self.summaryLabel, 4, 0)
-        grid.addWidget(self.summaryEdit, 4, 1)
-        grid.addWidget(self.descriptionLabel, 5, 0)
-        grid.addWidget(self.descriptionEdit, 5, 1)
-        grid.addWidget(self.URLLabel, 6, 0)
-        grid.addWidget(self.URLEdit, 6, 1)
+        grid.addWidget(self.URLLabel, 4, 0)
+        grid.addWidget(self.URLEdit, 4, 1)
         mainLayout.addSpacing(25)
         mainLayout.addLayout(grid)
         self.setLayout(mainLayout)
@@ -344,11 +327,6 @@ class MandatoryPage(QtWidgets.QWizardPage):
             self.versionEdit.setStyleSheet("")
 
     def validatePage(self):
-        ''' [Bool] Function that invokes just after pressing the next button
-            {True} - user moves to next page
-            {False}- user blocked on current page
-            ###### Setting up RPG class references ###### '''
-
         if '-' in self.versionEdit.text():
             self.versionEdit.setStyleSheet(self.redQLineEdit)
             return False
@@ -359,10 +337,64 @@ class MandatoryPage(QtWidgets.QWizardPage):
             self.base.spec.Release = self.releaseEdit.text()
             self.base.spec.License = self.licenseEdit.text()
             self.base.spec.URL = self.URLEdit.text()
-            self.base.spec.Summary = self.summaryEdit.text()
-            self.base.spec.description = self.descriptionEdit.text()
-            self.base.run_patched_source_analysis()
             return True
+
+    def nextId(self):
+        ''' [int] Function that determines the next page after the current one
+            - returns integer value and then checks, which value is page"
+            in NUM_PAGES'''
+        return Wizard.PageSummary
+
+
+class SummaryPage(QtWidgets.QWizardPage):
+
+    def __init__(self, Wizard, parent=None):
+        super(SummaryPage, self).__init__(parent)
+
+        self.base = Wizard.base
+
+        self.setTitle(self.tr("    Description fields"))
+        self.setSubTitle(self.tr("Additional information"))
+
+        self.summaryLabel = QLabel("Summary<font color=\'#FF3333\'>*</font>")
+        self.summaryEdit = QLineEdit()
+        self.summaryEdit.setMinimumHeight(30)
+        self.summaryLabel.setBuddy(self.summaryEdit)
+        self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
+        self.summaryLabel.setToolTip(
+            "A brief, one-line summary of the package. Use American English")
+
+        self.descriptionLabel = QLabel(
+            "Description<font color=\'#FF3333\'>*</font> ")
+        self.descriptionEdit = QTextEdit()
+        self.descriptionEdit.setMinimumHeight(30)
+        self.descriptionEdit.setMaximumHeight(120)
+        self.descriptionLabel.setBuddy(self.descriptionEdit)
+        self.descriptionLabel.setCursor(QtGui.
+                                        QCursor(QtCore.Qt.WhatsThisCursor))
+        self.descriptionLabel.setToolTip(
+            "A longer, multi-line description of the program")
+
+        # Making mandatory fields:
+        self.registerField("Summary*", self.summaryEdit)
+
+        mainLayout = QVBoxLayout()
+        grid = QGridLayout()
+        grid.setVerticalSpacing(15)
+        grid.setAlignment(QtCore.Qt.AlignTop)
+        grid.addWidget(self.summaryLabel, 0, 0)
+        grid.addWidget(self.summaryEdit, 0, 1)
+        grid.addWidget(self.descriptionLabel, 1, 0)
+        grid.addWidget(self.descriptionEdit, 1, 1)
+        mainLayout.addSpacing(25)
+        mainLayout.addLayout(grid)
+        self.setLayout(mainLayout)
+
+    def validatePage(self):
+        self.base.spec.Summary = self.summaryEdit.text()
+        self.base.spec.description = self.descriptionEdit.toPlainText()
+        self.base.run_patched_source_analysis()
+        return True
 
     def nextId(self):
         ''' [int] Function that determines the next page after the current one
