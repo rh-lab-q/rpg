@@ -199,6 +199,7 @@ class ImportPage(QtWidgets.QWizardPage):
             self.base.target_arch = self.ArchEdit.currentText()
             self.base.target_distro = self.DistroEdit.currentText()
             self.base.load_project_from_url(self.importEdit.text().strip())
+            self.base.run_extracted_source_analysis()
             new_thread = Thread(
                 target=self.base.fetch_repos, args=(self.base.target_distro,
                                                     self.base.target_arch))
@@ -223,6 +224,13 @@ class ImportPage(QtWidgets.QWizardPage):
 
 
 class MandatoryPage(QtWidgets.QWizardPage):
+
+    def initializePage(self):
+        self.nameEdit.setText(str(self.base.spec.Name))
+        self.versionEdit.setText(str(self.base.spec.Version))
+        self.releaseEdit.setText(str(self.base.spec.Release))
+        self.licenseEdit.setText(str(self.base.spec.License))
+        self.URLEdit.setText(str(self.base.spec.URL))
 
     def __init__(self, Wizard, parent=None):
         super(MandatoryPage, self).__init__(parent)
@@ -337,7 +345,6 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.base.spec.URL = self.URLEdit.text()
         self.base.spec.Summary = self.summaryEdit.text()
         self.base.spec.description = self.descriptionEdit.text()
-        self.base.run_extracted_source_analysis()
         self.base.run_patched_source_analysis()
         return True
 
@@ -899,7 +906,8 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         releaseBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
 
-        releaseBoxLabel = QLabel("Choose distribution<font color=\'#FF3333\'>*</font>")
+        releaseBoxLabel = QLabel(
+            "Choose distribution<font color=\'#FF3333\'>*</font>")
         layoutReleaseBox.setColumnStretch(0, 1)
         layoutReleaseBox.setColumnStretch(1, 1)
         layoutReleaseBox.setColumnStretch(2, 1)
