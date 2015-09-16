@@ -932,19 +932,18 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageUrlLabel.setToolTip(
             "An url of your package. It must be some public web site")
 
-        self.Fedora22_i386_CheckBox = QCheckBox("fedora-22-i386")
-        self.Fedora22_x64_CheckBox = QCheckBox("fedora-22-x86_64")
-        self.Fedora21_i386_CheckBox = QCheckBox("fedora-21-i386")
-        self.Fedora21_x64_CheckBox = QCheckBox("fedora-21-x86_64")
-        self.Fedora20_i386_CheckBox = QCheckBox("fedora-20-i386")
-        self.Fedora20_x64_CheckBox = QCheckBox("fedora-20-x86_64")
-        self.Fedoraraw_i386_CheckBox = QCheckBox("fedora-rawhide-i386")
-        self.Fedoraraw_x64_CheckBox = QCheckBox("fedora-rawhide-x86_64")
-        self.EPEL7_x64_CheckBox = QCheckBox("epel-7-x86_64")
-        self.EPEL6_x64_CheckBox = QCheckBox("epel-6-x86_64")
-        self.EPEL6_i386_CheckBox = QCheckBox("epel-6-i386")
-        self.EPEL5_x64_CheckBox = QCheckBox("epel-5-x86_64")
-        self.EPEL5_i386_CheckBox = QCheckBox("epel-5-i386")
+        self.Fedora22_CheckBox = QCheckBox("fedora-22")
+        self.Fedora22_CheckBox.setCheckState(QtCore.Qt.Checked)
+        self.Fedora21_CheckBox = QCheckBox("fedora-21")
+        self.Fedora20_CheckBox = QCheckBox("fedora-20")
+        self.Fedoraraw_CheckBox = QCheckBox("fedora-rawhide")
+        self.EPEL7_CheckBox = QCheckBox("epel-7")
+        self.EPEL6_CheckBox = QCheckBox("epel-6")
+        self.EPEL5_CheckBox = QCheckBox("epel-5")
+        self.i386_CheckBox = QCheckBox("i386")
+        self.i386_CheckBox.setCheckState(QtCore.Qt.Checked)
+        self.x64_CheckBox = QCheckBox("x86_64")
+        self.x64_CheckBox.setCheckState(QtCore.Qt.Checked)
 
         # Making mandatory fields:
         self.registerField("Username*", self.usernameEdit)
@@ -956,25 +955,19 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         releaseBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
 
-        releaseBoxLabel = QLabel(
-            "Choose distribution<font color=\'#FF3333\'>*</font>")
-        layoutReleaseBox.setColumnStretch(0, 1)
-        layoutReleaseBox.setColumnStretch(1, 1)
-        layoutReleaseBox.setColumnStretch(2, 1)
-        layoutReleaseBox.setColumnStretch(3, 1)
-        layoutReleaseBox.addWidget(self.EPEL7_x64_CheckBox, 0, 1)
-        layoutReleaseBox.addWidget(self.EPEL6_i386_CheckBox, 1, 1)
-        layoutReleaseBox.addWidget(self.EPEL6_x64_CheckBox, 2, 1)
-        layoutReleaseBox.addWidget(self.EPEL5_i386_CheckBox, 3, 1)
-        layoutReleaseBox.addWidget(self.EPEL5_x64_CheckBox, 4, 1)
-        layoutReleaseBox.addWidget(self.Fedora22_i386_CheckBox, 0, 2)
-        layoutReleaseBox.addWidget(self.Fedora22_x64_CheckBox, 1, 2)
-        layoutReleaseBox.addWidget(self.Fedora21_i386_CheckBox, 2, 2)
-        layoutReleaseBox.addWidget(self.Fedora21_x64_CheckBox, 3, 2)
-        layoutReleaseBox.addWidget(self.Fedora20_i386_CheckBox, 4, 2)
-        layoutReleaseBox.addWidget(self.Fedora20_x64_CheckBox, 5, 2)
-        layoutReleaseBox.addWidget(self.Fedoraraw_i386_CheckBox, 0, 3)
-        layoutReleaseBox.addWidget(self.Fedoraraw_x64_CheckBox, 1, 3)
+        releaseBoxLabel = QLabel("Choose distribution and architecture" +
+                                 "<font color=\'#FF3333\'>*</font>")
+        layoutReleaseBox.setColumnStretch(0, 0)
+        layoutReleaseBox.setColumnStretch(1, 0)
+        layoutReleaseBox.setColumnStretch(2, 0)
+        layoutReleaseBox.addWidget(self.EPEL7_CheckBox, 0, 2)
+        layoutReleaseBox.addWidget(self.EPEL6_CheckBox, 1, 2)
+        layoutReleaseBox.addWidget(self.EPEL5_CheckBox, 2, 2)
+        layoutReleaseBox.addWidget(self.Fedora22_CheckBox, 0, 1)
+        layoutReleaseBox.addWidget(self.Fedora21_CheckBox, 1, 1)
+        layoutReleaseBox.addWidget(self.Fedora20_CheckBox, 2, 1)
+        layoutReleaseBox.addWidget(self.i386_CheckBox, 0, 4)
+        layoutReleaseBox.addWidget(self.x64_CheckBox, 1, 4)
         releaseBox.setLayout(layoutReleaseBox)
 
         mainLayout = QVBoxLayout()
@@ -1016,18 +1009,19 @@ class CoprLoginPage(QtWidgets.QWizardPage):
                                   self.loginEdit.text(), self.tokenEdit.text())
 
         self.versionList = [
-            self.Fedora22_i386_CheckBox, self.Fedora22_x64_CheckBox,
-            self.Fedora21_i386_CheckBox, self.Fedora21_x64_CheckBox,
-            self.Fedora20_i386_CheckBox, self.Fedora20_x64_CheckBox,
-            self.Fedoraraw_i386_CheckBox, self.Fedoraraw_x64_CheckBox,
-            self.EPEL7_x64_CheckBox,
-            self.EPEL6_x64_CheckBox, self.EPEL6_i386_CheckBox,
-            self.EPEL5_x64_CheckBox, self.EPEL5_i386_CheckBox
-        ]
+            self.Fedora22_CheckBox, self.Fedora21_CheckBox,
+            self.Fedora20_CheckBox, self.Fedoraraw_CheckBox,
+            self.EPEL7_CheckBox, self.EPEL6_CheckBox, self.EPEL5_CheckBox]
+        self.archList = [self.i386_CheckBox, self.x64_CheckBox]
         self.base.coprversion = []
         for checkbox in self.versionList:
             if checkbox.isChecked():
-                self.base.coprversion.append(checkbox.text())
+                if self.i386_CheckBox.isChecked():
+                    distro = checkbox.text() + '-i686'
+                    self.base.coprversion.append(distro)
+                else:
+                    distro = checkbox.text() + '-x86_64'
+                    self.base.coprversion.append(distro)
 
         if not self.base.coprversion:
             return False
