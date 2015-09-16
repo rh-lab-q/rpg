@@ -14,7 +14,7 @@ class FilesToPkgsPlugin(Plugin):
                     if _file in self.TRANSLATED:
                         yield self.TRANSLATED[_file]
                     else:
-                        pckg = query.filter(file=_file)[0]
+                        pckg = query.filter(file__glob=_file)[0]
                         self.TRANSLATED[_file] = pckg.name
                         for _f in pckg.files:
                             self.TRANSLATED[_f] = pckg.name
