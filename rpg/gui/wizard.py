@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
                              QTextEdit, QHBoxLayout, QFileDialog,
-                             QComboBox, QWizard)
+                             QComboBox, QWizard, QFrame)
 from rpg.gui.dialogs import DialogImport
 from rpg.utils import path_to_str
 from pathlib import Path
@@ -17,14 +17,14 @@ class Wizard(QtWidgets.QWizard):
 
     ''' Main class that holds other pages, number of pages are in NUM_PAGES
         - to simply navigate between them
-        - counted from 0 (PageIntro) to 11 (PageCoprFinal)
+        - counted from 0 (PageIntro) to 12 (PageCoprFinal)
         - tooltips are from:
           https://fedoraproject.org/wiki/How_to_create_an_RPM_package '''
 
-    NUM_PAGES = 12
+    NUM_PAGES = 13
     (PageIntro, PageImport, PageMandatory, PageSummary, PageScripts,
         PageInstall, PageRequires, PageUninstall, PageBuild, PageCoprLogin,
-        PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
+        PageCoprDistro, PageCoprBuild, PageCoprFinal) = range(NUM_PAGES)
 
     def __init__(self, base, parent=None):
         super(Wizard, self).__init__(parent)
@@ -54,6 +54,7 @@ class Wizard(QtWidgets.QWizard):
         self.setPage(self.PageUninstall, UninstallPage(self))
         self.setPage(self.PageBuild, BuildPage(self))
         self.setPage(self.PageCoprLogin, CoprLoginPage(self))
+        self.setPage(self.PageCoprDistro, CoprDistroPage(self))
         self.setPage(self.PageCoprBuild, CoprBuildPage(self))
         self.setPage(self.PageCoprFinal, CoprFinalPage(self))
         self.setStartId(self.PageIntro)
@@ -887,8 +888,8 @@ class CoprLoginPage(QtWidgets.QWizardPage):
             "style=\" font-size:24pt;\">For upload and " +
             "build package in Copr you need an account " +
             "on <a href=\"https://copr.fedoraproject.org/api\">" +
-            "Copr API</a>.<br>Please log in and copy your information." +
-            " It will be saved on config file, but nowhere else.<br>" +
+            "Copr API</a>. Please log in and copy your information.<br>" +
+            " It will be saved on config file, but nowhere else." +
             " You also need upload your package " +
             "on some public web site." +
             "</span></p></body></html>")
@@ -897,40 +898,129 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.usernameEdit = QLineEdit()
         self.usernameEdit.setMinimumHeight(30)
         self.usernameLabel.setBuddy(self.usernameEdit)
-        self.usernameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.usernameLabel.setToolTip("Your username from Copr API")
+        self.usernameLabelText = QLabel(
+            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
+            "grey;\">Your username from Copr API." +
+            "</p></body></html>")
 
         self.loginLabel = QLabel("Login<font color=\'#FF3333\'>*</font>")
         self.loginEdit = QLineEdit()
         self.loginEdit.setMinimumHeight(30)
         self.loginLabel.setBuddy(self.loginEdit)
-        self.loginLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.loginLabel.setToolTip("Your login (not username!) from Copr API")
+        self.loginLabelText = QLabel(
+            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
+            "grey;\">Your login (not username!) from Copr API." +
+            "</p></body></html>")
 
         self.tokenLabel = QLabel("Token<font color=\'#FF3333\'>*</font>")
         self.tokenEdit = QLineEdit()
         self.tokenEdit.setMinimumHeight(30)
         self.tokenLabel.setBuddy(self.tokenEdit)
-        self.tokenLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.tokenLabel.setToolTip("Your token from Copr API")
+        self.tokenLabelText = QLabel(
+            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
+            "grey;\">Your token from Copr API." +
+            "</p></body></html>")
 
         self.packageNameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.packageNameEdit = QLineEdit()
         self.packageNameEdit.setMinimumHeight(30)
         self.packageNameLabel.setBuddy(self.packageNameEdit)
-        self.packageNameLabel.setCursor(
-            QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageNameLabel.setToolTip(
-            "Name of your package. It MUST be unique!")
+        self.packageNameLabelText = QLabel(
+            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
+            "grey;\">Name of your package. It MUST be unique!" +
+            "</p></body></html>")
 
         self.packageUrlLabel = QLabel("Url<font color=\'#FF3333\'>*</font>")
         self.packageUrlEdit = QLineEdit()
         self.packageUrlEdit.setMinimumHeight(30)
         self.packageUrlLabel.setBuddy(self.packageUrlEdit)
-        self.packageUrlLabel.setCursor(
-            QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageUrlLabel.setToolTip(
-            "An url of your package. It must be some public web site")
+        self.packageUrlLabelText = QLabel(
+            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
+            "grey;\">An url of your package. It must be some public web " +
+            "site.</p></body></html>")
+
+        # Making mandatory fields:
+        self.registerField("Username*", self.usernameEdit)
+        self.registerField("Login*", self.loginEdit)
+        self.registerField("Token*", self.tokenEdit)
+        self.registerField("PName*", self.packageNameEdit)
+        self.registerField("Url*", self.packageUrlEdit)
+
+        mainLayout = QVBoxLayout()
+        frameUsername = QFrame()
+        frameUsername.setFrameShape(QFrame.Panel)
+        frameUsername.setFrameShadow(QFrame.Sunken)
+        frameLogin = QFrame()
+        frameLogin.setFrameShape(QFrame.Panel)
+        frameLogin.setFrameShadow(QFrame.Sunken)
+        frameToken = QFrame()
+        frameToken.setFrameShape(QFrame.Panel)
+        frameToken.setFrameShadow(QFrame.Sunken)
+        frameName = QFrame()
+        frameName.setFrameShape(QFrame.Panel)
+        frameName.setFrameShadow(QFrame.Sunken)
+        frameUrl = QFrame()
+        frameUrl.setFrameShape(QFrame.Panel)
+        frameUrl.setFrameShadow(QFrame.Sunken)
+        gridLoginText = QGridLayout()
+        gridLoginText.addWidget(self.textLoginLabel, 0, 1, 1, 1)
+
+        gridUsername = QGridLayout()
+        gridLogin = QGridLayout()
+        gridToken = QGridLayout()
+        gridName = QGridLayout()
+        gridUrl = QGridLayout()
+        gridUsername.addWidget(self.usernameLabel, 0, 0, 1, 1)
+        gridUsername.addWidget(self.usernameEdit, 0, 1, 1, 8)
+        gridUsername.addWidget(self.usernameLabelText, 1, 0, 1, 8)
+        gridLogin.addWidget(self.loginLabel, 0, 0, 1, 1)
+        gridLogin.addWidget(self.loginEdit, 0, 1, 1, 8)
+        gridLogin.addWidget(self.loginLabelText, 1, 0, 1, 8)
+        gridToken.addWidget(self.tokenLabel, 0, 0, 1, 1)
+        gridToken.addWidget(self.tokenEdit, 0, 1, 1, 8)
+        gridToken.addWidget(self.tokenLabelText, 1, 0, 1, 8)
+        gridName.addWidget(self.packageNameLabel, 0, 0, 1, 1)
+        gridName.addWidget(self.packageNameEdit, 0, 1, 1, 8)
+        gridName.addWidget(self.packageNameLabelText, 1, 0, 1, 8)
+        gridUrl.addWidget(self.packageUrlLabel, 0, 0, 1, 1)
+        gridUrl.addWidget(self.packageUrlEdit, 0, 1, 1, 8)
+        gridUrl.addWidget(self.packageUrlLabelText, 1, 0, 1, 8)
+
+        frameUsername.setLayout(gridUsername)
+        frameLogin.setLayout(gridLogin)
+        frameToken.setLayout(gridToken)
+        frameName.setLayout(gridName)
+        frameUrl.setLayout(gridUrl)
+        mainLayout.addSpacing(25)
+        mainLayout.addLayout(gridLoginText)
+        mainLayout.addWidget(frameUsername)
+        mainLayout.addWidget(frameLogin)
+        mainLayout.addWidget(frameToken)
+        mainLayout.addWidget(frameName)
+        mainLayout.addWidget(frameUrl)
+        self.setLayout(mainLayout)
+
+    def validatePage(self):
+        self.base.coprusername = self.usernameEdit.text()
+        self.base.coprpackageName = self.packageNameEdit.text()
+        self.base.coprpackageUrl = self.packageUrlEdit.text()
+        self.base.copr_set_config(self.base.coprusername,
+                                  self.loginEdit.text(), self.tokenEdit.text())
+        return True
+
+    def nextId(self):
+        return Wizard.PageCoprDistro
+
+
+class CoprDistroPage(QtWidgets.QWizardPage):
+
+    def __init__(self, Wizard, parent=None):
+        super(CoprDistroPage, self).__init__(parent)
+
+        self.base = Wizard.base
+
+        self.setTitle(self.tr("    Copr page"))
+        self.setSubTitle(self.tr("Copr mandatory information"))
 
         self.Fedora22_CheckBox = QCheckBox("fedora-22")
         self.Fedora22_CheckBox.setCheckState(QtCore.Qt.Checked)
@@ -944,13 +1034,6 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.i386_CheckBox.setCheckState(QtCore.Qt.Checked)
         self.x64_CheckBox = QCheckBox("x86_64")
         self.x64_CheckBox.setCheckState(QtCore.Qt.Checked)
-
-        # Making mandatory fields:
-        self.registerField("Username*", self.usernameEdit)
-        self.registerField("Login*", self.loginEdit)
-        self.registerField("Token*", self.tokenEdit)
-        self.registerField("PName*", self.packageNameEdit)
-        self.registerField("Url*", self.packageUrlEdit)
 
         releaseBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
@@ -971,43 +1054,16 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         releaseBox.setLayout(layoutReleaseBox)
 
         mainLayout = QVBoxLayout()
-        gridLoginText = QGridLayout()
-        gridLoginText.addWidget(self.textLoginLabel, 0, 1, 1, 1)
-
         grid = QGridLayout()
-        grid2 = QGridLayout()
-        grid.setVerticalSpacing(15)
-        grid.addWidget(self.usernameLabel, 2, 0, 1, 1)
-        grid.addWidget(self.usernameEdit, 2, 1, 1, 1)
-        grid.addWidget(self.loginLabel, 3, 0, 1, 1)
-        grid.addWidget(self.loginEdit, 3, 1, 1, 1)
-        grid.addWidget(self.tokenLabel, 4, 0, 1, 1)
-        grid.addWidget(self.tokenEdit, 4, 1, 1, 1)
-        grid.addWidget(self.packageNameLabel, 5, 0, 1, 1)
-        grid.addWidget(self.packageNameEdit, 5, 1, 1, 1)
-        grid.addWidget(self.packageUrlLabel, 6, 0, 1, 1)
-        grid.addWidget(self.packageUrlEdit, 6, 1, 1, 1)
-        grid2.addWidget(releaseBoxLabel, 0, 0, 1, 1)
-
+        grid.addWidget(releaseBoxLabel, 0, 0, 1, 1)
         lowerLayout = QHBoxLayout()
         lowerLayout.addWidget(releaseBox)
-
         mainLayout.addSpacing(25)
-        mainLayout.addLayout(gridLoginText)
-        mainLayout.addSpacing(15)
         mainLayout.addLayout(grid)
-        mainLayout.addSpacing(15)
-        mainLayout.addLayout(grid2)
         mainLayout.addLayout(lowerLayout)
         self.setLayout(mainLayout)
 
     def validatePage(self):
-        self.base.coprusername = self.usernameEdit.text()
-        self.base.coprpackageName = self.packageNameEdit.text()
-        self.base.coprpackageUrl = self.packageUrlEdit.text()
-        self.base.copr_set_config(self.base.coprusername,
-                                  self.loginEdit.text(), self.tokenEdit.text())
-
         self.versionList = [
             self.Fedora22_CheckBox, self.Fedora21_CheckBox,
             self.Fedora20_CheckBox, self.Fedoraraw_CheckBox,
