@@ -2,7 +2,7 @@ from os.path import expanduser
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QLineEdit, QCheckBox,
                              QGroupBox, QPushButton, QGridLayout,
-                             QTextEdit, QHBoxLayout, QFileDialog,
+                             QTextEdit, QFileDialog,
                              QComboBox, QWizard, QFrame)
 from rpg.gui.dialogs import DialogImport
 from rpg.utils import path_to_str
@@ -30,6 +30,9 @@ class Wizard(QtWidgets.QWizard):
         super(Wizard, self).__init__(parent)
 
         self.base = base
+        self.base.tip_html_style = (
+            "<html><head/><body><p><span style=\"font-size:12pt; " +
+            "color:grey;\">%s</p></body></html>")
         self.setWindowTitle(self.tr("RPG"))
         self.setWizardStyle(self.ClassicStyle)
         btnList = ([QWizard.CancelButton, QWizard.Stretch,
@@ -116,9 +119,9 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importEdit = QLineEdit()
         self.importEdit.setMinimumHeight(30)
         self.importLabel.setBuddy(self.importEdit)
-        self.importLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.importLabel.setToolTip(
-            "Pristine source package (e.g. tarballs) and patches")
+        self.importLabelText = QLabel(
+            self.base.tip_html_style %
+            "Pristine source package (e.g. tarballs) and patches.")
         self.importEdit.textChanged.connect(self.checkPath)
         self.importEdit.setMinimumHeight(34)
 
@@ -138,9 +141,10 @@ class ImportPage(QtWidgets.QWizardPage):
             self.ArchEdit.addItem("x86_64")
             self.ArchEdit.addItem("i386")
         self.ArchLabel.setBuddy(self.ArchEdit)
-        self.ArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.ArchLabel.setToolTip(
-            "Choose target architecture (32 bit - i386 or 64 bit - x68_64)")
+        self.ArchLabelText = QLabel(
+            self.base.tip_html_style %
+            ("Choose target architecture (32 bit - i386 or 64 bit "
+             "- x68_64)."))
 
         self.DistroLabel = QLabel(
             "Distribution<font color=\'#FF3333\'>*</font>")
@@ -155,23 +159,44 @@ class ImportPage(QtWidgets.QWizardPage):
         self.DistroEdit.addItem("epel-6")
         self.DistroEdit.addItem("epel-5")
         self.DistroLabel.setBuddy(self.DistroEdit)
-        self.DistroLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.DistroLabel.setToolTip("Choose target distribution")
+        self.DistroLabelText = QLabel(
+            self.base.tip_html_style %
+            "Choose target distribution.")
 
         self.registerField("Source*", self.importEdit)
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
-        grid.setVerticalSpacing(15)
-        grid.addWidget(self.importLabel, 1, 0, 1, 1)
-        grid.addWidget(self.importEdit, 1, 1, 1, 6)
-        grid.addWidget(self.importButton, 1, 7, 1, 1)
-        grid.addWidget(self.DistroLabel, 2, 0, 1, 0)
-        grid.addWidget(self.DistroEdit, 2, 1, 1, 2)
-        grid.addWidget(self.ArchLabel, 3, 0, 1, 0)
-        grid.addWidget(self.ArchEdit, 3, 1, 1, 2)
+        frame = QFrame()
+        frameDistro = QFrame()
+        frameArch = QFrame()
+        frame.setFrameShape(QFrame.Panel)
+        frame.setFrameShadow(QFrame.Sunken)
+        frameDistro.setFrameShape(QFrame.Panel)
+        frameDistro.setFrameShadow(QFrame.Sunken)
+        frameArch.setFrameShape(QFrame.Panel)
+        frameArch.setFrameShadow(QFrame.Sunken)
+        gridArch = QGridLayout()
+        gridImport = QGridLayout()
+        gridDistro = QGridLayout()
+        gridImport.addWidget(self.importLabel, 0, 0, 1, 1)
+        gridImport.addWidget(self.importEdit, 0, 1, 1, 6)
+        gridImport.addWidget(self.importButton, 0, 7, 1, 1)
+        gridImport.addWidget(self.importLabelText, 1, 0, 1, 7)
+        gridDistro.addWidget(self.DistroLabel, 0, 0, 1, 0)
+        gridDistro.addWidget(self.DistroEdit, 0, 1, 1, 2)
+        gridDistro.addWidget(self.DistroLabelText, 1, 0, 1, 7)
+        gridArch .addWidget(self.ArchLabel, 0, 0, 1, 0)
+        gridArch .addWidget(self.ArchEdit, 0, 1, 1, 2)
+        gridArch .addWidget(self.ArchLabelText, 1, 0, 1, 7)
         mainLayout.addSpacing(25)
-        mainLayout.addLayout(grid)
+        frame.setLayout(gridImport)
+        frameDistro.setLayout(gridDistro)
+        frameArch.setLayout(gridArch)
+        mainLayout.addWidget(frame)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameDistro)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameArch)
         self.setLayout(mainLayout)
 
     def checkPath(self):
@@ -250,52 +275,51 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.setTitle(self.tr("    Mandatory fields"))
         self.setSubTitle(self.tr("Basic required information"))
 
-        ''' Creating widgets and setting them to layout'''
         self.nameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.nameEdit = QLineEdit()
         self.nameEdit.setMinimumHeight(30)
         self.nameLabel.setBuddy(self.nameEdit)
-        self.nameLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.nameLabel.setToolTip(
-            "The (base) name of the package, " +
-            "which should match the SPEC file name")
+        self.nameLabelText = QLabel(
+            self.base.tip_html_style %
+            ("The (base) name of the package, which should "
+             "be unique."))
 
         self.versionLabel = QLabel("Version<font color=\'#FF3333\'>*</font>")
         self.versionEdit = QLineEdit()
+        self.versionEdit.textChanged.connect(self.checkVersion)
         self.versionEdit.setMinimumHeight(30)
         self.versionLabel.setBuddy(self.versionEdit)
-        self.versionEdit.textChanged.connect(self.checkVersion)
-        self.versionLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.versionLabel.setToolTip(
-            "The upstream version number, " +
-            "usually numbers separated by dots (e.g. 1.7.4). " +
-            "It cannot contain a dash '-'.")
+        self.versionLabelText = QLabel(
+            self.base.tip_html_style %
+            ("The upstream version number, usually numbers "
+             "separated by dots (e.g. 1.7.4)."))
 
         self.releaseLabel = QLabel("Release<font color=\'#FF3333\'>*</font>")
         self.releaseEdit = QLineEdit()
         self.releaseEdit.setMinimumHeight(30)
         self.releaseLabel.setBuddy(self.releaseEdit)
-        self.releaseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.releaseLabel.setToolTip(
-            "The initial value should normally be 1%{?dist}. " +
-            "Increment the number every time you release a new package")
+        self.releaseLabelText = QLabel(
+            self.base.tip_html_style %
+            ("The initial value should normally be 1%{?dist}. "
+             "Increment the number every time you release a new package."))
 
         self.licenseLabel = QLabel("License<font color=\'#FF3333\'>*</font>")
         self.licenseEdit = QLineEdit()
         self.licenseEdit.setMinimumHeight(30)
         self.licenseLabel.setBuddy(self.licenseEdit)
-        self.licenseLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.licenseLabel.setToolTip(
-            "The license, which must be an open source software license")
+        self.licenseLabelText = QLabel(
+            self.base.tip_html_style %
+            ("The license, which must be an open source software "
+             "license."))
 
         self.URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
         self.URLEdit.setMinimumHeight(30)
         self.URLLabel.setBuddy(self.URLEdit)
-        self.URLLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.URLLabel.setToolTip(
-            "The full URL for more information about the " +
-            "program (e.g. the project website)")
+        self.URLLabelText = QLabel(
+            self.base.tip_html_style %
+            ("The full URL for more information about the "
+             "program (e.g. the project website)."))
 
         # Making mandatory fields:
         self.registerField("Name*", self.nameEdit)
@@ -304,20 +328,56 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.registerField("License*", self.licenseEdit)
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
-        grid.setVerticalSpacing(15)
-        grid.addWidget(self.nameLabel, 0, 0)
-        grid.addWidget(self.nameEdit, 0, 1)
-        grid.addWidget(self.versionLabel, 1, 0)
-        grid.addWidget(self.versionEdit, 1, 1)
-        grid.addWidget(self.releaseLabel, 2, 0)
-        grid.addWidget(self.releaseEdit, 2, 1)
-        grid.addWidget(self.licenseLabel, 3, 0)
-        grid.addWidget(self.licenseEdit, 3, 1)
-        grid.addWidget(self.URLLabel, 4, 0)
-        grid.addWidget(self.URLEdit, 4, 1)
+        frameName = QFrame()
+        frameVersion = QFrame()
+        frameRelease = QFrame()
+        frameLicense = QFrame()
+        frameUrl = QFrame()
+        frameName.setFrameShape(QFrame.Panel)
+        frameName.setFrameShadow(QFrame.Sunken)
+        frameVersion.setFrameShape(QFrame.Panel)
+        frameVersion.setFrameShadow(QFrame.Sunken)
+        frameRelease.setFrameShape(QFrame.Panel)
+        frameRelease.setFrameShadow(QFrame.Sunken)
+        frameLicense.setFrameShape(QFrame.Panel)
+        frameLicense.setFrameShadow(QFrame.Sunken)
+        frameUrl.setFrameShape(QFrame.Panel)
+        frameUrl.setFrameShadow(QFrame.Sunken)
+        gridName = QGridLayout()
+        gridVersion = QGridLayout()
+        gridRelease = QGridLayout()
+        gridLicense = QGridLayout()
+        gridUrl = QGridLayout()
+        gridName.addWidget(self.nameLabel, 0, 0, 1, 1)
+        gridName.addWidget(self.nameEdit, 0, 1, 1, 8)
+        gridName.addWidget(self.nameLabelText, 1, 0, 1, 8)
+        gridVersion.addWidget(self.versionLabel, 0, 0, 1, 1)
+        gridVersion.addWidget(self.versionEdit, 0, 1, 1, 8)
+        gridVersion.addWidget(self.versionLabelText, 1, 0, 1, 8)
+        gridRelease.addWidget(self.releaseLabel, 0, 0, 1, 1)
+        gridRelease.addWidget(self.releaseEdit, 0, 1, 1, 8)
+        gridRelease.addWidget(self.releaseLabelText, 1, 0, 1, 8)
+        gridLicense.addWidget(self.licenseLabel, 0, 0, 1, 1)
+        gridLicense.addWidget(self.licenseEdit, 0, 1, 1, 8)
+        gridLicense.addWidget(self.licenseLabelText, 1, 0, 1, 8)
+        gridUrl.addWidget(self.URLLabel, 0, 0, 1, 1)
+        gridUrl.addWidget(self.URLEdit, 0, 1, 1, 8)
+        gridUrl.addWidget(self.URLLabelText, 1, 0, 1, 8)
         mainLayout.addSpacing(25)
-        mainLayout.addLayout(grid)
+        frameName.setLayout(gridName)
+        frameVersion.setLayout(gridVersion)
+        frameRelease.setLayout(gridRelease)
+        frameLicense.setLayout(gridLicense)
+        frameUrl.setLayout(gridUrl)
+        mainLayout.addWidget(frameName)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameVersion)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameRelease)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameLicense)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameUrl)
         self.setLayout(mainLayout)
 
     def checkVersion(self):
@@ -353,7 +413,6 @@ class SummaryPage(QtWidgets.QWizardPage):
         super(SummaryPage, self).__init__(parent)
 
         self.base = Wizard.base
-
         self.setTitle(self.tr("    Description fields"))
         self.setSubTitle(self.tr("Additional information"))
 
@@ -361,33 +420,44 @@ class SummaryPage(QtWidgets.QWizardPage):
         self.summaryEdit = QLineEdit()
         self.summaryEdit.setMinimumHeight(30)
         self.summaryLabel.setBuddy(self.summaryEdit)
-        self.summaryLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.summaryLabel.setToolTip(
-            "A brief, one-line summary of the package. Use American English")
+        self.summaryLabelText = QLabel(
+            self.base.tip_html_style %
+            ("A brief, one-line summary of the package. Use "
+             "American English."))
 
         self.descriptionLabel = QLabel("Description")
         self.descriptionEdit = QTextEdit()
         self.descriptionEdit.setMinimumHeight(30)
-        self.descriptionEdit.setMaximumHeight(120)
         self.descriptionLabel.setBuddy(self.descriptionEdit)
-        self.descriptionLabel.setCursor(QtGui.
-                                        QCursor(QtCore.Qt.WhatsThisCursor))
-        self.descriptionLabel.setToolTip(
-            "A longer, multi-line description of the program")
+        self.descriptionLabelText = QLabel(
+            self.base.tip_html_style %
+            "A longer, multi-line description of the program.")
 
         # Making mandatory fields:
         self.registerField("Summary*", self.summaryEdit)
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
-        grid.setVerticalSpacing(15)
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        grid.addWidget(self.summaryLabel, 0, 0)
-        grid.addWidget(self.summaryEdit, 0, 1)
-        grid.addWidget(self.descriptionLabel, 1, 0)
-        grid.addWidget(self.descriptionEdit, 1, 1)
+        frameSummary = QFrame()
+        frameDescription = QFrame()
+        frameSummary.setFrameShape(QFrame.Panel)
+        frameSummary.setFrameShadow(QFrame.Sunken)
+        frameDescription.setFrameShape(QFrame.Panel)
+        frameDescription.setFrameShadow(QFrame.Sunken)
+        gridSummary = QGridLayout()
+        gridDescription = QGridLayout()
+        mainLayout.setAlignment(QtCore.Qt.AlignTop)
+        gridSummary.addWidget(self.summaryLabel, 0, 0, 1, 1)
+        gridSummary.addWidget(self.summaryEdit, 0, 1, 1, 8)
+        gridSummary.addWidget(self.summaryLabelText, 1, 0, 1, 8)
+        gridDescription.addWidget(self.descriptionLabel, 0, 0, 1, 1)
+        gridDescription.addWidget(self.descriptionEdit, 0, 1, 1, 8)
+        gridDescription.addWidget(self.descriptionLabelText, 1, 0, 1, 8)
         mainLayout.addSpacing(25)
-        mainLayout.addLayout(grid)
+        frameSummary.setLayout(gridSummary)
+        frameDescription.setLayout(gridDescription)
+        mainLayout.addWidget(frameSummary)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameDescription)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -431,49 +501,74 @@ class ScriptsPage(QtWidgets.QWizardPage):
 
         prepareLabel = QLabel("%prepare: ")
         self.prepareEdit = QTextEdit()
-        prepareLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        prepareLabel.setToolTip(
-            "Script commands to prepare the program (e.g. to uncompress it) " +
-            "so that it will be ready for building.<br>Typically this is " +
-            "just %autosetup; a common variation is %autosetup " +
-            "-n NAME if the source file unpacks into NAME")
+        prepareLabelText = QLabel(
+            self.base.tip_html_style %
+            ("Script commands to prepare the program (e.g. to "
+             "uncompress it) so that it will be ready for building.<br>"
+             "Typically this is just %autosetup; or "
+             "%autosetup -n NAME if the source file unpacks into NAME."))
 
         buildLabel = QLabel("%build: ")
         self.buildEdit = QTextEdit()
-        buildLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        buildLabel.setToolTip(
-            "Script commands to build the program (e.g. to compile it) and " +
-            "get it ready for installing")
+        buildLabelText = QLabel(
+            self.base.tip_html_style %
+            ("Script commands to build the program (e.g. to compile it)"
+             " and get it ready for installing."))
 
         checkLabel = QLabel("%check: ")
         self.checkEdit = QTextEdit()
-        checkLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        checkLabel.setToolTip("Script commands to test the program")
+        checkLabelText = QLabel(
+            self.base.tip_html_style %
+            "Script commands to test the program.")
 
         buildArchLabel = QLabel("BuildArch: ")
         self.buildArchCheckbox = QCheckBox("noarch")
-        buildArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        buildArchLabel.setToolTip(
-            "If you're packaging files that are architecture-independent " +
-            "(e.g. shell scripts, data files), then add BuildArch: noarch. " +
-            "The architecture for the binary RPM will then be noarch")
+        buildArchLabelText = QLabel(
+            self.base.tip_html_style %
+            ("If you're packaging files that are architecture-"
+             "independent (e.g. shell scripts, data files), then add<br> "
+             "BuildArch: noarch. The architecture for the binary RPM will "
+             "then be noarch."))
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
+        framePrepare = QFrame()
+        frameBuild = QFrame()
+        frameCheck = QFrame()
+        frameArch = QFrame()
+        framePrepare.setFrameShape(QFrame.Panel)
+        framePrepare.setFrameShadow(QFrame.Sunken)
+        frameBuild.setFrameShape(QFrame.Panel)
+        frameBuild.setFrameShadow(QFrame.Sunken)
+        frameCheck.setFrameShape(QFrame.Panel)
+        frameCheck.setFrameShadow(QFrame.Sunken)
+        frameArch.setFrameShape(QFrame.Panel)
+        frameArch.setFrameShadow(QFrame.Sunken)
+        gridPrepare = QGridLayout()
+        gridBuild = QGridLayout()
+        gridCheck = QGridLayout()
+        gridArch = QGridLayout()
         gridtext = QGridLayout()
-        grid.setVerticalSpacing(15)
         gridtext.addWidget(self.textLabel, 0, 0)
-        grid.addWidget(prepareLabel, 1, 0, 1, 1)
-        grid.addWidget(self.prepareEdit, 1, 1, 1, 1)
-        grid.addWidget(buildLabel, 2, 0, 1, 1)
-        grid.addWidget(self.buildEdit, 2, 1, 1, 1)
-        grid.addWidget(checkLabel, 3, 0, 1, 1)
-        grid.addWidget(self.checkEdit, 3, 1, 1, 1)
-        grid.addWidget(buildArchLabel, 4, 0)
-        grid.addWidget(self.buildArchCheckbox, 4, 1)
-        mainLayout.addSpacing(25)
-        mainLayout.addLayout(gridtext)
-        mainLayout.addLayout(grid)
+        gridPrepare.addWidget(prepareLabel, 0, 0, 1, 1)
+        gridPrepare.addWidget(self.prepareEdit, 0, 1, 1, 8)
+        gridPrepare.addWidget(prepareLabelText, 1, 0, 1, 8)
+        gridBuild.addWidget(buildLabel, 0, 0, 1, 1)
+        gridBuild.addWidget(self.buildEdit, 0, 1, 1, 8)
+        gridBuild.addWidget(buildLabelText, 1, 0, 1, 8)
+        gridCheck.addWidget(checkLabel, 0, 0, 1, 1)
+        gridCheck.addWidget(self.checkEdit, 0, 1, 1, 8)
+        gridCheck.addWidget(checkLabelText, 1, 0, 1, 8)
+        gridArch.addWidget(buildArchLabel, 0, 0)
+        gridArch.addWidget(self.buildArchCheckbox, 0, 1)
+        gridArch.addWidget(buildArchLabelText, 1, 0, 1, 8)
+        framePrepare.setLayout(gridPrepare)
+        frameBuild.setLayout(gridBuild)
+        frameCheck.setLayout(gridCheck)
+        frameArch.setLayout(gridArch)
+        mainLayout.addWidget(framePrepare)
+        mainLayout.addWidget(frameBuild)
+        mainLayout.addWidget(frameCheck)
+        mainLayout.addWidget(frameArch)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -502,7 +597,6 @@ class InstallPage(QtWidgets.QWizardPage):
         super(InstallPage, self).__init__(parent)
 
         self.base = Wizard.base
-
         self.setTitle(self.tr("    Package installation information"))
         self.setSubTitle(self.tr(
             "Properties for installation of package"))
@@ -516,41 +610,73 @@ class InstallPage(QtWidgets.QWizardPage):
 
         pretransLabel = QLabel("%pretrans: ")
         self.pretransEdit = QTextEdit()
-        pretransLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        pretransLabel.setToolTip("At the start of transaction")
+        pretransLabelText = QLabel(
+            self.base.tip_html_style %
+            "At the start of transaction.")
 
         preLabel = QLabel("%pre: ")
         self.preEdit = QTextEdit()
-        preLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        preLabel.setToolTip("Before a package is installed")
+        preLabelText = QLabel(
+            self.base.tip_html_style %
+            "Before a package is installed.")
 
         installLabel = QLabel("%install: ")
         self.installEdit = QTextEdit()
-        installLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        installLabel.setToolTip("Script commands to install the program")
+        installLabelText = QLabel(
+            self.base.tip_html_style %
+            "Script commands to install the program.")
 
         postLabel = QLabel("%post: ")
         self.postEdit = QTextEdit()
-        postLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        postLabel.setToolTip("After a package is installed")
+        postLabelText = QLabel(
+            self.base.tip_html_style %
+            "After a package is installed.")
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
+        framePretrans = QFrame()
+        framePre = QFrame()
+        frameInstall = QFrame()
+        framePost = QFrame()
+        framePretrans.setFrameShape(QFrame.Panel)
+        framePretrans.setFrameShadow(QFrame.Sunken)
+        framePre.setFrameShape(QFrame.Panel)
+        framePre.setFrameShadow(QFrame.Sunken)
+        frameInstall.setFrameShape(QFrame.Panel)
+        frameInstall.setFrameShadow(QFrame.Sunken)
+        framePost.setFrameShape(QFrame.Panel)
+        framePost.setFrameShadow(QFrame.Sunken)
+        gridPretrans = QGridLayout()
+        gridPre = QGridLayout()
+        gridInstall = QGridLayout()
+        gridPost = QGridLayout()
         gridtext = QGridLayout()
-        grid.setVerticalSpacing(15)
         gridtext.addWidget(self.textLabel, 0, 0)
-        grid.addWidget(pretransLabel, 1, 0, 1, 1)
-        grid.addWidget(self.pretransEdit, 1, 1, 1, 1)
-        grid.addWidget(preLabel, 2, 0, 1, 1)
-        grid.addWidget(self.preEdit, 2, 1, 1, 1)
-        grid.addWidget(installLabel, 3, 0, 1, 1)
-        grid.addWidget(self.installEdit, 3, 1, 1, 1)
-        grid.addWidget(postLabel, 4, 0, 1, 1)
-        grid.addWidget(self.postEdit, 4, 1, 1, 1)
+        gridPretrans.addWidget(pretransLabel, 0, 0, 1, 1)
+        gridPretrans.addWidget(self.pretransEdit, 0, 1, 1, 8)
+        gridPretrans.addWidget(pretransLabelText, 1, 0, 1, 8)
+        gridPre.addWidget(preLabel, 0, 0, 1, 1)
+        gridPre.addWidget(self.preEdit, 0, 1, 1, 8)
+        gridPre.addWidget(preLabelText, 1, 0, 1, 8)
+        gridInstall.addWidget(installLabel, 0, 0, 1, 1)
+        gridInstall.addWidget(self.installEdit, 0, 1, 1, 8)
+        gridInstall.addWidget(installLabelText, 1, 0, 1, 8)
+        gridPost.addWidget(postLabel, 0, 0, 1, 1)
+        gridPost.addWidget(self.postEdit, 0, 1, 1, 8)
+        gridPost.addWidget(postLabelText, 1, 0, 1, 8)
         mainLayout.addSpacing(25)
+        framePretrans.setLayout(gridPretrans)
+        framePre.setLayout(gridPre)
+        frameInstall.setLayout(gridInstall)
+        framePost.setLayout(gridPost)
         mainLayout.addLayout(gridtext)
         mainLayout.addSpacing(15)
-        mainLayout.addLayout(grid)
+        mainLayout.addWidget(framePretrans)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(framePre)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameInstall)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(framePost)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -584,45 +710,65 @@ class RequiresPage(QtWidgets.QWizardPage):
         buildRequiresLabel = QLabel("BuildRequires: ")
         self.bRequiresEdit = QTextEdit()
         self.bRequiresEdit.setMaximumHeight(220)
-        buildRequiresLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        buildRequiresLabel.setToolTip(
-            "A line-separated list of packages required for building " +
-            "(compiling) the program")
+        buildRequiresLabelText = QLabel(
+            self.base.tip_html_style %
+            ("A line-separated list of packages required for building "
+             "(compiling) the program."))
 
         self.textLabel = QLabel()
         self.textLabel.setText(
             "<html><head/><body><p><span style=\"font-size:12pt;\">" +
             "Add required packages for compilation and run. <br> " +
-            "</p></body></html>")
+            "</p></body><html>")
 
         requiresLabel = QLabel("Requires: ")
         self.requiresEdit = QTextEdit()
         self.requiresEdit.setMaximumHeight(220)
-        requiresLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        requiresLabel.setToolTip(
-            "A line-separate list of packages that are required " +
-            "when the program is installed")
+        requiresLabelText = QLabel(
+            self.base.tip_html_style %
+            ("A line-separate list of packages that are required "
+             "when the program is installed."))
 
         providesLabel = QLabel("Provides: ")
         self.providesEdit = QTextEdit()
-        providesLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        providesLabel.setToolTip(
-            "List virtual package names that this package provides")
+        providesLabelText = QLabel(
+            self.base.tip_html_style %
+            "List virtual package names that this package provides.")
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
+        frameBrequires = QFrame()
+        frameRequires = QFrame()
+        frameProvides = QFrame()
+        frameBrequires.setFrameShape(QFrame.Panel)
+        frameBrequires.setFrameShadow(QFrame.Sunken)
+        frameRequires.setFrameShape(QFrame.Panel)
+        frameRequires.setFrameShadow(QFrame.Sunken)
+        frameProvides.setFrameShape(QFrame.Panel)
+        frameProvides.setFrameShadow(QFrame.Sunken)
+        gridBrequires = QGridLayout()
+        gridRequires = QGridLayout()
+        gridProvides = QGridLayout()
         gridtext = QGridLayout()
-        grid.setVerticalSpacing(15)
         gridtext.addWidget(self.textLabel, 0, 0)
-        grid.addWidget(buildRequiresLabel, 1, 0, 1, 1)
-        grid.addWidget(self.bRequiresEdit, 1, 1, 1, 1)
-        grid.addWidget(requiresLabel, 2, 0, 1, 1)
-        grid.addWidget(self.requiresEdit, 2, 1, 1, 1)
-        grid.addWidget(providesLabel, 3, 0, 1, 1)
-        grid.addWidget(self.providesEdit, 3, 1, 1, 1)
+        gridBrequires.addWidget(buildRequiresLabel, 0, 0, 1, 1)
+        gridBrequires.addWidget(self.bRequiresEdit, 0, 1, 1, 8)
+        gridBrequires.addWidget(buildRequiresLabelText, 1, 0, 1, 8)
+        gridRequires.addWidget(requiresLabel, 0, 0, 1, 1)
+        gridRequires.addWidget(self.requiresEdit, 0, 1, 1, 8)
+        gridRequires.addWidget(requiresLabelText, 1, 0, 1, 8)
+        gridProvides.addWidget(providesLabel, 0, 0, 1, 1)
+        gridProvides.addWidget(self.providesEdit, 0, 1, 1, 8)
+        gridProvides.addWidget(providesLabelText, 1, 0, 1, 8)
         mainLayout.addSpacing(25)
+        frameBrequires.setLayout(gridBrequires)
+        frameRequires.setLayout(gridRequires)
+        frameProvides.setLayout(gridProvides)
         mainLayout.addLayout(gridtext)
-        mainLayout.addLayout(grid)
+        mainLayout.addWidget(frameBrequires)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameRequires)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(frameProvides)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -662,33 +808,56 @@ class UninstallPage(QtWidgets.QWizardPage):
 
         preunLabel = QLabel("%preun: ")
         self.preunEdit = QTextEdit()
-        preunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        preunLabel.setToolTip("Before a package is uninstalled")
+        preunLabelText = QLabel(
+            self.base.tip_html_style %
+            "Before a package is uninstalled.")
 
         postunLabel = QLabel("%postun: ")
         self.postunEdit = QTextEdit()
-        postunLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        postunLabel.setToolTip("After a package is uninstalled")
+        postunLabelText = QLabel(
+            self.base.tip_html_style %
+            "After a package is uninstalled.")
 
         posttransLabel = QLabel("%posttrans: ")
         self.posttransEdit = QTextEdit()
-        posttransLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        posttransLabel.setToolTip("At the end of transaction")
+        posttransLabelText = QLabel(
+            self.base.tip_html_style %
+            "At the end of transaction.")
 
         mainLayout = QVBoxLayout()
-        grid = QGridLayout()
+        framePreun = QFrame()
+        framePostun = QFrame()
+        framePosttrans = QFrame()
+        framePreun.setFrameShape(QFrame.Panel)
+        framePreun.setFrameShadow(QFrame.Sunken)
+        framePostun.setFrameShape(QFrame.Panel)
+        framePostun.setFrameShadow(QFrame.Sunken)
+        framePosttrans.setFrameShape(QFrame.Panel)
+        framePosttrans.setFrameShadow(QFrame.Sunken)
+        gridPreun = QGridLayout()
+        gridPostun = QGridLayout()
+        gridPosttrans = QGridLayout()
         gridtext = QGridLayout()
-        grid.setVerticalSpacing(15)
         gridtext.addWidget(self.textLabel, 0, 0)
-        grid.addWidget(preunLabel, 1, 0, 1, 1)
-        grid.addWidget(self.preunEdit, 1, 1, 1, 1)
-        grid.addWidget(postunLabel, 2, 0, 1, 1)
-        grid.addWidget(self.postunEdit, 2, 1, 1, 1)
-        grid.addWidget(posttransLabel, 3, 0, 1, 1)
-        grid.addWidget(self.posttransEdit, 3, 1, 1, 1)
+        gridPreun.addWidget(preunLabel, 0, 0, 1, 1)
+        gridPreun.addWidget(self.preunEdit, 0, 1, 1, 8)
+        gridPreun.addWidget(preunLabelText, 1, 0, 1, 8)
+        gridPostun.addWidget(postunLabel, 0, 0, 1, 1)
+        gridPostun.addWidget(self.postunEdit, 0, 1, 1, 8)
+        gridPostun.addWidget(postunLabelText, 1, 0, 1, 8)
+        gridPosttrans.addWidget(posttransLabel, 0, 0, 1, 1)
+        gridPosttrans.addWidget(self.posttransEdit, 0, 1, 1, 8)
+        gridPosttrans.addWidget(posttransLabelText, 1, 0, 1, 8)
         mainLayout.addSpacing(25)
+        framePreun.setLayout(gridPreun)
+        framePostun.setLayout(gridPostun)
+        framePosttrans.setLayout(gridPosttrans)
         mainLayout.addLayout(gridtext)
-        mainLayout.addLayout(grid)
+        mainLayout.addWidget(framePreun)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(framePostun)
+        mainLayout.addSpacing(15)
+        mainLayout.addWidget(framePosttrans)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -736,8 +905,9 @@ class BuildPage(QtWidgets.QWizardPage):
 
         specEditBox.setTitle("SPEC file")
         specWarningLabel = QLabel(
-            "Edit manually the SPEC file that generates RPM package " +
-            "(advanced users)")
+            self.base.tip_html_style %
+            ("Edit manually the SPEC file that generates RPM package "
+             "(advanced users)"))
         self.editSpecButton = QPushButton("Edit SPEC file")
         self.editSpecButton.clicked.connect(self.editSpecFile)
         self.editSpecButton.setMinimumHeight(45)
@@ -750,6 +920,7 @@ class BuildPage(QtWidgets.QWizardPage):
 
         buildPathBox.setTitle("Target build directory")
         buildPathLabel = QLabel(
+            self.base.tip_html_style %
             "Build packages into selected directory")
         self.buildLocationEdit = QLineEdit()
         self.buildLocationEdit.setMinimumHeight(35)
@@ -762,8 +933,9 @@ class BuildPage(QtWidgets.QWizardPage):
         buildPathBox.setLayout(layoutbuildPathBox)
 
         buildSRPMLabel = QLabel(
-            "Build packages containing source codes and spec files " +
-            "(not compiled to any specific architecture)")
+            self.base.tip_html_style %
+            ("Build packages containing source codes and spec files "
+             "(not compiled to any specific architecture)"))
         self.textBuildSRPMLabel = QLabel()
         self.buildSRPMButton = QPushButton("Build source package")
         self.buildSRPMButton.setMinimumHeight(45)
@@ -777,8 +949,9 @@ class BuildPage(QtWidgets.QWizardPage):
         buildSRPMBox.setLayout(layoutbuildSRPMBox)
 
         buildRPMLabel = QLabel(
-            "Build packages compiled for specific " +
-            "distribution and architecture")
+            self.base.tip_html_style %
+            ("Build packages compiled for specific "
+             "distribution and architecture"))
         self.textBuildRPMLabel = QLabel()
         self.BuildArchLabel = QLabel("    Architecture")
         self.BuildArchEdit = QComboBox()
@@ -899,45 +1072,40 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.usernameEdit.setMinimumHeight(30)
         self.usernameLabel.setBuddy(self.usernameEdit)
         self.usernameLabelText = QLabel(
-            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
-            "grey;\">Your username from Copr API." +
-            "</p></body></html>")
+            self.base.tip_html_style %
+            "Your username from Copr API.")
 
         self.loginLabel = QLabel("Login<font color=\'#FF3333\'>*</font>")
         self.loginEdit = QLineEdit()
         self.loginEdit.setMinimumHeight(30)
         self.loginLabel.setBuddy(self.loginEdit)
         self.loginLabelText = QLabel(
-            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
-            "grey;\">Your login (not username!) from Copr API." +
-            "</p></body></html>")
+            self.base.tip_html_style %
+            "Your login (not username!) from Copr API.")
 
         self.tokenLabel = QLabel("Token<font color=\'#FF3333\'>*</font>")
         self.tokenEdit = QLineEdit()
         self.tokenEdit.setMinimumHeight(30)
         self.tokenLabel.setBuddy(self.tokenEdit)
         self.tokenLabelText = QLabel(
-            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
-            "grey;\">Your token from Copr API." +
-            "</p></body></html>")
+            self.base.tip_html_style %
+            "Your token from Copr API.")
 
         self.packageNameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.packageNameEdit = QLineEdit()
         self.packageNameEdit.setMinimumHeight(30)
         self.packageNameLabel.setBuddy(self.packageNameEdit)
         self.packageNameLabelText = QLabel(
-            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
-            "grey;\">Name of your package. It MUST be unique!" +
-            "</p></body></html>")
+            self.base.tip_html_style %
+            "Name of your package. It MUST be unique!")
 
         self.packageUrlLabel = QLabel("Url<font color=\'#FF3333\'>*</font>")
         self.packageUrlEdit = QLineEdit()
         self.packageUrlEdit.setMinimumHeight(30)
         self.packageUrlLabel.setBuddy(self.packageUrlEdit)
         self.packageUrlLabelText = QLabel(
-            "<html><head/><body><p><span style=\"font-size:12pt; color:" +
-            "grey;\">An url of your package. It must be some public web " +
-            "site.</p></body></html>")
+            self.base.tip_html_style %
+            "An url of your package. It must be some public web site.")
 
         # Making mandatory fields:
         self.registerField("Username*", self.usernameEdit)
@@ -1037,6 +1205,9 @@ class CoprDistroPage(QtWidgets.QWizardPage):
 
         releaseBox = QGroupBox()
         layoutReleaseBox = QGridLayout()
+        framerelease = QFrame()
+        framerelease.setFrameShape(QFrame.Panel)
+        framerelease.setFrameShadow(QFrame.Sunken)
 
         releaseBoxLabel = QLabel("Choose distribution and architecture" +
                                  "<font color=\'#FF3333\'>*</font>")
@@ -1056,11 +1227,10 @@ class CoprDistroPage(QtWidgets.QWizardPage):
         mainLayout = QVBoxLayout()
         grid = QGridLayout()
         grid.addWidget(releaseBoxLabel, 0, 0, 1, 1)
-        lowerLayout = QHBoxLayout()
-        lowerLayout.addWidget(releaseBox)
+        grid.addWidget(releaseBox)
         mainLayout.addSpacing(25)
-        mainLayout.addLayout(grid)
-        mainLayout.addLayout(lowerLayout)
+        framerelease.setLayout(grid)
+        mainLayout.addWidget(framerelease)
         self.setLayout(mainLayout)
 
     def validatePage(self):
@@ -1115,34 +1285,44 @@ class CoprBuildPage(QtWidgets.QWizardPage):
 
         self.packageDescLabel = QLabel("Description ")
         self.packageDescEdit = QTextEdit()
-        self.packageDescLabel.setCursor(
-            QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageDescLabel.setToolTip(
-            "Description for your package, optional")
+        self.packageDescLabelText = QLabel(
+            self.base.tip_html_style %
+            "Description for your package, optional.")
 
         self.packageInstuctionLabel = QLabel("Instructions ")
         self.packageInstuctionEdit = QTextEdit()
-        self.packageInstuctionLabel.setCursor(
-            QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
-        self.packageInstuctionLabel.setToolTip(
-            "How install your project, where users can report bugs " +
-            "and issues. Or wiki link, optional")
+        self.packageInstuctionLabelText = QLabel(
+            self.base.tip_html_style %
+            ("How install your project, where users can report bugs "
+             "and issues. Or wiki link, optional."))
 
         mainLayout = QVBoxLayout()
+        frameDesc = QFrame()
+        frameInstuction = QFrame()
+        frameDesc.setFrameShape(QFrame.Panel)
+        frameDesc.setFrameShadow(QFrame.Sunken)
+        frameInstuction.setFrameShape(QFrame.Panel)
+        frameInstuction.setFrameShadow(QFrame.Sunken)
         gridBuildText = QGridLayout()
         gridBuildText.addWidget(self.textBuildLabel, 0, 1, 1, 1)
 
-        grid = QGridLayout()
-        grid.setVerticalSpacing(15)
-        grid.addWidget(self.packageDescLabel, 2, 0, 1, 1)
-        grid.addWidget(self.packageDescEdit, 2, 1, 1, 1)
-        grid.addWidget(self.packageInstuctionLabel, 3, 0, 1, 1)
-        grid.addWidget(self.packageInstuctionEdit, 3, 1, 1, 1)
+        gridDesc = QGridLayout()
+        gridInstuction = QGridLayout()
+        gridDesc.addWidget(self.packageDescLabel, 0, 0, 1, 1)
+        gridDesc.addWidget(self.packageDescEdit, 0, 1, 1, 8)
+        gridDesc.addWidget(self.packageDescLabelText, 1, 0, 1, 8)
+        gridInstuction.addWidget(self.packageInstuctionLabel, 0, 0, 1, 1)
+        gridInstuction.addWidget(self.packageInstuctionEdit, 0, 1, 1, 8)
+        gridInstuction.addWidget(self.packageInstuctionLabelText, 1, 0, 1, 8)
 
         mainLayout.addSpacing(25)
+        frameDesc.setLayout(gridDesc)
+        frameInstuction.setLayout(gridInstuction)
         mainLayout.addLayout(gridBuildText)
+        mainLayout.addWidget(frameDesc)
         mainLayout.addSpacing(15)
-        mainLayout.addLayout(grid)
+        mainLayout.addWidget(frameInstuction)
+        mainLayout.addSpacing(15)
         self.setLayout(mainLayout)
 
     def validatePage(self):
