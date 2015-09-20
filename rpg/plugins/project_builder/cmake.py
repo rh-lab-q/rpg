@@ -12,8 +12,8 @@ class CMakePlugin(Plugin):
             logging.debug('CMakeLists.txt found')
             build = Command()
             build.append("cmake .")
-            build.append("make")
-            install = Command("make install DESTDIR=$RPM_BUILD_ROOT")
+            build.append("%{make_build}")
+            install = Command('make install DESTDIR="$RPM_BUILD_ROOT"')
             _parse(project_dir, spec)
             spec.build = build
             spec.install = install
@@ -40,5 +40,5 @@ def _parse(project_dir, spec):
         with element.open() as f:
             matches += regex.findall(f.read())
             if "ENABLE_TESTING" in matches:
-                spec.check.append("make test")
+                spec.check.append("make test ARGS='-V %{?_smp_mflags}'")
                 return

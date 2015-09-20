@@ -1,2 +1,2 @@
-FILE (GLOB rpg_proj_builder_srcs *.py)
-INSTALL (FILES ${rpg_proj_builder_srcs} DESTINATION ${PYTHON_INSTALL_DIR}/rpg/plugins/recover)
+FILE (GLOB rpg_recover_srcs *.py)
+INSTALL (FILES ${rpg_recover_srcs} DESTINATION ${PYTHON_INSTALL_DIR}/rpg/plugins/recover)

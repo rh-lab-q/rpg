@@ -162,7 +162,8 @@ class FindPatchPluginTest(PluginTestCase):
     def test_cmake(self):
         cmakeplug = CMakePlugin()
         cmakeplug.patched(self.test_project_dir / "c", self.spec, self.sack)
-        self.assertEqual(str(self.spec.check), "make test")
+        self.assertEqual(str(self.spec.check),
+                         "make test ARGS='-V %{?_smp_mflags}'")
         expected = set(["/usr/bin/gmake", "/usr/bin/file",
                         "/usr/bin/makedepend", "/usr/bin/nosetests-3.4",
                         "/usr/bin/python3.4"])
