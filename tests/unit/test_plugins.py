@@ -165,8 +165,17 @@ class FindPatchPluginTest(PluginTestCase):
     def test_autotools_deps(self):
         auto = AutotoolsPlugin()
         self.spec.build_required_files = set()
+        auto.patched(
+            self.test_project_dir / "autotools", self.spec, self.sack)
         auto.compiled(
             self.test_project_dir / "autotools", self.spec, self.sack)
+        self.assertEqual(
+            str(self.spec.build),
+            "autoreconf --install --force\n"
+            "%{configure}\n%{make_build}")
+        self.assertEqual(
+            str(self.spec.install),
+            'make install DESTDIR="$RPM_BUILD_ROOT"')
         for exp in [
                 "/usr/share/gobject-introspection-1.0/Makefile.introspection",
                 "/usr/bin/gcc", "/usr/include/hawkey/sack.h",
