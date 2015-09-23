@@ -907,27 +907,27 @@ class BuildPage(QtWidgets.QWizardPage):
         specWarningLabel = QLabel(
             self.base.tip_html_style %
             ("Edit manually the SPEC file that generates RPM package "
-             "(advanced users)"))
+             "(advanced users)."))
         self.editSpecButton = QPushButton("Edit SPEC file")
         self.editSpecButton.clicked.connect(self.editSpecFile)
-        self.editSpecButton.setMinimumHeight(45)
+        self.editSpecButton.setMinimumHeight(40)
         self.editSpecButton.setMinimumWidth(180)
-        self.editSpecButton.setMaximumHeight(45)
+        self.editSpecButton.setMaximumHeight(40)
         self.editSpecButton.setMaximumWidth(180)
-        layoutspecEditBox.addWidget(specWarningLabel, 1, 0)
+        layoutspecEditBox.addWidget(specWarningLabel, 0, 0)
         layoutspecEditBox.addWidget(self.editSpecButton, 1, 1)
         specEditBox.setLayout(layoutspecEditBox)
 
         buildPathBox.setTitle("Target build directory")
         buildPathLabel = QLabel(
             self.base.tip_html_style %
-            "Build packages into selected directory")
+            "Build packages into selected directory.")
         self.buildLocationEdit = QLineEdit()
         self.buildLocationEdit.setMinimumHeight(35)
         self.buildToButton = QPushButton("Change path")
         self.buildToButton.setMinimumHeight(35)
         self.buildToButton.clicked.connect(self.openBuildPathFileDialog)
-        layoutbuildPathBox.addWidget(buildPathLabel, 0, 0)
+        layoutbuildPathBox.addWidget(buildPathLabel)
         layoutbuildPathBox.addWidget(self.buildLocationEdit, 1, 0)
         layoutbuildPathBox.addWidget(self.buildToButton, 1, 1)
         buildPathBox.setLayout(layoutbuildPathBox)
@@ -935,12 +935,12 @@ class BuildPage(QtWidgets.QWizardPage):
         buildSRPMLabel = QLabel(
             self.base.tip_html_style %
             ("Build packages containing source codes and spec files "
-             "(not compiled to any specific architecture)"))
+             "(not compiled to any specific architecture)."))
         self.textBuildSRPMLabel = QLabel()
         self.buildSRPMButton = QPushButton("Build source package")
-        self.buildSRPMButton.setMinimumHeight(45)
+        self.buildSRPMButton.setMinimumHeight(40)
         self.buildSRPMButton.setMinimumWidth(180)
-        self.buildSRPMButton.setMaximumHeight(45)
+        self.buildSRPMButton.setMaximumHeight(40)
         self.buildSRPMButton.setMaximumWidth(180)
         self.buildSRPMButton.clicked.connect(self.buildSrpm)
         layoutbuildSRPMBox.addWidget(buildSRPMLabel, 0, 0, 1, 2)
@@ -951,7 +951,7 @@ class BuildPage(QtWidgets.QWizardPage):
         buildRPMLabel = QLabel(
             self.base.tip_html_style %
             ("Build packages compiled for specific "
-             "distribution and architecture"))
+             "distribution and architecture."))
         self.textBuildRPMLabel = QLabel()
         self.BuildArchLabel = QLabel("    Architecture")
         self.BuildArchEdit = QComboBox()
@@ -962,7 +962,7 @@ class BuildPage(QtWidgets.QWizardPage):
         self.BuildArchLabel.setBuddy(self.BuildArchEdit)
         self.BuildArchLabel.setCursor(QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.BuildArchLabel.setToolTip(
-            "Choose architekture (32 bit - i386 or 64 bit - x68_64)")
+            "Choose architekture (32 bit - i386 or 64 bit - x68_64).")
         self.BuildDistroLabel = QLabel("    Distribution")
         self.BuildDistroEdit = QComboBox()
         self.BuildDistroEdit.setMaximumWidth(200)
@@ -980,9 +980,9 @@ class BuildPage(QtWidgets.QWizardPage):
             QtGui.QCursor(QtCore.Qt.WhatsThisCursor))
         self.BuildDistroLabel.setToolTip("Choose distribution")
         self.buildRPMButton = QPushButton("Build package")
-        self.buildRPMButton.setMinimumHeight(45)
+        self.buildRPMButton.setMinimumHeight(40)
         self.buildRPMButton.setMinimumWidth(180)
-        self.buildRPMButton.setMaximumHeight(45)
+        self.buildRPMButton.setMaximumHeight(40)
         self.buildRPMButton.setMaximumWidth(180)
         self.buildRPMButton.clicked.connect(self.buildRpm)
         layoutbuildRPMBox.addWidget(buildRPMLabel, 0, 0, 1, 6)
