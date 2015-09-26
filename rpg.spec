@@ -10,14 +10,13 @@ BuildRequires:  python3-nose
 BuildRequires:  python3-devel
 BuildRequires:  python3 >= 3.4
 BuildRequires:  python3-qt5
-BuildRequires:  python3-copr
+BuildRequires:  python3-copr >= 1.58
 BuildRequires:  python3-sphinx
 BuildRequires:  qt5-qtbase-gui
 BuildRequires:  coreutils
 BuildRequires:  file
 BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
-BuildRequires:  python3-copr
 BuildRequires:  python3-hawkey
 BuildRequires:  mock
 BuildArch:      noarch
@@ -33,7 +32,7 @@ Requires:       mock
 %if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
-Recommends:     python3-copr
+Recommends:     python3-copr >= 1.58
 %endif
 
 %description

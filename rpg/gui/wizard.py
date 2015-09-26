@@ -1063,8 +1063,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
             "on <a href=\"https://copr.fedoraproject.org/api\">" +
             "Copr API</a>. Please log in and copy your information.<br>" +
             " It will be saved on config file, but nowhere else." +
-            " You also need upload your package " +
-            "on some public web site." +
+            " You also need python3-copr-1.58 or higher." +
             "</span></p></body></html>")
 
         self.usernameLabel = QLabel("Username<font color=\'#FF3333\'>*</font>")
@@ -1105,7 +1104,13 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageUrlLabel.setBuddy(self.packageUrlEdit)
         self.packageUrlLabelText = QLabel(
             self.base.tip_html_style %
-            "An url of your package. It must be some public web site.")
+            ("An url of your package (a public web site). "
+             "You can also use path of local package."))
+
+        self.importButton = QPushButton("Import")
+        self.importButton.setMinimumHeight(45)
+        self.importButton.setMinimumWidth(115)
+        self.importButton.clicked.connect(self.importPath)
 
         # Making mandatory fields:
         self.registerField("Username*", self.usernameEdit)
@@ -1151,7 +1156,8 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         gridName.addWidget(self.packageNameEdit, 0, 1, 1, 8)
         gridName.addWidget(self.packageNameLabelText, 1, 0, 1, 8)
         gridUrl.addWidget(self.packageUrlLabel, 0, 0, 1, 1)
-        gridUrl.addWidget(self.packageUrlEdit, 0, 1, 1, 8)
+        gridUrl.addWidget(self.packageUrlEdit, 0, 1, 1, 6)
+        gridUrl.addWidget(self.importButton, 0, 7, 1, 1)
         gridUrl.addWidget(self.packageUrlLabelText, 1, 0, 1, 8)
 
         frameUsername.setLayout(gridUsername)
@@ -1168,12 +1174,28 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         mainLayout.addWidget(frameUrl)
         self.setLayout(mainLayout)
 
+    def importPath(self):
+        ''' Returns path selected file or archive'''
+
+        self.import_dialog = DialogImport()
+        self.import_dialog.exec_()
+        if (isinstance(self.import_dialog.filesSelected(), list)):
+            path = self.import_dialog.filesSelected()
+        else:
+            path = self.import_dialog.selectedFiles()
+        try:
+            self.packageUrlEdit.setText(path[0])
+        except IndexError:
+            pass
+
     def validatePage(self):
         self.base.coprusername = self.usernameEdit.text()
         self.base.coprpackageName = self.packageNameEdit.text()
         self.base.coprpackageUrl = self.packageUrlEdit.text()
+        self.base.coprlogin = self.loginEdit.text()
+        self.base.coprtoken = self.tokenEdit.text()
         self.base.copr_set_config(self.base.coprusername,
-                                  self.loginEdit.text(), self.tokenEdit.text())
+                                  self.base.coprlogin, self.base.coprtoken)
         return True
 
     def nextId(self):
@@ -1239,7 +1261,7 @@ class CoprDistroPage(QtWidgets.QWizardPage):
         for checkbox in self.versionList:
             if checkbox.isChecked():
                 if self.i386_CheckBox.isChecked():
-                    distro = checkbox.text() + '-i686'
+                    distro = checkbox.text() + '-i386'
                     self.base.coprversion.append(distro)
                 else:
                     distro = checkbox.text() + '-x86_64'
