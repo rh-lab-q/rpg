@@ -9,7 +9,7 @@ class BashCommandPlugin(Plugin):
     def mock_recover(self, log, spec):
         for err in log:
             match = search(
-                r"DEBUG\:\s*[^:]+\:\s*([^:]+)\:\s*" +
+                r"\s*([^:]+)\:\s*" +
                 r"[cC][oO][mM][mM][aA][nN][dD]\s*[nN][oO][tT]\s*" +
                 r"[fF][oO][uU][nN][dD]", err)
             if match:
