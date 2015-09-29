@@ -80,8 +80,7 @@ class FindPatchPluginTest(PluginTestCase):
                          self.spec, self.sack)
         files = sorted([
             ("/setup.py", None, None),
-            ("/testscript.py", None, None),
-            ("/__pycache__/", "%exclude", None)
+            ("/testscript.py", None, None)
         ])
         self.assertEqual(sorted(list(self.spec.files)),
                          files)
