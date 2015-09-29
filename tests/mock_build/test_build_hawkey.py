@@ -22,7 +22,7 @@ class BuildHawkeyTest(RpgTestCase):
                                       "C and Python API to libsolv.")
         self.base.spec.URL = (r"https://github.com/rpm-"
                               "software-management/%{name}")
-        self.base.target_arch = "i386"
+        self.base.target_arch = "x86_64"
         self.base.target_distro = "fedora-22"
         self.base.fetch_repos(self.base.target_distro, self.base.target_arch)
         self.base.run_extracted_source_analysis()
