@@ -77,7 +77,9 @@ class IntroPage(QtWidgets.QWizardPage):
             "RPG - RPM Package Generator is tool, that guides you through" +
             " the creation of a RPM package.<br>" +
             "Please fill following details about your package.<br>For " +
-            "more information use tool tips (move the cursor on the label)." +
+            "more information use tool tips (under the labels).<br>" +
+            "<strong>Note</strong>: All fields with the red asterisk " +
+            "(<font color=\'#FF3333\'>*</font>) are required."
             "</p></body></html>")
 
         mainLayout = QVBoxLayout()
@@ -121,7 +123,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importLabel.setBuddy(self.importEdit)
         self.importLabelText = QLabel(
             self.base.tip_html_style %
-            "Pristine source package (e.g. tarballs) and patches.")
+            "Pristine source package (e.g. tarballs) and patches (required).")
         self.importEdit.textChanged.connect(self.checkPath)
         self.importEdit.setMinimumHeight(34)
 
@@ -130,7 +132,7 @@ class ImportPage(QtWidgets.QWizardPage):
         self.importButton.setMinimumWidth(115)
         self.importButton.clicked.connect(self.importPath)
 
-        self.ArchLabel = QLabel("Architecture<font color=\'#FF3333\'>*</font>")
+        self.ArchLabel = QLabel("Architecture")
         self.ArchEdit = QComboBox()
         self.ArchEdit.setMinimumHeight(30)
         arch = platform.architecture()[0]
@@ -146,8 +148,7 @@ class ImportPage(QtWidgets.QWizardPage):
             ("Choose target architecture (32 bit - i386 or 64 bit "
              "- x68_64)."))
 
-        self.DistroLabel = QLabel(
-            "Distribution<font color=\'#FF3333\'>*</font>")
+        self.DistroLabel = QLabel("Distribution")
         self.DistroEdit = QComboBox()
         self.DistroEdit.setMinimumHeight(30)
         self.DistroEdit.addItem("fedora-22")
@@ -282,7 +283,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.nameLabelText = QLabel(
             self.base.tip_html_style %
             ("The (base) name of the package, which should "
-             "be unique."))
+             "be unique (required)."))
 
         self.versionLabel = QLabel("Version<font color=\'#FF3333\'>*</font>")
         self.versionEdit = QLineEdit()
@@ -292,7 +293,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.versionLabelText = QLabel(
             self.base.tip_html_style %
             ("The upstream version number, usually numbers "
-             "separated by dots (e.g. 1.7.4)."))
+             "separated by dots (e.g. 1.7.4) (required)."))
 
         self.releaseLabel = QLabel("Release<font color=\'#FF3333\'>*</font>")
         self.releaseEdit = QLineEdit()
@@ -300,8 +301,9 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.releaseLabel.setBuddy(self.releaseEdit)
         self.releaseLabelText = QLabel(
             self.base.tip_html_style %
-            ("The initial value should normally be 1%{?dist}. "
-             "Increment the number every time you release a new package."))
+            ("The initial value should be 1%{?dist}. "
+             "Increment the number every time you release a new package "
+             "(required)."))
 
         self.licenseLabel = QLabel("License<font color=\'#FF3333\'>*</font>")
         self.licenseEdit = QLineEdit()
@@ -310,7 +312,7 @@ class MandatoryPage(QtWidgets.QWizardPage):
         self.licenseLabelText = QLabel(
             self.base.tip_html_style %
             ("The license, which must be an open source software "
-             "license."))
+             "license (required)."))
 
         self.URLLabel = QLabel("URL: ")
         self.URLEdit = QLineEdit()
@@ -423,7 +425,7 @@ class SummaryPage(QtWidgets.QWizardPage):
         self.summaryLabelText = QLabel(
             self.base.tip_html_style %
             ("A brief, one-line summary of the package. Use "
-             "American English."))
+             "American English (required)."))
 
         self.descriptionLabel = QLabel("Description")
         self.descriptionEdit = QTextEdit()
@@ -1071,7 +1073,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.usernameLabel.setBuddy(self.usernameEdit)
         self.usernameLabelText = QLabel(
             self.base.tip_html_style %
-            "Your username from Copr API.")
+            "Your username from Copr API (required).")
 
         self.loginLabel = QLabel("Login<font color=\'#FF3333\'>*</font>")
         self.loginEdit = QLineEdit()
@@ -1079,7 +1081,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.loginLabel.setBuddy(self.loginEdit)
         self.loginLabelText = QLabel(
             self.base.tip_html_style %
-            "Your login (not username!) from Copr API.")
+            "Your login (not username!) from Copr API (required).")
 
         self.tokenLabel = QLabel("Token<font color=\'#FF3333\'>*</font>")
         self.tokenEdit = QLineEdit()
@@ -1087,7 +1089,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.tokenLabel.setBuddy(self.tokenEdit)
         self.tokenLabelText = QLabel(
             self.base.tip_html_style %
-            "Your token from Copr API.")
+            "Your token from Copr API (required).")
 
         self.packageNameLabel = QLabel("Name<font color=\'#FF3333\'>*</font>")
         self.packageNameEdit = QLineEdit()
@@ -1095,7 +1097,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageNameLabel.setBuddy(self.packageNameEdit)
         self.packageNameLabelText = QLabel(
             self.base.tip_html_style %
-            "Name of your package. It MUST be unique!")
+            "Name of your package. It MUST be unique (required).")
 
         self.packageUrlLabel = QLabel("Url<font color=\'#FF3333\'>*</font>")
         self.packageUrlEdit = QLineEdit()
@@ -1104,7 +1106,7 @@ class CoprLoginPage(QtWidgets.QWizardPage):
         self.packageUrlLabelText = QLabel(
             self.base.tip_html_style %
             ("An url of your package (a public web site). "
-             "You can also use path of local package."))
+             "You can also use path of local package (required)."))
 
         self.importButton = QPushButton("Import")
         self.importButton.setMinimumHeight(45)
