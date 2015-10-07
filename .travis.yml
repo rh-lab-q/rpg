@@ -7,23 +7,23 @@ notifications:
     on_success: never
     on_failure: always
 sudo: required
+services:
+- docker
 before_install:
 - echo "deb http://us.archive.ubuntu.com/ubuntu trusty main universe" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get update
+- docker pull fedora:22
 - wget https://github.com/dgoodwin/tito/archive/tito-0.4.18-1.tar.gz -O /tmp/tito.tar.gz
-- git clone https://git.fedorahosted.org/git/copr.git /tmp/copr
 install:
-- sudo apt-get install mock pigz python-lzma
-- sudo pip install flake8 flake8-diff
-- sudo pip install /tmp/tito.tar.gz
-- cd /tmp/copr/python
-- sudo pip install -r requirements.txt
-- sudo python setup.py install
-- sudo groupadd mock
-- sudo usermod -a -G mock travis
-- cd $HOME/build/$TRAVIS_REPO_SLUG
+- sudo apt-get install mock
+- sudo pip install /tmp/tito.tar.gz coveralls
 before_script:
-- sudo cp rel-eng/travis/mock/rpg.cfg /etc/mock/
-- git config user.email "travis@localhost" && git config user.name "Travis"
-script: rel-eng/travis/build.sh
-after_success: rel-eng/travis/upload.sh
+- docker run -i --privileged -d -v $HOME/build/$TRAVIS_REPO_SLUG:$HOME/build/$TRAVIS_REPO_SLUG --name test_fedora fedora:22 bash
+- tito build --test --srpm && cp /tmp/tito/*.src.rpm .
+- docker exec -i test_fedora bash -c "dnf install -y python-copr mock libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
+- docker exec -i test_fedora bash -c "dnf builddep -y hawkey"
+- docker exec -i test_fedora bash -c "dnf builddep -y libsolv"
+- docker exec -i test_fedora bash -c "dnf install -y python-pip python3-nose-cov git which; pip install coveralls flake8 flake8-diff"
+- docker exec -i test_fedora bash -c "useradd -g root fedora; usermod -a -G mock fedora"
+script:
+- rel-eng/travis/build.sh

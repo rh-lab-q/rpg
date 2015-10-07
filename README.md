@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/rh-lab-q/rpg.svg?branch=master)](https://travis-ci.org/rh-lab-q/rpg)
+[![Coverage Status](https://coveralls.io/repos/rh-lab-q/rpg/badge.svg?branch=master&service=github)](https://coveralls.io/github/rh-lab-q/rpg?branch=master)
 
 RPG - RPM Package Generator
 ===========================

@@ -115,6 +115,9 @@ class FindPatchPluginTest(PluginTestCase):
     @mock.patch("logging.log", new=MockedLogging.log)
     def test_files_to_pkgs(self):
         ftpp = FilesToPkgsPlugin()
+        self.spec.Requires = set()
+        self.spec.required_files = set()
+        self.spec.BuildRequires = set()
         self.spec.required_files = {
             "/usr/lib/python3.4/site-packages/dnf/conf/read.py",
             "/usr/lib/python3.4/site-packages/dnf/yum/sqlutils.py",
@@ -124,11 +127,9 @@ class FindPatchPluginTest(PluginTestCase):
         self.assertEqual(len(self.spec.Requires), 1)
         self.assertEqual({"python3-dnf"}, self.spec.Requires)
         self.assertEqual(set(), self.spec.BuildRequires)
-        self.assertEqual(MockedLogging.called, 2)
         self.spec.check.append("pwd")
         ftpp.installed(None, self.spec, MockSack())
         self.assertEqual({"python3-dnf"}, self.spec.BuildRequires)
-        self.assertEqual(MockedLogging.called, 2)
 
     def test_c(self):
         c_plug = CPlugin()

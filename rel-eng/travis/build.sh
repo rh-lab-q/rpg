@@ -26,66 +26,73 @@ echo "Commit range: $COMMIT_RANGE"
 # our package RPG
 package="rpg"
 package_basename=$(basename $package)
+travis_home=$HOME/build/$TRAVIS_REPO_SLUG
+docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG"
 # process package
-echo -en "travis_fold:start:$package_basename-build\\r"
 echo "Building $package_basename"
-srpm=$(tito build --srpm --test)
-tito_ret=$?
-srpm=$(echo "$srpm" | awk 'NF{p=$0}END{print p}' | sed 's/^Wrote: //g')
-if [ $tito_ret -ne 0 ]; then
-    echo "Tito failed to create SRPM"
-    exit $tito_ret
+if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
+    docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG; 
+    python $travis_home/rel-eng/travis/upload.py $COPR_LOGIN nightly $COPR_TOKEN $travis_home/*.src.rpm rpg" >copr.sh 2>coprerr.out &
+    copr_pid=$!
+else
+    LOGIN=Y29wcg==##pcpfxijfcfrjxinpvxrn
+    TOKEN=wqzowgqlhelyuoxbplthrbrvqvcroq
+    docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG; 
+    python $travis_home/rel-eng/travis/upload.py $LOGIN rpgtest $TOKEN $travis_home/*.src.rpm rpg-pull-requests" >copr.sh 2>coprerr.out &
+    copr_pid=$!
 fi
-echo "SRPM created: $srpm"
-echo -en "travis_fold:start:$package_basename-mock\\r"
-echo "Running mock"
-# build SRPM
-sudo mock -r rpg --resultdir=/tmp/mock/$package_basename --arch=noarch --rebuild $srpm >temp.mock_out 2>&1 &
-mock_pid=$!
 secs=0
-while ps -p $mock_pid > /dev/null; do
+while ps -p $copr_pid > /dev/null; do
     sleep 1
-    printf "\r>>> Mock is working -- %02d:%02d <<<" $((secs++/60)) $((secs%60))
+    printf "\r>>> Copr is working -- %02d:%02d <<<" $((++secs/60)) $((secs%60))
 done
 printf "\r"
-wait $mock_pid
+wait $copr_pid
+STATUS_ALL=$((STATUS_ALL+$?))
+cat coprerr.out
+sh copr.sh
+STATUS_ALL=$((STATUS_ALL+$?))
+PATHS='$PATH'
+docker exec -i test_fedora bash -c "chown -R fedora:root /tmp /var/tmp $travis_home"
+docker exec -i -u fedora test_fedora bash -c "cd $travis_home; export PATH=/usr/bin:$PATHS; 
+nosetests-3.4 tests/*/ --with-coverage --cover-package=rpg -v" >../temp.docker_out 2>&1 &
+docker_pid=$!
+secs=0
+while ps -p $docker_pid > /dev/null; do
+    sleep 1
+    printf "\r>>> Nosetests-3.4 is working -- %02d:%02d <<<" $((++secs/60)) $((secs%60))
+done
+printf "\r"
+wait $docker_pid
 status=$?
-cat temp.mock_out
-echo -en "travis_fold:end:$package_basename-mock\\r"
-if [ $status -eq 0 ] ; then
-    echo "Building $package_basename succeeded"
+echo -en "travis_fold:start:$package_basename-test\\r"
+if [ $status == 0 ] ; then
+    echo "All-Test $(tput setaf 2)succeeded $(tput sgr0)"
 else
-    echo "Mock failed with code: $status"
+    echo "All-Test $(tput setaf 1)failed$(tput sgr0)"
 fi
-# output logs
-echo -en "travis_fold:start:$package_basename-build-log\\r"
-echo "# build.log"
-cat /tmp/mock/$package_basename/build.log
-echo -en "travis_fold:end:$package_basename-build-log\\r"
-echo -en "travis_fold:start:$package_basename-root-log\\r"
-
-echo "# root.log"
-cat /tmp/mock/$package_basename/root.log
-echo -en "travis_fold:end:$package_basename-root-log\\r"
-
-echo -en "travis_fold:start:$package_basename-state-log\\r"
-echo "# state.log"
-cat /tmp/mock/$package_basename/state.log
-echo -en "travis_fold:end:$package_basename-state-log\\r"
-
+cat ../temp.docker_out
+echo -en "travis_fold:end:$package_basename-test\\r"
 STATUS_ALL=$((STATUS_ALL+status))
-echo -en "travis_fold:end:$package_basename-build\\r"
-
+echo -en "travis_fold:start:flake8\\r"
 if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
-    echo -en "travis_fold:start:flake8\\r"
-    echo "flake8"
-    flake8 .
-    echo -en "travis_fold:end:flake8\\r"
+    docker exec -i test_fedora bash -c "flake8 $travis_home" >../flake8.out
+    FLAKE="flake8"
+    count=$(cat ../flake8.out | wc -l )
 else
-    echo -en "travis_fold:start:flake8-diff\\r"
-    echo "flake8-diff"
-    flake8-diff
-    echo -en "travis_fold:end:flake8-diff\\r"
+    docker exec -i test_fedora bash -c "cd $travis_home; flake8-diff" >../flake8.out
+    FLAKE="flake8-diff"
+    count=$(($(cat ../flake8.out | wc -l )-$(grep "Found violations:" ../flake8.out | wc -l)))
 fi
 
+if [ $count == 0 ] ; then
+    echo "$FLAKE $(tput setaf 2)0 $(tput sgr0)error/warning"
+else
+    echo "$FLAKE $(tput setaf 1)$count $(tput sgr0)error(s)/warning(s)"
+fi
+cat ../flake8.out
+echo -en "travis_fold:end:flake8\\r"
+sudo chown -R travis:travis $HOME/build/$TRAVIS_REPO_SLUG
+coveralls
+docker stop test_fedora >/dev/null && docker rm test_fedora >/dev/null
 exit $STATUS_ALL
