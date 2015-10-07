@@ -1,5 +1,5 @@
 Name:           rpg
-Version:        0.0.3
+Version:        0.0.4
 Release:        1%{?snapshot}%{?dist}
 Summary:        RPM Package Generator
 License:        GPLv2
@@ -64,6 +64,63 @@ make ARGS="-V" test
 %{_mandir}/man8/rpg.8.gz
 
 %changelog
+* Wed Oct 07 2015 Jan Silhan <jsilhan@redhat.com> 0.0.4-1
+- Gui - meaning of asterisk added (fix #320) (regeciovad)
+- Changed gcc/g++ to makedepend, resolves system-depend tests (fix #296)
+  (Miroslav Cibulka)
+- Fixed bad parse of mock logs (Miroslav Cibulka)
+- Find file now find all installed files (fix #319) (Miroslav Cibulka)
+- Python now compiles installed directory if py file is found (fix #253)
+  (Miroslav Cibulka)
+- CMake macro correction (fix #313) (Miroslav Cibulka)
+- Gui - Copr pages text and spacing changes (regeciovad)
+- Copr - upload of local srpms (fix #309) (regeciovad)
+- Gui - Build page tips (regeciovad)
+- Gui - new CoprDistro page (fix #317) (regeciovad)
+- Gui - all tips are visible (fix #264) (regeciovad)
+- Gui - new coprLogin and coprDistro pages (fix #268) (regeciovad)
+- Gui - new distro selection (fix #292) (regeciovad)
+- Gui - fill of empty description (fix #289) (regeciovad)
+- Gui - split of mandatory page (fix #293) (regeciovad)
+- Gui - version tag validation (fix #301) (regeciovad)
+- Gui - prefill spec attributes (fix #280) (regeciovad)
+- build_rpm now throws error instead of return (fix #278) (Miroslav Cibulka)
+- C plugin is now extended with mock_recover (fix #303) (Miroslav Cibulka)
+- Find file test now watch directory for new files (fix #281) (Miroslav
+  Cibulka)
+- make test_build_rpg pass (fix #274) (Miroslav Cibulka)
+- Escaping spaces with path_to_str function (fix #245) (Miroslav Cibulka)
+- (build)requiredfiles may now be glob expression (Miroslav Cibulka)
+- Test for building libsovl (fix #62) (Miroslav Cibulka)
+- Verbose make test - mock tests removed from test suite (Miroslav Cibulka)
+- make check resolved by CMakePlugin (LukasSlouka)
+- expand build/install fields via rpm (Fixes #285) (Igor Gnatenko)
+- packaging: drop twice execution of make install (Igor Gnatenko)
+- postun & post ldconfig fix (Miroslav Cibulka)
+- Cplugin repair + added support for C++ (fix #249) (Miroslav Cibulka)
+- Compiled phase had wrong directory as argument (Miroslav Cibulka)
+- Report error on failed mock_recover (Miroslav Cibulka)
+- caching files from resolved packages (optimization of files_to_pkgs plugin)
+  (Miroslav Cibulka)
+- Gui - build page refactor (fix #267) (regeciovad)
+- Gui - intro page added (fix #266) (regeciovad)
+- Gui - asterisk in lighter red (fix #265) (regeciovad)
+- Gui - cancel button moved to the left corner (fix #263) (regeciovad)
+- Gui - page titles shifted to the right (fix #262) (regeciovad)
+- Copy rpms to the destination (fix #241) (regeciovad)
+- Update README.md (Jan Šilhan)
+- Update README.md (Jan Šilhan)
+- README: link to readthedocs (Jan Silhan)
+- build_rpm_recover is now general (fix #240) (Miroslav Cibulka)
+- CMake plugin upgrade (fix #256) (LukasSlouka)
+- spec.files refactor to set (fix #272) (LukasSlouka)
+- Requires set to list bug (fix #271) (LukasSlouka)
+- Autotools plugin implemented (fix #15) (LukasSlouka)
+- Setuptools plugin + short test (fix #131) (LukasSlouka)
+- Hawkey package test (fix #76) (LukasSlouka)
+- RPG fo newbies (fix #216) (regeciovad)
+- rpm_path + errors connected with this (Miroslav Cibulka)
+
 * Tue Aug 18 2015 Jan Silhan <jsilhan@redhat.com> 0.0.3-1
 - SourceLoader + load_project_from_url refactored (Miroslav Cibulka)
 - Gui building page redesign (fix #226) (regeciovad)
