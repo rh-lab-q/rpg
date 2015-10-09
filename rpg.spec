@@ -47,7 +47,7 @@ advanced users can use our tool for a quick creation of a package.
 %setup -q -n rpg-%{version}
 
 %build
-%cmake . -DWITH_MAN=1 -DDISABLE_MOCK_TEST=1
+%cmake . -DWITH_MAN=1 -DDISABLE_MOCK_TEST=1 -DDISABLE_CONNECTION_TEST=1
 make doc-man
 
 %post
