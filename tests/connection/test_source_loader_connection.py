@@ -6,7 +6,7 @@ from tests.support import RpgTestCase
 from shutil import rmtree
 
 
-class SourceLoaderLongTest(RpgTestCase):
+class SourceLoaderConnectionTest(RpgTestCase):
 
     def setUp(self):
         self._source_loader = SourceLoader()

@@ -3,7 +3,7 @@ PROJECT (RPG NONE)
 
 OPTION(DISABLE_MOCK_TEST "Enables tests in tests/mock_build directory" OFF)
 OPTION(DISABLE_UNIT_TEST "Enables tests in tests/unit directory" OFF)
-OPTION(DISABLE_LONG_TEST "Enables tests in tests/long directory" OFF)
+OPTION(DISABLE_CONNECTION_TEST "Enables tests in tests/connection directory" OFF)
 OPTION(WITH_MAN  "Enables installation of manual pages" OFF)
 
 # Python search:
@@ -64,7 +64,7 @@ IF (EXISTS ${PROJECT_SOURCE_DIR}/tests)
         ENABLE_TESTING ()
         ADD_SUBDIRECTORY (tests)
         ADD_CUSTOM_TARGET (test-unit COMMAND ${NoseProg} tests/unit WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-        ADD_CUSTOM_TARGET (test-long COMMAND ${NoseProg} tests/long WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-connection COMMAND ${NoseProg} tests/connection WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
         ADD_CUSTOM_TARGET (test-mock COMMAND ${NoseProg} tests/mock_build WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     ELSE ()
         MESSAGE (WARNING "Nosetests is missing! - no tests available")
