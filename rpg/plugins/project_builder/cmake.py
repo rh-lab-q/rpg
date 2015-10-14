@@ -1,10 +1,23 @@
 from rpg.command import Command
 from rpg.plugin import Plugin
+from rpg.utils import str_to_pkgname
 import logging
 import re
 
 
 class CMakePlugin(Plugin):
+
+    def extracted(self, project_dir, spec, sack):
+        if (project_dir / "CMakeLists.txt").is_file():
+            regex = re.compile(
+                r"project\s*\((.*?)(?:\s(.*?))?[\s\)]",
+                re.IGNORECASE | re.DOTALL)
+            with (project_dir / "CMakeLists.txt").open() as f:
+                result = regex.search(f.read())
+                if result.group(1):
+                    spec.Name = str_to_pkgname(result.group(1))
+                if result.group(2):
+                    spec.Version = result.group(2)
 
     def patched(self, project_dir, spec, sack):
         """ Appends commands to build Project with CMake build system """

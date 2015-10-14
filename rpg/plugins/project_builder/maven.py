@@ -1,13 +1,29 @@
 from rpg.command import Command
 from rpg.plugin import Plugin
+from rpg.utils import str_to_pkgname
 from javapackages.maven.artifact import Artifact
 from javapackages.maven.artifact import ArtifactFormatException
 from javapackages.maven.artifact import ArtifactValidationException
 from lxml import etree
 import logging
+import re
 
 
 class MavenPlugin(Plugin):
+
+    def extracted(self, project_dir, spec, sack):
+        if (project_dir / "pom.xml").is_file():
+            et = etree.parse(str(project_dir / "pom.xml")).getroot()
+            for branch in et:
+                tag = re.sub(r'^{.*?}', '', branch.tag)
+                if tag == 'name':
+                    spec.Name = str_to_pkgname(branch.text.strip())
+                elif tag == 'version':
+                    spec.Version = re.sub('-SNAPSHOT', '', branch.text.strip())
+                elif tag == 'description':
+                    spec.description = branch.text.strip()
+                elif tag == 'url':
+                    spec.URL = branch.text.strip()
 
     def patched(self, project_dir, spec, sack):
         """ Parses pom.xml file used by Maven build system for Java """

@@ -1,5 +1,6 @@
 from rpg.command import Command
 from rpg.plugin import Plugin
+from rpg.utils import str_to_pkgname
 import logging
 import re
 
@@ -14,6 +15,19 @@ class AutotoolsPlugin(Plugin):
 
     re_CHECK_MAKEFILE = re.compile(
         r"(/[\w/\.-]+\.h)", re.DOTALL)
+
+    def extracted(self, project_dir, spec, sack):
+        if (project_dir / "configure.ac").is_file():
+            regex = re.compile(
+                r"AC_INIT\s*\(\s*\[?\s*?(.*?)\s*\]?\s*,\s*"
+                r"\[?\s*?(.*?)\s*\]?\s*?[,)]",
+                re.IGNORECASE | re.DOTALL)
+            with (project_dir / "configure.ac").open() as f:
+                result = regex.search(f.read())
+                if result.group(1):
+                    spec.Name = str_to_pkgname(result.group(1))
+                if result.group(2):
+                    spec.Version = result.group(2)
 
     def patched(self, project_dir, spec, sack):
         """ Appends commands to build project with Autotools build system
