@@ -165,22 +165,17 @@ class FindPatchPluginTest(PluginTestCase):
             str(self.spec.install),
             "python3 setup.py install --skip-build --root $RPM_BUILD_ROOT")
 
-    def test_autotools(self):
-        autotplug = AutotoolsPlugin()
-        expected = set(["autoconf", "automake", "libtool",
-                        "test1 >= 2.36.0", "test2.1 >= test1.0",
-                        "test2.2", "test3.1 >= 0.4.6", "test3.2 >= 1.7.11",
-                        "test3.3 >= 4.11.0", "test4 <= test5", "test5.1",
-                        "test5.2", "test6 > test5", "test7.1", "test7.2",
-                        "test7.3", "test8.1 = doNotKnowIfViableButItWorks",
-                        "test8.2", "test9.1", "test9.2"])
-        autotplug.patched(
+    def test_autotools_deps(self):
+        auto = AutotoolsPlugin()
+        self.spec.build_required_files = set()
+        auto.compiled(
             self.test_project_dir / "autotools", self.spec, self.sack)
-        self.assertEqual(self.spec.BuildRequires, expected)
-        self.assertEqual(
-            str(self.spec.build),
-            "autoreconf --install --force\n"
-            "./configure\nmake")
-        self.assertEqual(
-            str(self.spec.install),
-            "make install DESTDIR=\"$RPM_BUILD_ROOT\"")
+        for exp in [
+                "/usr/share/gobject-introspection-1.0/Makefile.introspection",
+                "/usr/bin/gcc", "/usr/include/hawkey/sack.h",
+                "/usr/bin/gtkdoc-mkpdf", "/usr/bin/gtkdoc-check",
+                "/usr/bin/gtkdoc-rebase", "/usr/include/glib-2.0/gio/gio.h",
+                "/usr/include/glib-2.0/gio/giotypes.h",
+                "/usr/include/rpm/rpmfi.h", "/usr/include/rpm/rpmfiles.h",
+                "/usr/include/sys/stat.h", "/usr/include/bits/stat.h"]:
+            self.assertIn(exp, self.spec.build_required_files)

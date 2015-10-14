@@ -6,6 +6,15 @@ import re
 
 class AutotoolsPlugin(Plugin):
 
+    re_CHECK_MODULES = re.compile(
+        r"PKG_CHECK_MODULES\s*\(.*?,\s*(.*?)\s*?[,\)]", re.DOTALL)
+
+    re_CHECK_PROGS = re.compile(
+        r"((?:(?:/bin/)|(?:/usr)(?:/bin/)?)[\w/\.-]+)", re.DOTALL)
+
+    re_CHECK_MAKEFILE = re.compile(
+        r"(/[\w/\.-]+\.h)", re.DOTALL)
+
     def patched(self, project_dir, spec, sack):
         if (project_dir / "configure").is_file():
             logging.debug('configure found')
@@ -17,15 +26,7 @@ class AutotoolsPlugin(Plugin):
         elif ((project_dir / "configure.ac").is_file() and
               (project_dir / "Makefile.am").is_file()):
             logging.debug('configure.ac and Makefile.am found')
-            spec.BuildRequires.add("autoconf")
-            spec.BuildRequires.add("automake")
-            spec.BuildRequires.add("libtool")
-            f = (project_dir / "configure.ac").open()
-            regex = re.compile(
-                r"PKG_CHECK_MODULES\s*\(.*?,\s*(.*?)\s*?[,\)]", re.DOTALL)
-            deps = _extract_dependencies(regex, f)
-            for dep in deps:
-                spec.BuildRequires.add(dep)
+            spec.BuildRequires.update(["autoconf", "automake", "libtool"])
             build = Command()
             if (project_dir / "autogen.sh").is_file():
                 logging.debug('autogen.sh found')
@@ -41,20 +42,22 @@ class AutotoolsPlugin(Plugin):
         elif (project_dir / "Makefile.am").is_file():
             logging.warning('Makefile.am found, configure.ac missing')
 
+    def compiled(self, project_dir, spec, sack):
+        config_log = project_dir / "config.log"
+        if config_log.is_file():
+            spec.build_required_files.update(_extract_log_deps(
+                self.re_CHECK_PROGS, config_log.open()))
+        for deps in list(project_dir.glob("**/*.Po")):
+            with deps.open() as d:
+                spec.build_required_files.update(
+                    _extract_dependencies(
+                        self.re_CHECK_MAKEFILE, d.read(), project_dir))
 
-def _extract_dependencies(regex, file):
-    regex2 = re.compile(r"\[?\s*(\S*\s*[><=]+\s*[^\s\]]*|[^\s\]]+)\s*\]?")
-    file.seek(0)
-    temps = []
-    deps = []
-    matches = regex.findall(file.read())
-    for match in matches:
-        temps += list(regex2.findall(match))
-    for temp in temps:
-        if temp[0] == '$':
-            regex3 = re.compile(
-                temp[1:] + r"\s*=\s*[\"\[]\s*(.*?)\s*?[\]\"]", re.DOTALL)
-            deps += list(_extract_dependencies(regex3, file))
-        else:
-            deps.append(temp)
-    return deps
+
+def _extract_log_deps(regex, file):
+    for match in regex.findall(file.read()):
+        yield match
+
+
+def _extract_dependencies(regex, makefile, project_dir):
+    return [match for match in regex.findall(makefile)]
