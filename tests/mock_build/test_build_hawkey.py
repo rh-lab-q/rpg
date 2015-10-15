@@ -32,11 +32,6 @@ class BuildHawkeyTest(RpgTestCase):
         self.base.run_compiled_source_analysis()
         self.base.install_project()
         self.base.run_installed_source_analysis()
-        self.base.spec.BuildRequires.update(
-            set(['expat-devel', 'rpm-devel',
-                 'zlib-devel', 'check-devel',
-                 'libsolv-tools', 'python-nose',
-                 'python-devel']))
         self.base.build_srpm()
         self.assertTrue(self.base.srpm_path.exists())
         self.base.build_rpm_recover(
