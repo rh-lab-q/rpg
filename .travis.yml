@@ -27,4 +27,3 @@ before_script:
 - docker exec -i test_fedora bash -c "useradd -g root fedora; usermod -a -G mock fedora"
 script:
 - rel-eng/travis/build.sh
-
