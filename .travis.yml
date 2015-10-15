@@ -11,11 +11,11 @@ services:
 - docker
 before_install:
 - echo "deb http://us.archive.ubuntu.com/ubuntu trusty main universe" | sudo tee -a /etc/apt/sources.list
-- sudo apt-get update
+- sudo apt-get -y update
 - docker pull fedora:22
 - wget https://github.com/dgoodwin/tito/archive/tito-0.4.18-1.tar.gz -O /tmp/tito.tar.gz
 install:
-- sudo apt-get install mock
+- sudo apt-get -y install mock
 - sudo pip install /tmp/tito.tar.gz coveralls
 before_script:
 - docker run -i --privileged -d -v $HOME/build/$TRAVIS_REPO_SLUG:$HOME/build/$TRAVIS_REPO_SLUG --name test_fedora fedora:22 bash
@@ -27,3 +27,4 @@ before_script:
 - docker exec -i test_fedora bash -c "useradd -g root fedora; usermod -a -G mock fedora"
 script:
 - rel-eng/travis/build.sh
+
