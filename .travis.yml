@@ -22,6 +22,7 @@ before_script:
 - tito build --test --srpm && cp /tmp/tito/*.src.rpm .
 - docker exec -i test_fedora bash -c "dnf install -y python-copr mock libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
 - docker exec -i test_fedora bash -c "dnf builddep -y hawkey"
+- docker exec -i test_fedora bash -c "dnf builddep -y libhif"
 - docker exec -i test_fedora bash -c "dnf builddep -y libsolv"
 - docker exec -i test_fedora bash -c "dnf install -y python-pip python3-nose-cov git which; pip install coveralls flake8 flake8-diff"
 - docker exec -i test_fedora bash -c "useradd -g root fedora; usermod -a -G mock fedora"
