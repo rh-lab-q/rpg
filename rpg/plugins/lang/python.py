@@ -8,9 +8,9 @@ import rpm
 class PythonPlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
-        mod = ModuleFinder()
         for item in list(project_dir.glob('**/*.py')):
             try:
+                mod = ModuleFinder()
                 mod.run_script(str(item))
                 for _, mod in mod.modules.items():
                     if mod.__file__ and mod.__file__.startswith("/usr/lib"):
