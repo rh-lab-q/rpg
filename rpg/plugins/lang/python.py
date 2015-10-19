@@ -8,6 +8,7 @@ import rpm
 class PythonPlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
+        """ Find python dependencies """
         for item in list(project_dir.glob('**/*.py')):
             try:
                 mod = ModuleFinder()
@@ -20,6 +21,8 @@ class PythonPlugin(Plugin):
                              str(ie) + "\nOn file: " + str(item))
 
     def installed(self, project_dir, spec, sack):
+        """ Compiles all python files depending on which python version they
+            are and appends them into files macro """
         python_version = ""
         for py_file in list(project_dir.glob('**/*.py')):
             if rpm.expandMacro("%{python_sitearch}") in str(py_file) or\

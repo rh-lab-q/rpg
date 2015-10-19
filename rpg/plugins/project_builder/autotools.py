@@ -16,6 +16,8 @@ class AutotoolsPlugin(Plugin):
         r"(/[\w/\.-]+\.h)", re.DOTALL)
 
     def patched(self, project_dir, spec, sack):
+        """ Appends commands to build project with Autotools build system
+            and appends dependencies """
         if (project_dir / "configure").is_file():
             logging.debug('configure found')
             build = Command()
@@ -43,6 +45,8 @@ class AutotoolsPlugin(Plugin):
             logging.warning('Makefile.am found, configure.ac missing')
 
     def compiled(self, project_dir, spec, sack):
+        """ Find all files from config.log that may be dependencies to this
+            project. """
         config_log = project_dir / "config.log"
         if config_log.is_file():
             spec.build_required_files.update(_extract_log_deps(

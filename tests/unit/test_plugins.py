@@ -5,14 +5,13 @@ from rpg.plugins.misc.find_file import FindFilePlugin
 from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
 from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
-from rpg.utils import get_architecture
-import sys
 from rpg.plugins.lang.c import CPlugin
 from rpg.spec import Spec
 from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 from rpg.plugins.project_builder.autotools import AutotoolsPlugin
+from glob import glob
 
 
 class MockSack:
@@ -99,17 +98,10 @@ class FindPatchPluginTest(PluginTestCase):
         self.assertEqual(str(self.spec.postun), lib)
 
     def test_python_find_requires(self):
-        # FIXME when ORed files considered
         plugin = PythonPlugin()
         plugin.patched(self.test_project_dir / "py" / "requires",
                        self.spec, self.sack)
-        version = sys.version_info
-        arch = get_architecture()
-        if arch == 32:
-            arch = ""
-        imports = [("/usr/lib{0}/python{1}.{2}/" +
-                    "lib-dynload/math.cpython-{1}{2}m.so")
-                   .format(arch, version.major, version.minor)]
+        imports = glob("/usr/lib*/python*/lib-dynload/math.cpython-*m.so")
         self.assertEqual(self.spec.required_files, set(imports))
 
     @mock.patch("logging.log", new=MockedLogging.log)

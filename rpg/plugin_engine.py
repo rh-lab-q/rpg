@@ -4,15 +4,31 @@ import logging
 import os.path
 import traceback
 
-phases = ("extracted", "patched", "compiled", "installed", "package_build")
-
 
 class PluginEngine:
+    """ PluginEngine class is responsible for executing properly plugins.
+        Plugin class should implement one of methods named as phase
+        it subscribes to. That method takes pathlib.Path instance of project
+        root dir, spec object and dnf sack.
 
-    """PluginEngine class is responsible for executing properly plugins.
-       Plugin class should implement one of methods named as phase
-       it subscribes to. That method takes pathlib.Path instance of project
-       root dir, spec object and dnf sack."""
+:Example:
+
+>>> from rpg import base
+>>> from rpg.spec import Spec
+>>> from rpg.plugin_engine import PluginEngine
+>>> base = Base()
+>>> spec = Spec()
+>>> sack = base.load_dnf_sack()
+>>> plug_eng = PluginEngine(spec, sack)
+>>> plug_eng.load_plugins("../plugin_dir", ["excluded plugin"])
+>>> plug_eng.execute_phase(phase[0])
+>>> try:
+        build_mock_recover()
+    except Exception as ex:
+        plug_eng.execute_mock_recover(ex.logs)
+"""
+
+    phases = ("extracted", "patched", "compiled", "installed", "package_build")
 
     def __init__(self, spec, sack):
         self.spec = spec
@@ -22,7 +38,7 @@ class PluginEngine:
     def execute_phase(self, phase, project_dir):
         """trigger all plugin methods that are subscribed to the phase"""
 
-        if phase not in phases:
+        if phase not in self.phases:
             logging.warn("tried to execute non-valid phase %s" % phase)
             return
         logging.info("plugin phase %s executed" % phase)
@@ -44,6 +60,8 @@ class PluginEngine:
                         % (plugin_name, msg))
 
     def execute_mock_recover(self, log):
+        """ Executes all mock_recoved methods that checkout returned log
+            from mock build and parse it to find repairable errors. """
         _ret_code = False
         for plugin in self.plugins:
             try:
@@ -51,8 +69,9 @@ class PluginEngine:
             except AttributeError:
                 continue
             if callable(method):
-                logging.info("executing {}.mock_recover()"
-                             .format(plugin.__class__.__name__))
+                logging.info(
+                    "executing {}.mock_recover()"
+                    .format(plugin.__class__.__name__))
                 try:
                     _ret_code |= method(log, self.spec)
                 except Exception as ex:
@@ -68,7 +87,7 @@ class PluginEngine:
 
         pyfiles = path.rglob('*.py')
         for pyfile in pyfiles:
-            splitted_path = _os_path_split(str(pyfile)[:-3])
+            splitted_path = self._os_path_split(str(pyfile)[:-3])
             path_to_file = '.'.join(splitted_path[:-1])
             imported_path = __import__(
                 path_to_file, fromlist=[splitted_path[-1]])
@@ -81,7 +100,7 @@ class PluginEngine:
                     try:
                         plugin = attr()
                         plugin_name = plugin.__class__.__name__
-                        if not plugin_name in excludes:
+                        if plugin_name not in excludes:
                             self.plugins.add(plugin)
                             logging.info("plugin %s loaded (%s)" %
                                          (plugin_name, plugin_file))
@@ -92,17 +111,17 @@ class PluginEngine:
                         logging.warn("plugin %s not loaded (%s)" %
                                      (plugin_name, plugin_file))
 
-
-def _os_path_split(path):
-    parts = []
-    while True:
-        newpath, tail = os.path.split(path)
-        if newpath == path:
-            assert not tail
-            if path:
-                parts.append(path)
-            break
-        parts.append(tail)
-        path = newpath
-    parts.reverse()
-    return parts
+    @staticmethod
+    def _os_path_split(path):
+        parts = []
+        while True:
+            newpath, tail = os.path.split(path)
+            if newpath == path:
+                assert not tail
+                if path:
+                    parts.append(path)
+                break
+            parts.append(tail)
+            path = newpath
+        parts.reverse()
+        return parts

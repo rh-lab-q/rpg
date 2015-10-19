@@ -4,6 +4,7 @@ from rpg.plugin import Plugin
 class FindLibraryPlugin(Plugin):
 
     def installed(self, project_dir, spec, sack):
+        """ Appends ldconfig if any type of library is installed """
         dyn_libs = list(project_dir.glob('**/lib*.so*'))
         static_libs = list(project_dir.glob('**/lib*.a*'))
         if ((dyn_libs and dyn_libs[0].is_file()) or

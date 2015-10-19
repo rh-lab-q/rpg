@@ -7,6 +7,9 @@ class BashCommandPlugin(Plugin):
     _file = ""
 
     def mock_recover(self, log, spec):
+        """ Parses mock logs and finds missing executables, append them
+            into build_required_files (to be translated into packages)
+            Returns True on any change"""
         for err in log:
             match = search(
                 r"\s*([^:]+)\:\s*" +
@@ -22,7 +25,6 @@ class BashCommandPlugin(Plugin):
                         self._file = match.group(1)
                     else:
                         self._file = "/usr/bin/" + match.group(1)
-                spec.required_files.add(self._file)
                 spec.build_required_files.add(self._file)
                 return True
         return False

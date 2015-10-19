@@ -10,7 +10,6 @@ class Conf:
     load_dnf = True
 
     def parse_cmdline(self):
-
         self.parser = argparse.ArgumentParser(
             description="RPG is tool, that guides people through the " +
                         "creation of a RPM package. "

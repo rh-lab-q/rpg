@@ -10,6 +10,7 @@ import logging
 class MavenPlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
+        """ Parses pom.xml file used by Maven build system for Java """
         if (project_dir / "pom.xml").is_file():
             logging.debug('pom.xml found')
             spec.BuildRequires.add("maven-local")
@@ -29,6 +30,8 @@ class MavenPlugin(Plugin):
             spec.install = install
 
     def compiled(self, project_dir, spec, sack):
+        """ After generation of dependencies (build) parses builddep file
+            and creates Maven project build dependencies """
         if(project_dir / ".xmvn-builddep").is_file():
             try:
                 et = etree.parse(str(project_dir / ".xmvn-builddep")).getroot()

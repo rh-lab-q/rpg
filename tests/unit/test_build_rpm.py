@@ -68,7 +68,7 @@ class SourceLoaderLongTest(RpgTestCase):
     @mock.patch('subprocess.PIPE', new=MockedSubprocess.PIPE)
     @mock.patch('subprocess.STDOUT', new=MockedSubprocess.STDOUT)
     @mock.patch('rpg.command.Command.execute', new=lambda *args: args)
-    @mock.patch('rpg.package_builder.PackageBuilder.check_logs',
+    @mock.patch('rpg.package_builder.PackageBuilder._check_logs',
                 new=lambda *args: args)
     def test_rpm_build_err_parse(self):
         with self.assertRaises(BuildException) as be:

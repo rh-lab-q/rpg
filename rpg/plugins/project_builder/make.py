@@ -6,6 +6,7 @@ import logging
 class MakePlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
+        """ Appends commands to build Project using Makefile build system """
         if (project_dir / "Makefile").is_file() or\
                 (project_dir / "makefile").is_file():
             spec.BuildRequires.add("make")

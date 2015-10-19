@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PYTHON_ARGCOMPLETE_OK
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
 from rpg import Base
 from rpg.gui.wizard import Wizard

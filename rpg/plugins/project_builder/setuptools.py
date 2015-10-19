@@ -6,6 +6,8 @@ import logging
 class SetuptoolsPlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
+        """ Appends commands to build Python project with
+            Setuptools build system """
         if (project_dir / "setup.py").is_file():
             spec.BuildRequires.add("python3-setuptools")
             logging.debug('setup.py found')

@@ -1,7 +1,6 @@
 from rpg.package_builder import PackageBuilder
 from rpg.command import Command
 from rpg.spec import Spec
-from rpg.utils import path_to_str
 from rpg import Base
 from tests.support import RpgTestCase
 from pathlib import Path
@@ -48,9 +47,6 @@ class MockAnalyseTest(RpgTestCase):
         self.base.build_rpm_recover("fedora-22",
                                     "x86_64")
         self.assertFalse(self.base.spec.build_required_files)
-        self.assertFalse(self.base.spec.required_files)
-        self.assertEqual(self.base.spec.Requires,
-                         self.base.spec.BuildRequires)
         self.assertEqual(self.base.spec.BuildRequires,
                          set(['python3-nose', 'python-nose', 'doxygen']))
 

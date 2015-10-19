@@ -8,11 +8,24 @@ from tempfile import mkdtemp
 
 
 class SourceLoader(object):
+    """ Is class responsible for extracting, archiving, downloading sources
 
-    # _compressions = {
-    #   compr_extension: [compr_prog, extract_switch, output_set_switch,
-    #    { addition_compr_ext: [compr_prog, switch] }, ...
-    # }
+:Example:
+
+>>> from rpg.source_loader import SourceLoader
+>>> src_ldr = SourceLoader()
+>>> src_ldr.download_archive("http://www.sample.com/arch.tar", "arch.tar")
+>>> src_ldr.load_sources("../arch.tar", "/tmp/rpg-51A5F8")
+
+
+:Example:
+
+>>> from rpg.source_loader import SourceLoader
+>>> src_ldr = SourceLoader()
+>>> src_ldr.download_git_repo("http://www.github.com/sample_repo", "arch.tar")
+>>> src_ldr.load_sources("../arch.tar", "/tmp/rpg-51A5F8")
+    """
+
     _compressions = {
         "tar": [
             "tar",

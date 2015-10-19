@@ -2,14 +2,14 @@ import logging
 import re
 from rpg.command import Command
 from rpg.utils import path_to_str
-from shutil import copytree
 import subprocess
 import tempfile
 from pathlib import Path
-import sys
 
 
 class BuildException(Exception):
+    """ This is thrown when mock build fails, contains information
+        about error and return code """
 
     def __init__(self, errors, return_code):
         self.return_code = return_code
@@ -20,10 +20,25 @@ class BuildException(Exception):
 
 
 class PackageBuilder(object):
-    regex = re.compile(r"[eE][rR][rR][oO][rR]|" +
-                       r"[eE][xX][cC][eE][pP][tT][iI][oO][nN]|" +
-                       r"[cC][oO][mM][mM][aA][nN][dD] [nN][oO][tT] " +
-                       r"[fF][oO][uU][nN][dD]")
+    """ Builder of RPM packages with use of Mock
+
+:Example:
+
+>>> from pathlib import Path
+>>> from rpg.package_builder import PackageBuilder
+>>> from rpg.spec import Spec
+>>> pck_builder = PackageBuilder()
+>>> spec_file = Spec()
+>>> tarball = "archive.tar"
+>>> output_dir = Path("/tmp/rpg-854ABCD50/")
+>>> pck_builder.build_srpm(spec_file, tarball, output_dir)
+>>> pck_builder.build_rpm(output_dir / "*.src.rpm", "fedora-22",
+                          "x86-64", output_dir)
+"""
+    _regex = re.compile(r"[eE][rR][rR][oO][rR]|" +
+                        r"[eE][xX][cC][eE][pP][tT][iI][oO][nN]|" +
+                        r"[cC][oO][mM][mM][aA][nN][dD] [nN][oO][tT] " +
+                        r"[fF][oO][uU][nN][dD]")
 
     def __init__(self):
         self.temp_dir = Path(tempfile.gettempdir())
@@ -31,9 +46,8 @@ class PackageBuilder(object):
 
     @staticmethod
     def build_srpm(spec_file, tarball, output_dir):
-        """builds RPM package with build_srpm and build_rpm"""
-
-        # Build srpm pakcage from given spec_file and tarball
+        """ Builds source rpm from spec and tarball and moves it to the
+            output directory """
         Command("rpmdev-setuptree").execute()
         Command("cp " + path_to_str(tarball) +
                 ' $(rpm --eval "%{_topdir}")/SOURCES').execute()
@@ -42,29 +56,32 @@ class PackageBuilder(object):
                 " " + path_to_str(output_dir)).execute()
 
     @staticmethod
-    def check_logs(path):
+    def _check_logs(path):
         with open(str(path / "build.log")) as build_log:
             for line in build_log.readlines():
-                if PackageBuilder.regex.search(line):
+                if PackageBuilder._regex.search(line):
                     yield line
 
-    def build_rpm(self, srpm, distro, arch, output_dir):
-        self.build_ret_code = 0
+    @staticmethod
+    def _move_files(output, files):
+        if not output.exists() and not output.is_dir():
+            Command("mkdir " + path_to_str(output)).execute()
+        for _out in files:
+            try:
+                Command("mv " + path_to_str(_out) +
+                        " " + path_to_str(output)).execute()
+            except:
+                pass
 
-        def move_files(output, files):
-            if not output.exists() and not output.is_dir():
-                Command("mkdir " + path_to_str(output)).execute()
-            for _out in files:
-                try:
-                    Command("mv " + path_to_str(_out) +
-                            " " + path_to_str(output)).execute()
-                except:
-                    pass
+    def build_rpm(self, srpm, distro, arch, output_dir):
+        """ builds rpm from source RPM to distro and architecture
+            binary RPM into output_dir """
+        self.build_ret_code = 0
 
         def check_output(proc):
             while proc.poll() is None:
                 line = proc.stdout.readline().decode("utf-8")
-                if PackageBuilder.regex.search(line):
+                if self._regex.search(line):
                     yield line
             self.build_ret_code = proc.returncode
 
@@ -82,14 +99,16 @@ class PackageBuilder(object):
                     stderr=subprocess.STDOUT
                 )
             )
-        ) + list(self.check_logs(self.temp_dir))
-        move_files(output_dir, self.temp_dir.glob("*.rpm"))
+        ) + list(self._check_logs(self.temp_dir))
+        self._move_files(output_dir, self.temp_dir.glob("*.rpm"))
         self.mock_logs = output_dir / "mock_logs"
-        move_files(self.mock_logs, self.temp_dir.glob("*.log"))
+        self._move_files(self.mock_logs, self.temp_dir.glob("*.log"))
         raise BuildException(_ret, self.build_ret_code)
 
     @staticmethod
     def fetch_repos(dist, arch):
+        """ Initialize mock on distro and architecture for example:
+            fedora-22 and x86-64 """
         logging.info("New thread for fetch repos started")
         config_file = dist + '-' + arch
         Command("mock --init -r " + config_file).execute()

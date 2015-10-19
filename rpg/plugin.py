@@ -1,27 +1,21 @@
 class Plugin:
+    """ Class from which are plugins derived
 
-    """class from which are plugins derived"""
+        def extracted(self, project_dir, spec, sack):
+            pass
 
-    # def extracted(self, project_dir, spec, sack):
-    #     # :api
-    #     pass
+        def patched(self, project_dir, spec, sack):
+            pass
 
-    # def patched(self, project_dir, spec, sack):
-    #     # :api
-    #     pass
+        def compiled(self, project_dir, spec, sack):
+            pass
 
-    # def compiled(self, project_dir, spec, sack):
-    #     # :api
-    #     pass
+        def installed(self, project_dir, spec, sack):
+            pass
 
-    # def installed(self, project_dir, spec, sack):
-    #     # :api
-    #     pass
+        def package_build(self, package_path, spec, sack):
+            pass
 
-    # def package_build(self, package_path, spec, sack):
-    #     # :api
-    #     pass
-
-    # def mock_recover(self, log, spec):
-    #     # :api
-    #     pass
+        def mock_recover(self, log, spec):
+            pass
+    """

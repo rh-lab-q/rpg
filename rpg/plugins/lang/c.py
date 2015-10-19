@@ -13,6 +13,9 @@ class CPlugin(Plugin):
                r"c", r"h"]
 
     def patched(self, project_dir, spec, sack):
+        """ Finds dependencies via makedepend - This is not garanteed to be
+            all of them. Makedepend uses macro preprocessor and if it throws
+            and error makedepend didn't print deps. """
         out = Command([
             "find " + path_to_str(project_dir) + " -name " +
             " -o -name ".join(
@@ -39,6 +42,7 @@ class CPlugin(Plugin):
                          r"No such file or directory")
 
     def mock_recover(self, log, spec):
+        """ This find dependencies makedepend didn't find. """
         for err in log:
             _missing = self.MOCK_C_ERR.search(err)
             if _missing:

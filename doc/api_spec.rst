@@ -1,6 +1,8 @@
-Spec class
-==========
+Spec module
+===========
 
-.. autoclass:: spec.Spec(Subpackage)
+.. automodule:: spec
     :members:
     :undoc-members:
+    :inherited-members:
+    :show-inheritance:

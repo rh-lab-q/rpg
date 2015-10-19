@@ -18,6 +18,8 @@ Contents:
    command_ref
    writing_plugins
    api_base
+   api_command
+   api_plugin
    api_spec
 
 Indices and tables

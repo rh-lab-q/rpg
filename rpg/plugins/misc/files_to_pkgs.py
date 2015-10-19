@@ -8,7 +8,8 @@ class FilesToPkgsPlugin(Plugin):
     _IGNORE = []
 
     def installed(self, project_dir, spec, sack):
-        """ Resolves files in (Build) requires into packages """
+        """ Translates (build_)required_files into (Build)Requires macros
+            with DNF sack """
         def _resolve(files, query):
             for _file in files:
                 try:

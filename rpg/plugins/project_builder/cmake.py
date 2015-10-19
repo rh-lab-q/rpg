@@ -7,6 +7,7 @@ import re
 class CMakePlugin(Plugin):
 
     def patched(self, project_dir, spec, sack):
+        """ Appends commands to build Project with CMake build system """
         if (project_dir / "CMakeLists.txt").is_file():
             spec.BuildRequires.add("cmake")
             logging.debug('CMakeLists.txt found')
@@ -19,6 +20,7 @@ class CMakePlugin(Plugin):
             spec.install = install
 
     def compiled(self, project_dir, spec, sack):
+        """ Finds (not only for build) dependencies from CMakeCache """
         regex = re.compile(r":FILEPATH=(/\S*)")
         cache_files = list(project_dir.glob("**/CMakeCache.txt"))
         matches = []
