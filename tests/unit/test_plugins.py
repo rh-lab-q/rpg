@@ -11,6 +11,7 @@ from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 from rpg.plugins.project_builder.autotools import AutotoolsPlugin
+from rpg.plugins.project_builder.maven import MavenPlugin
 from glob import glob
 
 
@@ -175,3 +176,21 @@ class FindPatchPluginTest(PluginTestCase):
                 "/usr/include/rpm/rpmfi.h", "/usr/include/rpm/rpmfiles.h",
                 "/usr/include/sys/stat.h", "/usr/include/bits/stat.h"]:
             self.assertIn(exp, self.spec.build_required_files)
+
+    def test_maven(self):
+        mavenplug = MavenPlugin()
+        mavenplug.extracted(
+            self.test_project_dir / "maven", self.spec, self.sack)
+        self.assertEqual(self.spec.Name, "testproject")
+        self.assertEqual(self.spec.URL, "http://some.url")
+        self.assertEqual(self.spec.Version, "0.1")
+        mavenplug.compiled(
+            self.test_project_dir / "maven", self.spec, self.sack)
+        expected = set(["mvn(org.apache.felix:felix-parent:pom:)",
+                        "mvn(org.ow2.asm:asm-all)",
+                        "mvn(org.apache.rat:apache-rat-plugin)",
+                        "mvn(org.osgi:org.osgi.annotation)",
+                        "mvn(org.apache.felix:org.apache.felix.resolver)",
+                        "mvn(org.apache.maven.plugins:maven-source-plugin)",
+                        "mvn(org.apache.felix:maven-bundle-plugin)"])
+        self.assertEqual(self.spec.BuildRequires, expected)

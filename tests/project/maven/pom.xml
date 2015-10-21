@@ -1,0 +1,8 @@
+<project>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>rpg.mavenproject.test</groupId>
+   <artifactId>my-app</artifactId>
+   <version>0.1-SNAPSHOT</version>
+   <name>testproject</name>
+   <url>http://some.url</url>
+</project>
