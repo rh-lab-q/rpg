@@ -6,36 +6,43 @@ License:        GPLv2
 URL:            https://github.com/rh-lab-q/rpg
 Source:         %{name}-%{version}.tar.gz
 BuildRequires:  cmake
+BuildRequires:  python3-qt5
+BuildRequires:  qt5-qtbase-gui
+BuildArch:      noarch
+
+Requires:       python3-qt5
+Requires:       qt5-qtbase-gui
+Requires:       python3-rpg = %{version}-%{release}
+
+%package -n python3-rpg
+Summary:    Python3 interface for RPG.
+%{?python_provide:%python_provide python3-rpg}
 BuildRequires:  python3-nose
 BuildRequires:  python3-devel
 BuildRequires:  python3 >= 3.4
-BuildRequires:  python3-qt5
-BuildRequires:  python3-copr >= 1.58
 BuildRequires:  python3-sphinx
-BuildRequires:  qt5-qtbase-gui
+BuildRequires:  python3-hawkey
+BuildRequires:  python3-javapackages
 BuildRequires:  coreutils
 BuildRequires:  file
 BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
-BuildRequires:  python3-hawkey
+BuildRequires:  python3-copr >= 1.58
 BuildRequires:  mock
-BuildRequires:  python3-javapackages
-BuildArch:      noarch
-
 Requires:       python3 >= 3.4
-Requires:       python3-qt5
-Requires:       qt5-qtbase-gui
+Requires:       mock
+Requires:       python3-javapackages
 Requires:       coreutils
 Requires:       file
 Requires:       makedepend
 Requires:       rpmdevtools
-Requires:       mock
-Requires:       python3-javapackages
 %if 0%{?fedora} >= 21
 Recommends:     python3-argcomplete
 Recommends:     python3-dnf
 Recommends:     python3-copr >= 1.58
 %endif
+%description -n python3-rpg
+Python3 interface for RPG.
 
 %description
 RPG is tool, that guides people through the creation of a RPM
@@ -61,9 +68,11 @@ exec bash
 make ARGS="-V" test
 
 %files
-%{_bindir}/rpg
-%{python3_sitelib}/rpg/
 %{_mandir}/man8/rpg.8.gz
+%{_bindir}/rpg
+
+%files -n python3-rpg
+%{python3_sitelib}/rpg/
 
 %changelog
 * Wed Oct 07 2015 Jan Silhan <jsilhan@redhat.com> 0.0.4-1
@@ -244,4 +253,3 @@ make ARGS="-V" test
   (xcibul10)
 - create_archive() implemented (fix #137) (fix #89) (xcibul10)
 - SourceLoader refactored (fix #96) (xcibul10)
-
