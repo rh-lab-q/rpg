@@ -83,6 +83,7 @@ else
     docker exec -i test_fedora bash -c "cd $travis_home; flake8-diff" >../flake8.out
     FLAKE="flake8-diff"
     count=$(($(cat ../flake8.out | wc -l )-$(grep "Found violations:" ../flake8.out | wc -l)))
+    STATUS_ALL=$((STATUS_ALL+count))
 fi
 
 if [ $count == 0 ] ; then
