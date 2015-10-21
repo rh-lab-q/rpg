@@ -1,8 +1,22 @@
 from rpg.command import Command
 
 
-class Subpackage(object):
-    """ From this every spec object should be derived """
+class Spec:
+    """ SPEC properties holder
+
+:Example:
+
+>>> from rpg.spec import Spec
+>>> spec = Spec()
+>>> spec.Name = "Example"
+>>> spec.Version = "0.6.11"
+>>> spec.Release = "1%{?snapshot}%{?dist}"
+>>> spec.License = "GPLv2"
+>>> spec.Summary = "Example ..."
+>>> spec.description = ("Example ...")
+>>> spec.URL = "https://github.com/example_repo"
+"""
+    changelogs = []
 
     #: names of 'single' keys
     _singles = [
@@ -120,40 +134,6 @@ class Subpackage(object):
                     block += '%' + ordered_key + '\n' + str(value) + '\n\n'
         return block
 
-    def mark_doc(self, file):
-        """Helper function for GUI to mark additional files as documentation.
-        Function adds '%doc' attribute to a specific file or creates a new
-        entry in the set of files."""
-
-        for f in self.files:
-            if f[0] == file:
-                f[1].append("%doc")
-                break
-        else:
-            self.files.add((file, ["%doc"], None))
-
-
-class Spec(Subpackage):
-    """ SPEC properties holder
-
-:Example:
-
->>> from rpg.spec import Spec
->>> spec = Spec()
->>> spec.Name = "Example"
->>> spec.Version = "0.6.11"
->>> spec.Release = "1%{?snapshot}%{?dist}"
->>> spec.License = "GPLv2"
->>> spec.Summary = "Example ..."
->>> spec.description = ("Example ...")
->>> spec.URL = "https://github.com/example_repo"
-"""
-    subpackages = []
-    changelogs = []
-
-    def __init__(self):
-        super(Spec, self).__init__()
-
     def __str__(self):
         """ Returns final representation of spec file """
         return (
@@ -167,19 +147,6 @@ class Spec(Subpackage):
         out.write("\n%changelog")
         for changelog in self.changelogs:
             out.write("{}\n".format(changelog))
-
-    def load(self, source_file):
-        """ Loads spec file from external file """
-        pass
-
-    def _get_tags(self):
-        return super(Spec, self)._get_tags()
-
-    def _get_requires(self):
-        return super(Spec, self)._get_requires()
-
-    def _get_scripts(self):
-        return super(Spec, self)._get_scripts()
 
     class Changelog:
         _weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
