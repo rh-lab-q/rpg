@@ -26,7 +26,7 @@ class ProjectBuilder:
         rmtree(str(project_target_dir))
         copytree(project_source_dir, str(project_target_dir))
 
-        build_command.execute_from(project_target_dir)
+        build_command.execute(project_target_dir)
 
     def install(self, project_source_dir, project_target_dir, install_command):
         """ Installs project into our "installed" directory """
@@ -35,4 +35,4 @@ class ProjectBuilder:
                                                str(install_command)))
         install_command.rpm_variables.append(("RPM_BUILD_ROOT",
                                               project_target_dir))
-        install_command.execute_from(project_source_dir)
+        install_command.execute(project_source_dir)

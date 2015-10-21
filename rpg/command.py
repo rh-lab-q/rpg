@@ -37,15 +37,12 @@ class Command:
             msg = "Only list of command strings or command string is accepted"
             raise TypeError(msg)
 
-    def execute(self, binary=False):
-        """ executes command in any dir, can raise CalledProcessError """
-        command_lines = self._assign_rpm_variables() + self._command_lines
-        return self._cmd_output(command_lines, binary)
-
-    def execute_from(self, work_dir):
+    def execute(self, work_dir=None):
         """ executes command in work_dir (instance of pathlib.Path),
             can raise CalledProcessError """
-        cd_workdir = ["cd %s" % path_to_str(work_dir.resolve())]
+        cd_workdir = []
+        if work_dir:
+            cd_workdir = ["cd %s" % path_to_str(work_dir.resolve())]
         command_lines = self._assign_rpm_variables() + cd_workdir + \
             [rpm.expandMacro(x) for x in self._command_lines]
         return self._cmd_output(command_lines)
