@@ -12,37 +12,181 @@ BuildArch:      noarch
 
 Requires:       python3-qt5
 Requires:       qt5-qtbase-gui
+Recommends:     python3-argcomplete
+Requires:       python3-rpg = %{version}-%{release}
+Recommends:     rpg-plugin-c = %{version}-%{release}
+Recommends:     rpg-plugin-python = %{version}-%{release}
+Recommends:     rpg-plugin-files-to-pkgs = %{version}-%{release}
+Recommends:     rpg-plugin-find-file = %{version}-%{release}
+Recommends:     rpg-plugin-find-library = %{version}-%{release}
+Recommends:     rpg-plugin-find-patch = %{version}-%{release}
+Recommends:     rpg-plugin-find-translation = %{version}-%{release}
+Recommends:     rpg-plugin-autotools = %{version}-%{release}
+Recommends:     rpg-plugin-cmake = %{version}-%{release}
+Recommends:     rpg-plugin-make = %{version}-%{release}
+Recommends:     rpg-plugin-maven = %{version}-%{release}
+Recommends:     rpg-plugin-setuptools = %{version}-%{release}
+Recommends:     rpg-plugin-bash-command = %{version}-%{release}
+
+%package plugin-c
+Summary:    C plugin for RPG
+
+BuildRequires:  coreutils
+BuildRequires:  makedepend
+
+Requires:       python3 >= 3.4
+Requires:       makedepend
+Requires:       coreutils
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-python
+Summary:    Python plugin for RPG
+
+BuildRequires:  python3-dnf
+
+Requires:       python3 >= 3.4
+Requires:       python3-dnf
+Requires:       python3-rpg = %{version}-%{release}
+
+
+%package plugin-find-to-pkgs
+Summary:    Find to package plugin for RPG
+
+BuildRequires:  python3-dnf
+
+Requires:       python3 >= 3.4
+Recommends:     python3-dnf
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-find-file
+Summary:    Find file plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-find-library
+Summary:    Find library plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-find-patch
+Summary:    Find patch plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-find-translation
+Summary:    Find translation plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-autotools
+Summary:    Autotools plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-cmake
+Summary:    Cmake plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-make
+Summary:    Make plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-maven
+Summary:    Maven plugin for RPG
+
+BuildRequires:  python3-javapackages
+
+Requires:       python3 >= 3.4
+Requires:       python3-javapackages
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-setuptools
+Summary:    Setuptools plugin for RPG
+
+Requires:       python3 >= 3.4
+Requires:       python3-rpg = %{version}-%{release}
+
+%package plugin-bash-command
+Summary:    Bash command plugin for RPG
+
+Requires:       python3 >= 3.4
 Requires:       python3-rpg = %{version}-%{release}
 
 %package -n python3-rpg
 Summary:    Python3 interface for RPG.
+
 %{?python_provide:%python_provide python3-rpg}
+
 BuildRequires:  python3-nose
 BuildRequires:  python3-devel
 BuildRequires:  python3 >= 3.4
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-hawkey
-BuildRequires:  python3-javapackages
 BuildRequires:  coreutils
-BuildRequires:  file
-BuildRequires:  makedepend
 BuildRequires:  rpmdevtools
 BuildRequires:  python3-copr >= 1.58
 BuildRequires:  mock
+BuildRequires:  file
+
+Requires:       rpmdevtools
 Requires:       python3 >= 3.4
 Requires:       mock
-Requires:       python3-javapackages
 Requires:       coreutils
 Requires:       file
-Requires:       makedepend
-Requires:       rpmdevtools
-%if 0%{?fedora} >= 21
-Recommends:     python3-argcomplete
 Recommends:     python3-dnf
 Recommends:     python3-copr >= 1.58
-%endif
+Recommends:     python3-argcomplete
+
 %description -n python3-rpg
 Python3 interface for RPG.
+
+%description plugin-c
+C plugin for RPG
+
+%description plugin-python
+Python plugin for RPG
+
+%description plugin-find-to-pkgs
+Find to package plugin for RPG
+
+%description plugin-find-file
+Find file plugin for RPG
+
+%description plugin-find-library
+Find library plugin for RPG
+
+%description plugin-find-patch
+Find patch plugin for RPG
+
+%description plugin-find-translation
+Find translation plugin for RPG
+
+%description plugin-autotools
+Autotools plugin for RPG
+
+%description plugin-cmake
+Cmake plugin for RPG
+
+%description plugin-make
+Make plugin for RPG
+
+%description plugin-maven
+Maven plugin for RPG
+
+%description plugin-setuptools
+Setuptools plugin for RPG
+
+%description plugin-bash-command
+Bash command plugin for RPG
 
 %description
 RPG is tool, that guides people through the creation of a RPM
@@ -67,8 +211,62 @@ make ARGS="-V" test
 %{_mandir}/man8/rpg.8.gz
 %{_bindir}/rpg
 
+%files plugin-c
+%{python3_sitelib}/rpg/plugins/lang/c.py
+%{python3_sitelib}/rpg/plugins/lang/__pycache__/c*
+
+%files plugin-python
+%{python3_sitelib}/rpg/plugins/lang/python.py
+%{python3_sitelib}/rpg/plugins/lang/__pycache__/python*
+
+%files plugin-find-to-pkgs
+%{python3_sitelib}/rpg/plugins/misc/files_to_pkgs.py
+%{python3_sitelib}/rpg/plugins/misc/__pycache__/files_to_pkgs*
+
+%files plugin-find-file
+%{python3_sitelib}/rpg/plugins/misc/find_file.py
+%{python3_sitelib}/rpg/plugins/misc/__pycache__/find_file*
+
+%files plugin-find-library
+%{python3_sitelib}/rpg/plugins/misc/find_library.py
+%{python3_sitelib}/rpg/plugins/misc/__pycache__/find_library*
+
+%files plugin-find-patch
+%{python3_sitelib}/rpg/plugins/misc/find_patch.py
+%{python3_sitelib}/rpg/plugins/misc/__pycache__/find_patch*
+
+%files plugin-find-translation
+%{python3_sitelib}/rpg/plugins/misc/find_translation.py
+%{python3_sitelib}/rpg/plugins/misc/__pycache__/find_translation*
+
+%files plugin-autotools
+%{python3_sitelib}/rpg/plugins/project_builder/autotools.py
+%{python3_sitelib}/rpg/plugins/project_builder/__pycache__/autotools*
+
+%files plugin-cmake
+%{python3_sitelib}/rpg/plugins/project_builder/cmake.py
+%{python3_sitelib}/rpg/plugins/project_builder/__pycache__/cmake*
+
+%files plugin-make
+%{python3_sitelib}/rpg/plugins/project_builder/make.py
+%{python3_sitelib}/rpg/plugins/project_builder/__pycache__/make*
+
+%files plugin-maven
+%{python3_sitelib}/rpg/plugins/project_builder/maven.py
+%{python3_sitelib}/rpg/plugins/project_builder/__pycache__/maven*
+
+%files plugin-setuptools
+%{python3_sitelib}/rpg/plugins/project_builder/setuptools.py
+%{python3_sitelib}/rpg/plugins/project_builder/__pycache__/setuptools*
+
+%files plugin-bash-command
+%{python3_sitelib}/rpg/plugins/recover/bash_command.py
+%{python3_sitelib}/rpg/plugins/recover/__pycache__/bash_command*
+
 %files -n python3-rpg
 %{python3_sitelib}/rpg/
+%exclude %{python3_sitelib}/rpg/plugins
+
 
 %changelog
 * Wed Nov 25 2015 Jan Silhan <jsilhan@redhat.com> 0.0.5-1
