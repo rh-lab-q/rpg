@@ -62,7 +62,7 @@ class MockedSubprocess(object):
         return 1
 
 
-class SourceLoaderLongTest(RpgTestCase):
+class BuildLogParseTest(RpgTestCase):
 
     @mock.patch('subprocess.Popen', new=MockedSubprocess.Popen)
     @mock.patch('subprocess.PIPE', new=MockedSubprocess.PIPE)

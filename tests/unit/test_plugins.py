@@ -7,6 +7,7 @@ from rpg.plugins.misc.find_library import FindLibraryPlugin
 from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 from rpg.plugins.lang.c import CPlugin
 from rpg.plugins.source_loader.tar import TarPlugin
+from rpg.plugins.source_loader.zip import ZipPlugin
 from rpg.spec import Spec
 from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
@@ -216,6 +217,13 @@ class FindPatchPluginTest(PluginTestCase):
         tar_plug.extraction(temp_tar, self.temp_dir)
         self.assertTrue(list(self.temp_dir.glob("**/*")))
         self.assertTarEqualDir(temp_tar, self.temp_dir)
+
+    def test_zip(self):
+        zip_plugin = ZipPlugin()
+        temp_tar = self.test_project_dir / "archives" / "rpg-0.0.2-1.zip"
+        zip_plugin.extraction(temp_tar, self.temp_dir)
+        self.assertTrue(list(self.temp_dir.glob("**/*")))
+        self.assertZipEqualDir(temp_tar, self.temp_dir)
 
     def tearDown(self):
         rmtree(str(self.temp_dir))
