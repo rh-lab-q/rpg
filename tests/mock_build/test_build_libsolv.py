@@ -33,7 +33,7 @@ class BuildTest(RpgTestCase):
             r'-DENABLE_RUBY=1 '
             r'-DUSE_VENDORDIRS=1 '
             r'-DFEDORA=1 '
-            r'-DENABLE_LZMA_COMPRESSION=1'
+            r'-DENABLE_LZMA_COMPRESSION=1',
             "make"])
         self.base.build_project()
         self.base.run_compiled_source_analysis()
