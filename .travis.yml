@@ -15,7 +15,7 @@ install:
 - sudo pip install coveralls
 before_script:
 - docker run -i --privileged -d -v $HOME/build/$TRAVIS_REPO_SLUG:$HOME/build/$TRAVIS_REPO_SLUG --name test_fedora fedora:23 bash
-- docker exec -i test_fedora bash -c "dnf install -y python-copr mock tito libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
+- docker exec -i test_fedora bash -c "dnf install -y xz-java maven-local python-copr mock tito libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
 - docker exec -i test_fedora bash -c "dnf builddep -y hawkey"
 - docker exec -i test_fedora bash -c "dnf builddep -y libhif"
 - docker exec -i test_fedora bash -c "dnf builddep -y libsolv"

@@ -46,9 +46,11 @@ class MockedLogging:
 class MockedDNFQuery:
 
     def filter(self, **kwd):
-        if kwd["file__glob"] ==\
+        if "file__glob" in kwd and kwd["file__glob"] ==\
                 "/usr/lib/python3.4/site-packages/dnf/conf/read.py":
             return [MockedPackage("python3-dnf")]
+        elif "provides" in kwd and kwd["provides"]:
+            return True
         raise IndexError
 
     def available(self):
@@ -204,7 +206,7 @@ class FindPatchPluginTest(PluginTestCase):
         self.assertEqual(self.spec.URL, "http://some.url")
         self.assertEqual(self.spec.Version, "0.1")
         mavenplug.compiled(
-            self.test_project_dir / "maven", self.spec, self.sack)
+            self.test_project_dir / "maven", self.spec, MockSack())
         expected = set(["mvn(org.apache.felix:felix-parent:pom:)",
                         "mvn(org.ow2.asm:asm-all)",
                         "mvn(org.apache.rat:apache-rat-plugin)",

@@ -15,7 +15,7 @@ class MavenPlugin(Plugin):
         if (project_dir / "pom.xml").is_file():
             et = etree.parse(str(project_dir / "pom.xml")).getroot()
             for branch in et:
-                tag = re.sub(r'^{.*?}', '', branch.tag)
+                tag = re.sub(r'^{.*?}', '', str(branch.tag))
                 if tag == 'name':
                     spec.Name = str_to_pkgname(branch.text.strip())
                 elif tag == 'version':
@@ -54,7 +54,9 @@ class MavenPlugin(Plugin):
                 deps = et.findall('./dependency')
                 for dep in deps:
                     art = Artifact.from_xml_element(dep)
-                    spec.BuildRequires.add(art.get_rpm_str(art.version))
+                    if sack.query().filter(
+                            provides=art.get_rpm_str(art.version)):
+                        spec.BuildRequires.add(art.get_rpm_str(art.version))
             except (ArtifactValidationException,
                     ArtifactFormatException) as e:
                 logging.warning("Exception during maven dependency generation"

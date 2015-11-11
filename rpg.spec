@@ -105,6 +105,7 @@ Summary:    Maven plugin for RPG
 
 BuildRequires:  python3-javapackages
 
+Requires:       maven-local
 Requires:       python3 >= 3.4
 Requires:       python3-javapackages
 Requires:       python3-rpg = %{version}-%{release}
