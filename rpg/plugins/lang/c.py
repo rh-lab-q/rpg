@@ -41,14 +41,20 @@ class CPlugin(Plugin):
     MOCK_C_ERR = compile(r"fatal error\: ([^:]*\.[^:]*)\: "
                          r"No such file or directory")
 
+    _LAST_MISSING = ""
+
     def mock_recover(self, log, spec):
         """ This find dependencies makedepend didn't find. """
         for err in log:
             _missing = self.MOCK_C_ERR.search(err)
             if _missing:
                 _missing = _missing.group(1)
+                if self._LAST_MISSING == _missing:
+                    raise RuntimeError("Can't resolve missing file '{}'"
+                                       .format(_missing))
                 logging.debug("Adding missing file " + _missing)
                 spec.required_files.update(["*" + _missing])
                 spec.build_required_files.update(["*" + _missing])
+                self._LAST_MISSING = _missing
                 return True
         return False
