@@ -1,6 +1,9 @@
 class Plugin:
     """ Class from which are plugins derived
 
+        def extraction(self, source, dest):
+            pass
+
         def extracted(self, project_dir, spec, sack):
             pass
 

@@ -7,6 +7,7 @@ class BaseTest(RpgTestCase):
 
     def setUp(self):
         self.base = Base()
+        self.base.load_plugins()
 
     def test_checksum(self):
         shasum = self.base._compute_checksum(self.test_project_dir / "patch")

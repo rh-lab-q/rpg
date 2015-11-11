@@ -35,6 +35,22 @@ class PluginEngine:
         self.sack = sack
         self.plugins = set()
 
+    def execute_download(self, source, dest):
+        logging.info("plugin 'download' phase executed")
+        for plugin in self.plugins:
+            if self.call_method(
+                    self.load_method(plugin, "download"), source, dest):
+                return
+
+    def execute_extraction(self, source, dest):
+        """ Executes extraction of archive into destination directory """
+        logging.info("plugin 'extraction' phase executed")
+        for plugin in self.plugins:
+            if self.call_method(self.load_method(
+                                plugin, "extraction"), source, dest):
+                return
+        raise RuntimeError("No plugin to extract '{}'!".format(source))
+
     def execute_phase(self, phase, project_dir):
         """trigger all plugin methods that are subscribed to the phase"""
 
@@ -43,43 +59,17 @@ class PluginEngine:
             return
         logging.info("plugin phase %s executed" % phase)
         for plugin in self.plugins:
-            try:
-                method = getattr(plugin, phase)
-            except AttributeError:
-                continue
-            if callable(method):
-                plugin_name = plugin.__class__.__name__
-                logging.info("executing %s plugin" % plugin_name)
-                try:
-                    method(project_dir, self.spec, self.sack)
-                except Exception as err:
-                    msg = str(err) + "\n" +\
-                        ''.join(traceback.format_tb(err.__traceback__))
-                    logging.warn(
-                        "error during executing plugin %s:\n%s"
-                        % (plugin_name, msg))
+            self.call_method(
+                self.load_method(plugin, phase),
+                project_dir, self.spec, self.sack)
 
     def execute_mock_recover(self, log):
         """ Executes all mock_recoved methods that checkout returned log
             from mock build and parse it to find repairable errors. """
         _ret_code = False
         for plugin in self.plugins:
-            try:
-                method = getattr(plugin, "mock_recover")
-            except AttributeError:
-                continue
-            if callable(method):
-                logging.info(
-                    "executing {}.mock_recover()"
-                    .format(plugin.__class__.__name__))
-                try:
-                    _ret_code |= method(log, self.spec)
-                except Exception as ex:
-                    msg = str(ex) + "\n" +\
-                        ''.join(traceback.format_tb(ex.__traceback__))
-                    logging.warn(
-                        "error during execution \n{}"
-                        .format(msg))
+            _ret_code |= self.call_method(
+                self.load_method(plugin, "mock_recover"), log, self.spec)
         return _ret_code
 
     def load_plugins(self, path, excludes=[]):
@@ -125,3 +115,37 @@ class PluginEngine:
             path = newpath
         parts.reverse()
         return parts
+
+    @staticmethod
+    def get_class(method):
+        method_name = method.__name__
+        classes = [method.__self__.__class__
+                   if method.__self__ else
+                   method.im_class]
+        while classes:
+            c = classes.pop()
+            if method_name in c.__dict__:
+                return c
+            else:
+                classes = list(c.__bases__) + classes
+        return None
+
+    @staticmethod
+    def load_method(plugin, method):
+        try:
+            return getattr(plugin, method)
+        except AttributeError:
+            pass
+
+    @staticmethod
+    def call_method(method, *args, **kwargs):
+        try:
+            if callable(method):
+                ret = method(*args, **kwargs)
+                return ret if ret else False
+        except Exception as err:
+            logging.error(
+                "error during executing plugin {}:\n{}".format(
+                    PluginEngine.get_class(method).__name__, str(err) + "\n" +
+                    ''.join(traceback.format_tb(err.__traceback__))))
+        return False

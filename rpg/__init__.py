@@ -5,17 +5,15 @@ from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 from rpg.project_builder import ProjectBuilder
 from copr.client import CoprClient
 from rpg.package_builder import PackageBuilder, BuildException
-from rpg.source_loader import SourceLoader
 from rpg.spec import Spec
 from rpg.command import Command
 from rpg.conf import Conf
 from rpg.utils import path_to_str
-from re import search
-from os.path import isdir, basename
-from os import makedirs
-from os import geteuid
-from os import remove
+from os.path import isdir, isfile, basename
+from os import makedirs, geteuid
 import shutil
+from shutil import rmtree
+from tempfile import gettempdir, mkdtemp
 
 
 class Base(object):
@@ -55,7 +53,6 @@ class Base(object):
         self.spec = Spec()
         self.sack = None
         self._package_builder = PackageBuilder()
-        self._source_loader = SourceLoader()
 
     def load_dnf_sack(self):
         logging.info('DNF sack is loading')
@@ -169,25 +166,33 @@ class Base(object):
 
     def load_project_from_url(self, path):
         """executed in background after dir/tarball/SRPM selection"""
-        temp_arch = "downloaded_archive.tar.gz"
-        if search(r"github\.com/[^/]+/[^/]+/?$", str(path)):
-            self._source_loader.download_git_repo(path, temp_arch)
-            path = Path(temp_arch)
-        elif str(path).startswith("http"):
-            temp_arch = search(r"([^/]+\.[^/]+(?:\.[^/]+)?)$", str(path))\
-                .group(0)
-            self._source_loader.download_archive(path, temp_arch)
-            path = Path(temp_arch)
+        if not isdir(str(path)) and not isfile(str(path)):
+            temp = Path(gettempdir()) / "rpg-download"
+            self._plugin_engine.execute_download(path, temp)
+            path = Path(temp)
+            self._hash = self._compute_checksum(path)
+            self._input_name = "downloaded"
         else:
-            temp_arch = None
             path = Path(path)
-        self._hash = self._compute_checksum(path)
-        self._input_name = path.name
+            self._hash = self._compute_checksum(path)
+            self._input_name = path.name
         self._setup_workspace()
-        self._source_loader.load_sources(path, self.extracted_dir)
+        if isdir(str(path)):
+            Command("cp -pr " + str(path) + " " + str(self.extracted_dir))\
+                .execute()
+        else:
+            self._plugin_engine.execute_extraction(path, self.extracted_dir)
+        direc = [str(f) for f in self.extracted_dir.iterdir()]
+        if len(direc) == 1 and isdir(direc[0]):
+            direc = direc[0]
+            temp = mkdtemp()
+            Command('mv ' + direc + '/* ' + temp +
+                    ' && rm -rf ' + direc +
+                    ' && mv ' + temp + '/* ' + str(self.extracted_dir))\
+                .execute()
+            rmtree(temp)
+        logging.debug(str(direc))
         self.spec.prep = Command("%autosetup")
-        if temp_arch:
-            remove(temp_arch)
 
     def run_extracted_source_analysis(self):
         """executed in background after dir/tarball/SRPM selection"""
@@ -217,7 +222,7 @@ class Base(object):
 
     def write_spec(self):
         """ Creates spec file or rewrites old one. """
-        with open(str(self.spec_path), 'w') as spec_file:
+        with open(path_to_str(self.spec_path), 'w') as spec_file:
             spec_file.write(str(self.spec))
 
     def build_srpm(self):
@@ -262,6 +267,7 @@ class Base(object):
                             "Build failed! See logs in '{}'"
                             .format(self._package_builder.mock_logs))
                     break
+            Command("rm -rf {}".format(path_to_str(self.spec_path))).execute()
             analyse()
 
     def fetch_repos(self, dist, arch):
@@ -297,7 +303,8 @@ class Base(object):
             cmd = "find %s -type f -print0 | sort -z | xargs " \
                   "-0 sha1sum | sha1sum" % path_to_str(sources.resolve())
         else:
-            cmd = "sha1sum %s" % path_to_str(sources.resolve())
+            cmd = "cat %s | sha1sum" % path_to_str(sources.resolve())
+        logging.error(str(cmd))
         return Command([cmd]).execute()[:7]
 
     @property
