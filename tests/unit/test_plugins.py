@@ -6,13 +6,17 @@ from rpg.plugins.misc.find_translation import FindTranslationPlugin
 from rpg.plugins.misc.find_library import FindLibraryPlugin
 from rpg.plugins.misc.files_to_pkgs import FilesToPkgsPlugin
 from rpg.plugins.lang.c import CPlugin
+from rpg.plugins.source_loader.tar import TarPlugin
 from rpg.spec import Spec
 from unittest import mock
 from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 from rpg.plugins.project_builder.autotools import AutotoolsPlugin
 from rpg.plugins.project_builder.maven import MavenPlugin
+from pathlib import Path
+from shutil import rmtree
 import re
+import tempfile
 
 
 class MockSack:
@@ -56,6 +60,7 @@ class FindPatchPluginTest(PluginTestCase):
         self.maxDiff = None
         self.spec = Spec()
         self.sack = None
+        self.temp_dir = Path(tempfile.mkdtemp())
 
     def test_is_patch(self):
         patch = self.test_project_dir / "patch" / "0.patch"
@@ -204,3 +209,13 @@ class FindPatchPluginTest(PluginTestCase):
                         "mvn(org.apache.maven.plugins:maven-source-plugin)",
                         "mvn(org.apache.felix:maven-bundle-plugin)"])
         self.assertEqual(self.spec.BuildRequires, expected)
+
+    def test_tar(self):
+        tar_plug = TarPlugin()
+        temp_tar = self.test_project_dir / "archives" / "rpg-0.0.2-1.tar.gz"
+        tar_plug.extraction(temp_tar, self.temp_dir)
+        self.assertTrue(list(self.temp_dir.glob("**/*")))
+        self.assertTarEqualDir(temp_tar, self.temp_dir)
+
+    def tearDown(self):
+        rmtree(str(self.temp_dir))
