@@ -1,5 +1,5 @@
 Name:           rpg
-Version:        0.0.4
+Version:        0.0.5
 Release:        1%{?snapshot}%{?dist}
 Summary:        RPM Package Generator
 License:        GPLv2
@@ -75,6 +75,31 @@ make ARGS="-V" test
 %{python3_sitelib}/rpg/
 
 %changelog
+* Wed Nov 25 2015 Jan Silhan <jsilhan@redhat.com> 0.0.5-1
+- tito: added releasers (Jan Silhan)
+- Fix new docker image (Pavol Vican)
+- command: removed execute_from (Jan Silhan)
+- spec: remove unused methods and attribute (fix #333) (Jan Silhan)
+- add flake8-diff error code (fix #344) (Pavol Vican)
+- Autotools macro corrections (fix #312) (Miroslav Cibulka)
+- Separated packages rpg and python3-rpg (fix #275) (regeciovad)
+- Unit test for maven (fix #341) (xslouk02)
+- prefil of the mandatory page (fix #295) (Lukas Slouka)
+- AUTHORS added (Miroslav Cibulka)
+- Documenting code and some minor refactoring (Miroslav Cibulka)
+- libhif test (fix #327) (Miroslav Cibulka)
+- Extention of hawkey test (Miroslav Cibulka)
+- Ignore not found files in translating files to packages (Miroslav Cibulka)
+- apt-get yes to all - travis build fix (Miroslav Cibulka)
+- autotools: log-checking compiled-phase added (#334) (Miroslav Cibulka)
+- add parameter -y of command apt-get (Pavol Vican)
+- fix mock build test (Pavol Vican)
+- disable long test in spec file (fix #330) (Pavol Vican)
+- Fix test in TRAVIS CI + upload SRPM (fix #316) (fix #308) (fix #213) (Pavol
+  Vican)
+- Maven plugin (#fix #130) (LukasSlouka)
+- Changed long tests to connection tests (fix #329) (yousifd)
+
 * Wed Oct 07 2015 Jan Silhan <jsilhan@redhat.com> 0.0.4-1
 - Gui - meaning of asterisk added (fix #320) (regeciovad)
 - Changed gcc/g++ to makedepend, resolves system-depend tests (fix #296)
