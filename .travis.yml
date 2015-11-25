@@ -10,17 +10,12 @@ sudo: required
 services:
 - docker
 before_install:
-- echo "deb http://us.archive.ubuntu.com/ubuntu trusty main universe" | sudo tee -a /etc/apt/sources.list
-- sudo apt-get -y update
 - docker pull fedora:23
-- wget https://github.com/dgoodwin/tito/archive/tito-0.4.18-1.tar.gz -O /tmp/tito.tar.gz
 install:
-- sudo apt-get -y install mock
-- sudo pip install /tmp/tito.tar.gz coveralls
+- sudo pip install coveralls
 before_script:
 - docker run -i --privileged -d -v $HOME/build/$TRAVIS_REPO_SLUG:$HOME/build/$TRAVIS_REPO_SLUG --name test_fedora fedora:23 bash
-- tito build --test --srpm && cp /tmp/tito/*.src.rpm .
-- docker exec -i test_fedora bash -c "dnf install -y python-copr mock libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
+- docker exec -i test_fedora bash -c "dnf install -y python-copr mock tito libsolv-devel make gcc gcc-c++ python3-dnf python-devel 'dnf-command(builddep)'; dnf builddep -y $HOME/build/$TRAVIS_REPO_SLUG/rpg.spec"
 - docker exec -i test_fedora bash -c "dnf builddep -y hawkey"
 - docker exec -i test_fedora bash -c "dnf builddep -y libhif"
 - docker exec -i test_fedora bash -c "dnf builddep -y libsolv"

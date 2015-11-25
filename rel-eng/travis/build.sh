@@ -27,18 +27,16 @@ echo "Commit range: $COMMIT_RANGE"
 package="rpg"
 package_basename=$(basename $package)
 travis_home=$HOME/build/$TRAVIS_REPO_SLUG
-docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG"
+docker exec -i test_fedora bash -c "export LC_ALL=en_US.UTF-8; cd $travis_home; tito build --test --srpm"
 # process package
 echo "Building $package_basename"
 if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
-    docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG; 
-    python $travis_home/rel-eng/travis/upload.py $COPR_LOGIN nightly $COPR_TOKEN $travis_home/*.src.rpm rpg" >copr.sh 2>coprerr.out &
+    docker exec -i test_fedora bash -c "export travis_home=$travis_home; python $travis_home/rel-eng/travis/upload.py $COPR_LOGIN nightly $COPR_TOKEN /tmp/tito/*.src.rpm rpg" >copr.sh 2>coprerr.out &
     copr_pid=$!
 else
     LOGIN=Y29wcg==##pcpfxijfcfrjxinpvxrn
     TOKEN=wqzowgqlhelyuoxbplthrbrvqvcroq
-    docker exec -i test_fedora bash -c "export travis_home=$HOME/build/$TRAVIS_REPO_SLUG; 
-    python $travis_home/rel-eng/travis/upload.py $LOGIN rpgtest $TOKEN $travis_home/*.src.rpm rpg-pull-requests" >copr.sh 2>coprerr.out &
+    docker exec -i test_fedora bash -c "export travis_home=$travis_home; python $travis_home/rel-eng/travis/upload.py $LOGIN rpgtest $TOKEN /tmp/tito/*.src.rpm rpg-pull-requests" >copr.sh 2>coprerr.out &
     copr_pid=$!
 fi
 secs=0
