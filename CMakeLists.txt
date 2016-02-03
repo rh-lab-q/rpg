@@ -9,6 +9,8 @@ OPTION(WITH_MAN  "Enables installation of manual pages" OFF)
 # Python search:
 FIND_PACKAGE (PythonInterp 3.4 REQUIRED)
 
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info.major, sys.version_info.minor))" OUTPUT_VARIABLE PYTHON_MAJOR_DOT_MINOR_VERSION)
+
 # Python3QT5 search:
 EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c 
     "from PyQt5 import QtWidgets, QtCore, QtGui\n"
@@ -58,16 +60,16 @@ ENDIF ()
 
 # nosetests search:
 IF (EXISTS ${PROJECT_SOURCE_DIR}/tests)
-    FIND_PROGRAM (NoseProg nosetests-3.4)
-    IF (NoseProg)
-        MESSAGE (STATUS "Nosestests exists")
+    FIND_PROGRAM (NOSETESTS_EXE nosetests-${PYTHON_MAJOR_DOT_MINOR_VERSION})
+    IF (NOSETESTS_EXE)
+        MESSAGE (STATUS "${NOSETESTS_EXE} found")
         ENABLE_TESTING ()
         ADD_SUBDIRECTORY (tests)
-        ADD_CUSTOM_TARGET (test-unit COMMAND ${NoseProg} tests/unit WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-        ADD_CUSTOM_TARGET (test-connection COMMAND ${NoseProg} tests/connection WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-        ADD_CUSTOM_TARGET (test-mock COMMAND ${NoseProg} tests/mock_build WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-unit COMMAND ${NOSETESTS_EXE} tests/unit WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-connection COMMAND ${NOSETESTS_EXE} tests/connection WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+        ADD_CUSTOM_TARGET (test-mock COMMAND ${NOSETESTS_EXE} tests/mock_build WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     ELSE ()
-        MESSAGE (WARNING "Nosetests is missing! - no tests available")
+        MESSAGE (WARNING "Nosetests is missing! - no tests available - ${NOSETESTS_EXE}")
     ENDIF ()
 ELSE ()
     MESSAGE (WARNING "No tests available")
