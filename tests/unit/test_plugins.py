@@ -12,7 +12,7 @@ from rpg.plugins.project_builder.cmake import CMakePlugin
 from rpg.plugins.project_builder.setuptools import SetuptoolsPlugin
 from rpg.plugins.project_builder.autotools import AutotoolsPlugin
 from rpg.plugins.project_builder.maven import MavenPlugin
-from glob import glob
+import re
 
 
 class MockSack:
@@ -102,8 +102,9 @@ class FindPatchPluginTest(PluginTestCase):
         plugin = PythonPlugin()
         plugin.patched(self.test_project_dir / "py" / "requires",
                        self.spec, self.sack)
-        imports = glob("/usr/lib*/python*/lib-dynload/math.cpython-*m.so")
-        self.assertEqual(self.spec.required_files, set(imports))
+        self.assertTrue(any(re.match(
+            r"/usr/lib.*/python.*/lib-dynload/math\.cpython.*\.so", req)
+            for req in self.spec.required_files))
 
     @mock.patch("logging.log", new=MockedLogging.log)
     def test_files_to_pkgs(self):
