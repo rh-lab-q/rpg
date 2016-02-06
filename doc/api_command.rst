@@ -1,6 +1,6 @@
 Command module
 ==============
 
-.. automodule:: rpg.command
+.. automodule:: command
     :members:
     :undoc-members:

@@ -4,6 +4,9 @@ class Plugin:
         def extraction(self, source, dest):
             pass
 
+        def download(self, source, dest):
+            pass
+
         def extracted(self, project_dir, spec, sack):
             pass
 

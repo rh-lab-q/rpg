@@ -1,6 +1,6 @@
 Base class
 ==========
 
-.. autoclass:: __init__.Base
+.. automodule:: __init__
     :members:
     :undoc-members:

@@ -1,6 +1,6 @@
 Plugin class
 ============
 
-.. autoclass:: rpg.plugin.Plugin
+.. automodule:: plugin
     :members:
     :undoc-members:
