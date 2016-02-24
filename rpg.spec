@@ -4,7 +4,7 @@ Release:        1%{?snapshot}%{?dist}
 Summary:        RPM Package Generator
 License:        GPLv2
 URL:            https://github.com/rh-lab-q/rpg
-Source0:        https://github.com/rh-lab-q/%{name}/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/rh-lab-q/%{name}/archive/%{name}-%{version}-1.tar.gz
 BuildRequires:  cmake
 BuildRequires:  python3-qt5
 BuildRequires:  qt5-qtbase-gui
