@@ -5,9 +5,10 @@ from os import path
 
 class Conf:
 
-    directories = []
-    exclude = []
-    load_dnf = True
+    def __init__(self):
+        self.directories = []
+        self.exclude = []
+        self.load_dnf = True
 
     def parse_cmdline(self):
         self.parser = argparse.ArgumentParser(

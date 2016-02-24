@@ -9,7 +9,7 @@ from rpg.spec import Spec
 from rpg.command import Command
 from rpg.conf import Conf
 from rpg.utils import path_to_str
-from os.path import isdir, isfile, basename
+from os.path import isdir, isfile
 from os import makedirs, geteuid
 import shutil
 from shutil import rmtree
@@ -104,7 +104,7 @@ class Base(object):
         """ Returns path where compiled, extracted, installed
             directories are """
         try:
-            return Path("/tmp/rpg-%s-%s" % (self._input_name, self._hash))
+            return Path("/tmp/rpg-%s" % self._hash)
         except AttributeError:
             msg = "`load_project_from_url` method needs to be called first"
             raise RuntimeError(msg)
@@ -169,13 +169,9 @@ class Base(object):
         if not isdir(str(path)) and not isfile(str(path)):
             temp = Path(gettempdir()) / "rpg-download"
             self._plugin_engine.execute_download(path, temp)
-            path = Path(temp)
-            self._hash = self._compute_checksum(path)
-            self._input_name = "downloaded"
-        else:
-            path = Path(path)
-            self._hash = self._compute_checksum(path)
-            self._input_name = path.name
+            path = temp
+        self.source_path = path = Path(path)
+        self._hash = self._compute_checksum(path)
         self._setup_workspace()
         if isdir(str(path)):
             Command("cp -pr " + str(path) + " " + str(self.extracted_dir))\
@@ -328,14 +324,6 @@ class Base(object):
 
     def guess_name(self):
         """ Returns guessed name from source path """
-        suffixes = [".zip", ".tar", ".rar", ".tgz", ".lzma"]
-        name = str(self._input_name)
-        if isdir(name):
-            return basename(name)
-        else:
-            for suffix in suffixes:
-                if suffix in name:
-                    return suffix.join(name.split(suffix)[:-1])
         return ""
 
     def guess_provide(self):

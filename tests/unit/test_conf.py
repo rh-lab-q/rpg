@@ -17,12 +17,6 @@ class ConfTest(RpgTestCase):
         conf.parse_cmdline()
         self.assertEqual(str(['tests/project/py']), str(conf.directories))
 
-    def test_include_dir_fail(self):
-        sys.argv = ["rpg", "--plugin-dir", str("NotADir")]
-        conf = Conf()
-        conf.parse_cmdline()
-        self.assertEqual(str(["tests/project/py"]), str(conf.directories))
-
     def test_exclude_plug(self):
         sys.argv = ["rpg", "--disable-plugin", str("TestPlugin")]
         conf = Conf()
