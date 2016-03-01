@@ -161,6 +161,9 @@ class FindPatchPluginTest(PluginTestCase):
             self.test_project_dir / "setuptools", self.spec, self.sack)
         self.assertEqual(self.spec.Name, "SetupToolsTestProject")
         self.assertEqual(self.spec.Version, "0.1")
+        self.assertEqual(self.spec.description, "test description")
+        self.assertEqual(self.spec.URL, "http://test.example")
+        self.assertEqual(self.spec.License, "BSD")
         setuptplug.patched(
             self.test_project_dir / "setuptools", self.spec, self.sack)
         self.assertEqual(self.spec.BuildRequires, {"python3-setuptools"})
